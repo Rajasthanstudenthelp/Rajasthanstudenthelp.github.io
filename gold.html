@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gold & Silver Weight Converter with Calculator</title>
+<style>
+/* आपका पुराना और सुंदर ऑरिजिनल डिज़ाइन */
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(135deg, #fdf6e3, #fbe9b8);
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+}
+.container {
+  background: #fff8e1;
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  max-width: 480px;
+  width: 100%;
+  border: 2px solid #ffd700;
+  position: relative;
+}
+h1 {
+  text-align: center;
+  color: #b8860b;
+  font-size: 28px;
+  text-shadow: 1px 1px 2px #fffacd;
+  margin-top: 40px;
+}
+.flag-icon, .calc-icon {
+  position: absolute;
+  top: 15px;
+  font-size: 28px;
+  cursor: pointer;
+  transition: 0.3s;
+  z-index: 10;
+}
+.flag-icon:hover, .calc-icon:hover { transform: scale(1.2); }
+.flag-icon { left: 15px; }
+.calc-icon { left: 60px; }
+.date-time {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 15px;
+  font-weight: bold;
+  color: #5c3a21;
+}
+label { display: block; margin-top: 15px; font-weight: bold; color: #8b5e3c; }
+input, select {
+  width: 100%; padding: 12px; margin-top: 5px;
+  border-radius: 12px; border: 1px solid #daa520;
+  font-size: 16px; background: #fff8dc;
+  box-sizing: border-box;
+}
+button {
+  width: 100%; padding: 14px; margin-top: 20px;
+  background: #ffd700; color: #5c3a21; font-size: 16px;
+  font-weight: bold; border: none; border-radius: 12px;
+  cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  transition: 0.3s;
+}
+button:hover { background: #e6c200; }
+.result, .friendly-result, .price-result {
+  margin-top: 20px; background: #fffacd; padding: 15px;
+  border-radius: 12px; font-size: 16px; white-space: pre-line;
+  border: 1px solid #ffd700; color: #8b5e3c; font-weight: bold;
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+  display: none;
+}
+
+/* कैलकुलेटर का सुंदर डिज़ाइन */
+#calculator {
+  display: none; position: absolute;
+  top: 100px; left: 50%;
+  transform: translateX(-50%);
+  width: 320px; max-width: 95%;
+  background: #fff8dc; border: 2px solid #daa520;
+  border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  z-index: 100; resize: both; overflow: auto;
+}
+#calc-header {
+  background: #ffd700; padding: 10px;
+  cursor: move; border-top-left-radius: 13px;
+  border-top-right-radius: 13px; font-weight: bold;
+  text-align: center; position: relative;
+  user-select: none;
+}
+#calc-close {
+  position: absolute;
+  top: 2px;
+  right: 8px;
+  font-size: 22px;
+  color: red;
+  cursor: pointer;
+  font-weight: bold;
+}
+#calc-display {
+  width: 90%; margin: 10px auto;
+  font-size: 24px;
+  padding: 10px;
+  border-radius: 8px; border: 1px solid #daa520;
+  background: #fffacd; height: 70px; text-align: right;
+  white-space: pre-line; overflow-wrap: break-word;
+  display: block; box-sizing: border-box;
+}
+.calc-buttons {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 8px; padding: 10px;
+}
+.calc-buttons button {
+  padding: 20px; font-size: 20px; border-radius: 10px;
+  border: none; cursor: pointer; background: #ffd700;
+  color: #5c3a21; box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+  margin-top: 0;
+}
+.calc-buttons button:hover { background: #e6c200; }
+@media(max-width:400px){
+  #calc-display { font-size: 20px; height: 60px; }
+  .calc-buttons button { padding: 15px; font-size: 18px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="flag-icon" id="langToggle" onclick="toggleLang()">🇮🇳</div>
+  <div class="calc-icon" id="calcToggle">
+    <img src="https://img.icons8.com/ios/452/calculator.png" alt="Calculator Icon" style="width:28px; height:28px;">
+  </div>
+
+  <div class="date-time" id="dateTime"></div>
+  <h1 id="title">Gold & Silver Weight Converter</h1>
+
+  <label for="pricePer10" id="lblPrice">10 ग्राम = कितने रुपये?</label>
+  <input type="number" step="0.01" id="pricePer10" placeholder="यहाँ 10 ग्राम का भाव डालें">
+
+  <label for="value" id="lblValue">मान डालें:</label>
+  <input type="number" step="0.0001" id="value" placeholder="यहाँ वजन डालें">
+
+  <label for="fromUnit" id="lblFrom">कहाँ से बदलना है:</label>
+  <select id="fromUnit"></select>
+
+  <label for="toUnitInteger" id="lblTo1">पहले ऑप्शन में बदलना है:</label>
+  <select id="toUnitInteger"></select>
+
+  <label for="toUnitDecimal" id="lblTo2">दूसरे हिस्से में बदलना है:</label>
+  <select id="toUnitDecimal"></select>
+
+  <button onclick="convertWeight()" id="btnConvert">Convert</button>
+
+  <div class="result" id="result"></div>
+  <div class="friendly-result" id="friendlyResult"></div>
+  <div class="price-result" id="priceResult"></div>
+</div>
+
+<div id="calculator">
+  <div id="calc-header">
+    Calculator
+    <span id="calc-close" onclick="closeCalculator()">×</span>
+  </div>
+  <input type="text" id="calc-display" readonly>
+  <div class="calc-buttons">
+    <button onclick="calcPress('C')">C</button>
+    <button onclick="calcPress('⌫')">⌫</button>
+    <button onclick="calcPress('%')">%</button>
+    <button onclick="calcPress('/')">÷</button>
+
+    <button onclick="calcPress('7')">7</button>
+    <button onclick="calcPress('8')">8</button>
+    <button onclick="calcPress('9')">9</button>
+    <button onclick="calcPress('*')">×</button>
+
+    <button onclick="calcPress('4')">4</button>
+    <button onclick="calcPress('5')">5</button>
+    <button onclick="calcPress('6')">6</button>
+    <button onclick="calcPress('-')">−</button>
+
+    <button onclick="calcPress('1')">1</button>
+    <button onclick="calcPress('2')">2</button>
+    <button onclick="calcPress('3')">3</button>
+    <button onclick="calcPress('+')">+</button>
+
+    <button onclick="calcPress('()')">( )</button>
+    <button onclick="calcPress('0')">0</button>
+    <button onclick="calcPress('.')">.</button>
+    <button style="background:#32cd32; color:#fff;" onclick="calcPress('=')">=</button>
+  </div>
+</div>
+
+<script>
+const conversion = { tola:11.664, gram:1, kg:1000, mg:0.001, chirmi:0.1215, masha:11.664/12, ratti:(11.664/12)/8, ana:11.664/16 };
+const labels = {
+  hi: { title:"सोना-चाँदी वजन परिवर्तक", lblValue:"मान (वजन) डालें:", lblFrom:"कहाँ से बदलना है:", lblTo1:"पहले ऑप्शन में बदलना है:", lblTo2:"दूसरे हिस्से में बदलना है:", btnConvert:"बदलें", lblPrice:"10 ग्राम = कितने रुपये?",
+        units:{tola:"तोला",gram:"ग्राम",kg:"किलो",mg:"मिलीग्राम",chirmi:"चिरमी",masha:"माशा",ratti:"रत्ती",ana:"आना"},
+        invalid:"कृपया एक सही संख्या डालें।",
+        result:(v,fl,ip,il,dp,dl,cd)=>`पहले ऑप्शन में: ${v} ${fl} = ${ip} ${il} और दशमलव हिस्सा ${dp.toFixed(4)} ${il}\nदशमलव हिस्सा (${dp.toFixed(4)} ${il}) = ${cd.toFixed(4)} ${dl}`,
+        friendly:(v,fl,ip,il,cd,dl)=>`${v} ${fl} = ${ip} ${il} और ${cd.toFixed(3)} ${dl}`,
+        price: total=>`कुल मूल्य = ₹${total.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
+  },
+  en: { title:"Gold & Silver Weight Converter", lblValue:"Enter Weight:", lblFrom:"Convert from:", lblTo1:"Convert first into:", lblTo2:"Convert remainder into:", btnConvert:"Convert", lblPrice:"Price per 10 Grams (₹):",
+        units:{tola:"Tola",gram:"Gram",kg:"Kilogram",mg:"Milligram",chirmi:"Chirmi",masha:"Masha",ratti:"Ratti",ana:"Ana"},
+        invalid:"Please enter a valid number.",
+        result:(v,fl,ip,il,dp,dl,cd)=>`Step 1: ${v} ${fl} = ${ip} ${il} and decimal part ${dp.toFixed(4)} ${il}\nStep 2: Decimal part (${dp.toFixed(4)} ${il}) = ${cd.toFixed(4)} ${dl}`,
+        friendly:(v,fl,ip,il,cd,dl)=>`${v} ${fl} = ${ip} ${il} and ${cd.toFixed(3)} ${dl}`,
+        price: total=>`Total Value = ₹${total.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
+  }
+};
+let currentLang="hi";
+
+function fillUnits(){
+  ["fromUnit","toUnitInteger","toUnitDecimal"].forEach(id=>{
+    let sel=document.getElementById(id);
+    let previousValue = sel.value; 
+    sel.innerHTML="";
+    for(let key in labels[currentLang].units){
+      let opt=document.createElement("option");
+      opt.value=key;
+      opt.textContent=labels[currentLang].units[key];
+      sel.appendChild(opt);
+    }
+    if(previousValue) { sel.value = previousValue; }
+  });
+}
+
+function toggleLang(){
+  currentLang=(currentLang==="hi")?"en":"hi";
+  document.getElementById("langToggle").innerText=(currentLang==="hi")?"🇮🇳":"🇬🇧";
+  applyLang();
+  
+  let valInput = document.getElementById('value').value;
+  if(valInput !== "") { convertWeight(); }
+}
+
+function applyLang(){
+  document.getElementById("title").innerText=labels[currentLang].title;
+  document.getElementById("lblValue").innerText=labels[currentLang].lblValue;
+  document.getElementById("lblFrom").innerText=labels[currentLang].lblFrom;
+  document.getElementById("lblTo1").innerText=labels[currentLang].lblTo1;
+  document.getElementById("lblTo2").innerText=labels[currentLang].lblTo2;
+  document.getElementById("btnConvert").innerText=labels[currentLang].btnConvert;
+  document.getElementById("lblPrice").innerText=labels[currentLang].lblPrice;
+  fillUnits();
+}
+
+function convertWeight(){
+  let value=parseFloat(document.getElementById('value').value);
+  let pricePer10=parseFloat(document.getElementById('pricePer10').value);
+  
+  let resDiv = document.getElementById('result');
+  let frDiv = document.getElementById('friendlyResult');
+  let prDiv = document.getElementById('priceResult');
+
+  if(isNaN(value)){
+    resDiv.style.display = "block";
+    resDiv.innerText=labels[currentLang].invalid;
+    frDiv.style.display = "none";
+    prDiv.style.display = "none";
+    return;
+  }
+  
+  let fromUnit=document.getElementById('fromUnit').value;
+  let toUnitInt=document.getElementById('toUnitInteger').value;
+  let toUnitDec=document.getElementById('toUnitDecimal').value;
+  
+  let fromLabel=labels[currentLang].units[fromUnit];
+  let intLabel=labels[currentLang].units[toUnitInt];
+  let decLabel=labels[currentLang].units[toUnitDec];
+
+  let valueInGram=value*conversion[fromUnit];
+  let convertedTotal=valueInGram/conversion[toUnitInt];
+  let integerPart=Math.floor(convertedTotal);
+  let decimalPart=convertedTotal-integerPart;
+  let decimalInGram=decimalPart*conversion[toUnitInt];
+  let convertedDecimal=decimalInGram/conversion[toUnitDec];
+
+  resDiv.style.display = "block";
+  frDiv.style.display = "block";
+  
+  resDiv.innerText=labels[currentLang].result(value,fromLabel,integerPart,intLabel,decimalPart,decLabel,convertedDecimal);
+  frDiv.innerText=labels[currentLang].friendly(value,fromLabel,integerPart,intLabel,convertedDecimal,decLabel);
+
+  if(!isNaN(pricePer10) && pricePer10>0){
+    prDiv.style.display = "block";
+    let pricePerGram=pricePer10/10;
+    let totalPrice=valueInGram*pricePerGram;
+    prDiv.innerText=labels[currentLang].price(totalPrice);
+  } else { prDiv.style.display = "none"; }
+}
+
+function updateDateTime(){
+  let now=new Date();
+  let options={weekday:'long'};
+  let day=now.toLocaleDateString('hi-IN',options);
+  let time=now.toLocaleTimeString([], {hour:'numeric',minute:'numeric',hour12:true});
+  let date=now.toLocaleDateString('en-GB');
+  document.getElementById("dateTime").innerText=`${time} | ${date} | ${day}`;
+}
+setInterval(updateDateTime,1000);
+updateDateTime();
+
+window.onload = () => {
+  fillUnits();
+  document.getElementById("fromUnit").value="gram";
+  document.getElementById("toUnitInteger").value="ana";
+  document.getElementById("toUnitDecimal").value="chirmi";
+  applyLang();
+};
+
+// --- CUSTOM MATH EVALUATOR (No eval = No Error & No Malware Warning) ---
+function safeEvaluate(str) {
+    str = str.replace(/\s+/g, '').replace(/%/g, '*0.01');
+    function calc(s) {
+        let reMulDiv = /(-?\d*\.?\d+)([*/])(-?\d*\.?\d+)/;
+        while (reMulDiv.test(s)) {
+            s = s.replace(reMulDiv, (m, a, o, b) => {
+                return o === '*' ? Number(a) * Number(b) : Number(a) / Number(b);
+            });
+        }
+        s = s.replace(/\+-/g, '-').replace(/--/g, '+').replace(/^\+/, '');
+        let reAddSub = /(-?\d*\.?\d+)([+-])(\d*\.?\d+)/;
+        while (reAddSub.test(s)) {
+            s = s.replace(reAddSub, (m, a, o, b) => {
+                return o === '+' ? Number(a) + Number(b) : Number(a) - Number(b);
+            });
+        }
+        return s;
+    }
+    while (str.includes('(')) {
+        let prev = str;
+        str = str.replace(/\(([^()]+)\)/g, (m, inner) => calc(inner));
+        if (str === prev) throw new Error("Bracket Error");
+    }
+    let result = Number(calc(str));
+    if(isNaN(result) || !isFinite(result)) throw new Error("Math Error");
+    return result;
+}
+
+const calcPopup=document.getElementById('calculator');
+const calcDisplay=document.getElementById('calc-display');
+let calcExp="";
+
+document.getElementById('calcToggle').onclick=()=>{ 
+  calcPopup.style.display=(calcPopup.style.display==='block')?'none':'block'; 
+};
+function closeCalculator(){ calcPopup.style.display='none'; }
+
+function calcPress(val){
+    if(val==='C'){ calcExp=""; calcDisplay.value=""; return; }
+  if(val==='⌫'){ calcExp = calcExp.slice(0, -1); calcDisplay.value = calcExp; return; }
+  
+  if(val==='='){ 
+    if(calcExp.trim() === '') return;
+    try{ 
+      let cleanExp = calcExp;
+      if (/[+\-*/.]$/.test(cleanExp)) { cleanExp = cleanExp.slice(0, -1); }
+      
+      // यह सुरक्षित कस्टम मैथ सॉल्वर अब Error नहीं देगा
+      let res = safeEvaluate(cleanExp);
+      
+      let finalRes = Number.isInteger(res) ? res : parseFloat(res.toFixed(4));
+      calcDisplay.value = calcExp + "\n= " + finalRes; 
+      calcExp = finalRes.toString(); 
+    }
+    catch(e){ 
+      calcDisplay.value = "Error"; 
+      calcExp=""; 
+    }
+    return; 
+  }
+  
+  if(val==='()'){ 
+    let open = (calcExp.match(/\(/g) || []).length;
+    let close = (calcExp.match(/\)/g) || []).length;
+    calcExp += (open > close) ? ")" : "("; 
+    calcDisplay.value=calcExp; 
+    return; 
+  }
+  
+  calcExp += val; 
+  calcDisplay.value = calcExp; 
+}
+
+// कैलकुलेटर को स्क्रीन पर खिसकाने का सिस्टम
+let isDragging=false, offsetX, offsetY;
+const header=document.getElementById('calc-header');
+
+header.addEventListener('mousedown', function(e){ 
+    if(e.target.id==='calc-close') return; 
+    isDragging=true; 
+    offsetX=e.clientX-calcPopup.offsetLeft; 
+    offsetY=e.clientY-calcPopup.offsetTop; 
+});
+document.addEventListener('mouseup', ()=>{ isDragging=false; });
+document.addEventListener('mousemove', function(e){ 
+    if(isDragging){ 
+        calcPopup.style.left=(e.clientX-offsetX)+'px'; 
+        calcPopup.style.top=(e.clientY-offsetY)+'px'; 
+    } 
+});
+
+// मोबाइल टच के लिए Drag सिस्टम
+header.addEventListener('touchstart', function(e){ 
+    if(e.target.id==='calc-close') return;
+    let touch = e.touches[0];
+    isDragging=true; 
+    offsetX=touch.clientX-calcPopup.offsetLeft; 
+    offsetY=touch.clientY-calcPopup.offsetTop; 
+});
+document.addEventListener('touchend', ()=>{ isDragging=false; });
+document.addEventListener('touchmove', function(e){ 
+    if(isDragging){ 
+        e.preventDefault(); 
+        let touch = e.touches[0];
+        calcPopup.style.left=(touch.clientX-offsetX)+'px'; 
+        calcPopup.style.top=(touch.clientY-offsetY)+'px'; 
+    } 
+}, { passive: false });
+</script>
+</body>
+</html>
