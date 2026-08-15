@@ -3,99 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ISB-24 Web3 Messenger</title>
+    <title>ISB-24 Premium Web3</title>
     <!-- Google Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- Google Login API -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
-        /* WhatsApp Style Themes */
-        :root { --app-bar: #075e54; --app-bar-dark: #128c7e; --bg-color: #ece5dd; --card-bg: #ffffff; --text-color: #303030; --text-muted: #888888; --primary: #25D366; --secondary: #34B7F1; --input-bg: #ffffff; --border: #e0e0e0; --chat-sent: #dcf8c6; --chat-recv: #ffffff; }
-        [data-theme="dark"] { --app-bar: #1f2c34; --app-bar-dark: #128c7e; --bg-color: #0b141a; --card-bg: #111b21; --text-color: #e9edef; --text-muted: #8696a0; --primary: #00a884; --secondary: #53bdeb; --input-bg: #2a3942; --border: #222d34; --chat-sent: #005c4b; --chat-recv: #202c33; }
+        /* 12 PREMIUM THEMES */
+        :root { /* 1. Royal Indigo (Default Day) */ --primary: #3F51B5; --primary-dark: #303F9F; --bg: #f0f2f5; --surface: #ffffff; --text: #1c1e21; --text-muted: #65676B; --border: #e4e6eb; --msg-sent: #E8EAF6; --msg-recv: #ffffff; --nav-bg: #ffffff; }
+        [data-theme="dark"] { /* 2. Midnight Dark */ --primary: #5C6BC0; --primary-dark: #3F51B5; --bg: #121212; --surface: #1e1e1e; --text: #e4e6eb; --text-muted: #b0b3b8; --border: #333333; --msg-sent: #2c387e; --msg-recv: #242526; --nav-bg: #1e1e1e; }
+        [data-theme="telegram"] { /* 3. Ocean Blue */ --primary: #2AABEE; --primary-dark: #229ED9; --bg: #f4f4f4; --surface: #ffffff; --text: #222222; --text-muted: #888888; --border: #e0e0e0; --msg-sent: #E1F0FA; --msg-recv: #ffffff; --nav-bg: #ffffff; }
+        [data-theme="sunset"] { /* 4. Sunset Orange */ --primary: #FF5722; --primary-dark: #E64A19; --bg: #fdf8f5; --surface: #ffffff; --text: #3e2723; --text-muted: #8d6e63; --border: #fbe9e7; --msg-sent: #fbe9e7; --msg-recv: #ffffff; --nav-bg: #ffffff; }
+        [data-theme="forest"] { /* 5. Deep Forest */ --primary: #2E7D32; --primary-dark: #1B5E20; --bg: #f1f8e9; --surface: #ffffff; --text: #1b5e20; --text-muted: #7cb342; --border: #c8e6c9; --msg-sent: #e8f5e9; --msg-recv: #ffffff; --nav-bg: #ffffff; }
+        [data-theme="ruby"] { /* 6. Ruby Red */ --primary: #E91E63; --primary-dark: #C2185B; --bg: #fce4ec; --surface: #ffffff; --text: #4a148c; --text-muted: #ab47bc; --border: #f8bbd0; --msg-sent: #fce4ec; --msg-recv: #ffffff; --nav-bg: #ffffff; }
+        [data-theme="cyberpunk"] { /* 7. Cyberpunk */ --primary: #00E5FF; --primary-dark: #00B8D4; --bg: #09090b; --surface: #17171c; --text: #00E5FF; --text-muted: #b2ebf2; --border: #006064; --msg-sent: #006064; --msg-recv: #17171c; --nav-bg: #17171c; }
+        [data-theme="coffee"] { /* 8. Classic Coffee */ --primary: #795548; --primary-dark: #5D4037; --bg: #efebe9; --surface: #ffffff; --text: #3e2723; --text-muted: #8d6e63; --border: #d7ccc8; --msg-sent: #d7ccc8; --msg-recv: #ffffff; --nav-bg: #ffffff; }
+        [data-theme="mint"] { /* 9. Fresh Mint */ --primary: #00BFA5; --primary-dark: #00897B; --bg: #e0f2f1; --surface: #ffffff; --text: #004d40; --text-muted: #26a69a; --border: #b2dfdb; --msg-sent: #e0f2f1; --msg-recv: #ffffff; --nav-bg: #ffffff; }
+        [data-theme="gold"] { /* 10. Royal Gold */ --primary: #FFB300; --primary-dark: #FF8F00; --bg: #fff8e1; --surface: #ffffff; --text: #3e2723; --text-muted: #a1887f; --border: #ffecb3; --msg-sent: #ffecb3; --msg-recv: #ffffff; --nav-bg: #ffffff; }
+        [data-theme="orchid"] { /* 11. Dark Orchid */ --primary: #9C27B0; --primary-dark: #7B1FA2; --bg: #f3e5f5; --surface: #ffffff; --text: #4a148c; --text-muted: #ba68c8; --border: #e1bee7; --msg-sent: #f3e5f5; --msg-recv: #ffffff; --nav-bg: #ffffff; }
+        [data-theme="amoled"] { /* 12. Pitch Black (AMOLED) */ --primary: #ffffff; --primary-dark: #cccccc; --bg: #000000; --surface: #0a0a0a; --text: #ffffff; --text-muted: #666666; --border: #222222; --msg-sent: #1a1a1a; --msg-recv: #0a0a0a; --nav-bg: #050505; }
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; transition: 0.3s; overflow-x: hidden;}
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; transition: background-color 0.3s, color 0.3s; overflow-x: hidden;}
         
-        .app-bar { background-color: var(--app-bar); color: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); position: sticky; top: 0; z-index: 100; }
-        .app-title { font-size: 20px; font-weight: bold; letter-spacing: 1px; }
-        .app-bar-icons { display: flex; gap: 20px; align-items: center; }
-        .app-bar i { font-size: 24px; cursor: pointer; color: inherit; }
-        
-        .tabs { display: flex; background-color: var(--app-bar); color: rgba(255,255,255,0.7); position: sticky; top: 54px; z-index: 99; box-shadow: 0 2px 5px rgba(0,0,0,0.1);}
-        .tab { flex: 1; text-align: center; padding: 12px 0; font-weight: bold; cursor: pointer; transition: 0.3s; border-bottom: 3px solid transparent; text-transform: uppercase; font-size: 14px;}
-        .tab.active { color: #fff; border-bottom-color: #fff; }
+        /* App Header */
+        .app-bar { background-color: var(--surface); color: var(--primary); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.05);}
+        .app-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+        .app-bar-icons { display: flex; gap: 15px; align-items: center; }
+        .app-bar i { font-size: 24px; cursor: pointer; color: var(--text-muted); transition: color 0.2s; }
+        .app-bar i:hover { color: var(--primary); }
 
-        .container { max-width: 600px; margin: 0 auto; padding-bottom: 80px; position: relative;}
+        /* Main Container */
+        .container { max-width: 800px; margin: 0 auto; padding-bottom: 70px; }
         .tab-content { display: none; animation: fadeIn 0.3s ease-out; }
         .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .list-item { display: flex; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--border); cursor: pointer; background: var(--card-bg); transition: 0.2s;}
-        .list-item:active { background: var(--border); }
-        .avatar { width: 50px; height: 50px; background: var(--primary); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #fff; font-size: 24px; font-weight: bold; margin-right: 15px; text-transform: uppercase;}
+        /* Lists */
+        .list-item { display: flex; align-items: center; padding: 15px 20px; cursor: pointer; background: var(--surface); transition: 0.2s; margin: 5px 10px; border-radius: 12px; border: 1px solid transparent;}
+        .list-item:hover { border: 1px solid var(--border); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.02);}
+        .list-item:active { transform: scale(0.98); }
+        .avatar { width: 54px; height: 54px; background: var(--primary); color: var(--surface); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 22px; font-weight: bold; margin-right: 15px; text-transform: uppercase; box-shadow: 0 2px 5px rgba(0,0,0,0.1);}
         .list-info { flex: 1; overflow: hidden; }
-        .list-title { font-size: 16px; font-weight: bold; color: var(--text-color); margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-        .list-subtitle { font-size: 13px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 5px;}
-        .list-time { font-size: 12px; color: var(--text-muted); }
+        .list-title { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .list-subtitle { font-size: 14px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 5px;}
+        .list-time { font-size: 12px; color: var(--text-muted); font-weight: 500; }
 
-        .fab { position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px; background: var(--primary); color: #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; z-index: 90; transition: 0.2s;}
-        .fab:active { transform: scale(0.95); }
+        /* Floating Action Button */
+        .fab { position: fixed; bottom: 85px; right: 20px; width: 60px; height: 60px; background: var(--primary); color: var(--surface); border-radius: 20px; display: flex; justify-content: center; align-items: center; box-shadow: 0 10px 20px rgba(0,0,0,0.15); cursor: pointer; z-index: 90; transition: 0.3s;}
+        .fab:hover { transform: translateY(-3px) rotate(5deg); box-shadow: 0 15px 25px rgba(0,0,0,0.2); }
+        .fab:active { transform: scale(0.9); }
 
-        .chat-window { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 200; flex-direction: column; animation: slideIn 0.3s forwards;}
+        /* Bottom Navigation */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--nav-bg); display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid var(--border); z-index: 100; box-shadow: 0 -2px 10px rgba(0,0,0,0.05);}
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); cursor: pointer; transition: 0.3s; width: 25%;}
+        .nav-item i { font-size: 24px; transition: 0.3s;}
+        .nav-item span { font-size: 11px; font-weight: 600; }
+        .nav-item.active { color: var(--primary); }
+        .nav-item.active i { transform: translateY(-2px); }
+
+        /* Chat Window */
+        .chat-window { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 200; flex-direction: column; animation: slideIn 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;}
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-        .chat-header { background: var(--app-bar); color: #fff; padding: 10px 15px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);}
-        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background-image: url('https://i.ibb.co/3s1fKmM/bg-chat.png'); background-size: cover; background-blend-mode: multiply; background-color: var(--bg-color);}
+        .chat-header { background: var(--surface); padding: 10px 15px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid var(--border); box-shadow: 0 2px 10px rgba(0,0,0,0.05);}
+        .chat-header i { color: var(--primary); font-size: 26px; }
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
         
-        .chat-input-area { background: var(--card-bg); padding: 10px 15px; display: flex; gap: 10px; align-items: center;}
-        .attach-btn { width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; color: var(--text-muted); cursor: pointer; border-radius: 50%; transition: 0.2s;}
-        .chat-input-area input[type="text"] { flex: 1; padding: 12px 15px; border-radius: 25px; border: none; background: var(--input-bg); color: var(--text-color); font-size: 15px; outline: none; border: 1px solid var(--border);}
-        .btn-send { width: 45px; height: 45px; background: var(--primary); color: #fff; border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer;}
+        .chat-input-area { background: var(--surface); padding: 12px 15px; display: flex; gap: 12px; align-items: center; border-top: 1px solid var(--border);}
+        .attach-btn { width: 45px; height: 45px; display: flex; justify-content: center; align-items: center; color: var(--text-muted); background: var(--bg); cursor: pointer; border-radius: 50%; transition: 0.2s;}
+        .attach-btn:hover { background: var(--border); color: var(--primary); }
+        .chat-input-area input[type="text"] { flex: 1; padding: 15px 20px; border-radius: 30px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 15px; outline: none; transition: 0.3s;}
+        .chat-input-area input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.1);}
+        .btn-send { width: 50px; height: 50px; background: var(--primary); color: var(--surface); border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: 0.2s;}
+        .btn-send:active { transform: scale(0.9); }
 
-        .bubble { max-width: 80%; padding: 8px 12px; border-radius: 8px; font-size: 15px; line-height: 1.4; position: relative; word-wrap: break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.1);}
-        .bubble.sent { align-self: flex-end; background: var(--chat-sent); color: var(--text-color); border-top-right-radius: 0;}
-        .bubble.received { align-self: flex-start; background: var(--chat-recv); color: var(--text-color); border-top-left-radius: 0;}
-        .bubble-time { font-size: 10px; color: var(--text-muted); text-align: right; margin-top: 4px; display: block; float: right; margin-left: 10px;}
-        
-        .file-attachment { display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.05); padding: 10px; border-radius: 8px; margin-bottom: 5px; cursor:pointer;}
-        .file-attachment i { font-size: 30px; color: var(--primary); }
-        .file-name { font-size: 13px; font-weight: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px;}
+        /* Bubbles */
+        .bubble { max-width: 75%; padding: 12px 16px; border-radius: 18px; font-size: 15px; line-height: 1.5; position: relative; word-wrap: break-word; box-shadow: 0 2px 5px rgba(0,0,0,0.05);}
+        .bubble.sent { align-self: flex-end; background: var(--msg-sent); color: var(--text); border-bottom-right-radius: 4px;}
+        .bubble.received { align-self: flex-start; background: var(--msg-recv); color: var(--text); border-bottom-left-radius: 4px; border: 1px solid var(--border);}
+        .bubble-time { font-size: 11px; color: var(--text-muted); text-align: right; margin-top: 5px; display: block; opacity: 0.8;}
 
-        .google-login-box { display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--card-bg); padding: 40px 20px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 350px;}
+        /* Auth Screen */
+        .auth-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px; background: linear-gradient(135deg, var(--bg) 0%, var(--surface) 100%); }
+        .auth-box { background: var(--surface); padding: 40px 30px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); width: 100%; max-width: 380px; text-align: center; border: 1px solid var(--border);}
+        .shield-icon { font-size: 70px; color: var(--primary); margin-bottom: 15px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));}
         
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px);}
-        .modal-content { background: var(--card-bg); width: 90%; max-width: 400px; border-radius: 12px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .input-group label { display: block; font-size: 13px; font-weight: bold; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase;}
-        .input-group input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--input-bg); color: var(--text-color); margin-bottom: 15px; outline:none;}
+        /* Settings / Theme Grid */
+        .settings-header { padding: 30px 20px 10px; font-size: 14px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 1px;}
+        .theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 10px 20px; }
+        .theme-circle { width: 50px; height: 50px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.2s;}
+        .theme-circle:hover { transform: scale(1.1); }
+        .theme-circle.active { border-color: var(--text); transform: scale(1.1); }
+
+        /* Modals */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px);}
+        .modal-content { background: var(--surface); width: 90%; max-width: 400px; border-radius: 20px; padding: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .input-group label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase;}
+        .input-group input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg); color: var(--text); margin-bottom: 20px; outline:none; font-size:15px;}
+        .input-group input:focus { border-color: var(--primary); }
         
-        /* Backup Button for Offline Testing */
-        .backup-btn { margin-top:15px; display:flex; align-items:center; justify-content:center; gap:10px; background:transparent; color:var(--text-color); border:1px solid var(--border); padding:10px 20px; border-radius:25px; font-weight:bold; font-size:14px; cursor:pointer;}
+        /* Placeholder screens for Updates/Calls */
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+        .empty-state i { font-size: 60px; color: var(--border); margin-bottom: 15px; }
+        .empty-state h3 { color: var(--text); margin-bottom: 5px; }
     </style>
 </head>
-<body data-theme="dark">
-
-    <!-- Anti-Reverse Engineering Lock -->
-    <script>
-        document.addEventListener('contextmenu', e => e.preventDefault());
-        document.onkeydown = function(e) { if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) || (e.ctrlKey && e.keyCode == 85)) return false; };
-    </script>
+<body data-theme="default">
 
     <!-- AUTHENTICATION SCREEN -->
-    <div id="authScreen" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; padding:20px;">
-        <div class="google-login-box">
-            <i class="material-icons" style="font-size: 60px; color: var(--primary); margin-bottom: 10px;">verified_user</i>
-            <h2 style="margin:0 0 5px 0; color:var(--text-color);">ISB Web3 Network</h2>
-            <p style="color:var(--text-muted); text-align:center; font-size:13px; margin-bottom:20px; line-height: 1.5;">End-to-End ISB Encrypted Storage.</p>
+    <div id="authScreen" class="auth-container">
+        <div class="auth-box">
+            <i class="material-icons shield-icon">fingerprint</i>
+            <h2 style="margin:0 0 10px 0; font-weight:800; font-size: 26px;">ISB Premium</h2>
+            <p style="color:var(--text-muted); font-size:14px; margin-bottom:30px; line-height: 1.5;">End-to-End Encrypted Web3 Network.</p>
             
-            <!-- Google Button Container -->
-            <div id="googleButtonContainer" style="width: 100%; display: flex; justify-content: center; min-height:45px;"></div>
+            <!-- ONLY Real Google Login -->
+            <div id="googleButtonContainer" style="display: flex; justify-content: center; min-height:50px;"></div>
+            <div id="googleErrorMsg" style="display:none; color:#E91E63; font-size:12px; margin-top:15px;">
+                ⚠️ Failed to load Google Login. Please open in normal Chrome, allow cookies, or disable ad-blockers.
+            </div>
 
-            <!-- Backup Login -->
-            <button class="backup-btn" onclick="mockGoogleLogin()">
-                <i class="material-icons" style="font-size:18px;">bug_report</i> Test Login (Offline Mode)
-            </button>
-
-            <div style="font-size:11px; text-align:center; color:var(--text-muted); margin-top:20px;">
-                Protected by Google OAuth 2.0
+            <div style="font-size:12px; color:var(--text-muted); margin-top:30px; font-weight:500;">
+                Secured by Google OAuth 2.0 & ISB-24 Core
             </div>
         </div>
     </div>
@@ -103,54 +132,100 @@
     <!-- MAIN APP UI -->
     <div id="mainApp" style="display: none;">
         <div class="app-bar">
-            <div class="app-title">ISB Messenger</div>
+            <div class="app-title">ISB Premium</div>
             <div class="app-bar-icons">
                 <i class="material-icons" onclick="syncDrive()" id="syncIcon" title="Sync Securely">sync</i>
-                <i class="material-icons" onclick="toggleTheme()">brightness_6</i>
-                <i class="material-icons" onclick="logoutUser()">logout</i>
+                <i class="material-icons">search</i>
             </div>
-        </div>
-
-        <div class="tabs">
-            <div class="tab active" onclick="switchTab('chatsTab')">Chats</div>
-            <div class="tab" onclick="switchTab('vaultTab')">Profile</div>
         </div>
 
         <div class="container">
+            <!-- CHATS TAB -->
             <div id="chatsTab" class="tab-content active">
                 <div id="chatsList"></div>
-                <div class="fab" onclick="openNewChatModal()"><i class="material-icons">chat</i></div>
+                <div class="fab" onclick="openNewChatModal()"><i class="material-icons">add_comment</i></div>
             </div>
 
-            <div id="vaultTab" class="tab-content">
-                <div style="text-align:center; margin-top: 30px;">
-                    <div class="avatar" style="margin: 0 auto 10px auto; width:80px; height:80px; font-size:36px;" id="profileAvatar">U</div>
-                    <div id="profileEmail" style="font-weight:bold; font-size:18px; color:var(--text-color);">unknown@gmail.com</div>
-                    <div style="font-size:13px; color:var(--primary); font-weight:bold; margin-top:5px;">Connected securely</div>
+            <!-- UPDATES TAB (Professional Placeholder) -->
+            <div id="updatesTab" class="tab-content">
+                <div class="empty-state">
+                    <i class="material-icons">donut_large</i>
+                    <h3>No Recent Updates</h3>
+                    <p>Your contacts haven't posted any secure status updates yet.</p>
+                </div>
+                <div class="fab"><i class="material-icons">camera_alt</i></div>
+            </div>
+
+            <!-- CALLS TAB (Professional Placeholder) -->
+            <div id="callsTab" class="tab-content">
+                <div class="empty-state">
+                    <i class="material-icons">call_end</i>
+                    <h3>Call Log Empty</h3>
+                    <p>Make End-to-End encrypted WebRTC voice and video calls.</p>
+                </div>
+                <div class="fab"><i class="material-icons">add_call</i></div>
+            </div>
+
+            <!-- SETTINGS TAB -->
+            <div id="settingsTab" class="tab-content">
+                <div style="text-align:center; padding: 40px 20px 20px;">
+                    <div class="avatar" style="margin: 0 auto 15px auto; width:100px; height:100px; font-size:40px; border: 4px solid var(--surface); outline: 2px solid var(--border);" id="profileAvatar">U</div>
+                    <div id="profileEmail" style="font-weight:800; font-size:20px;">unknown@gmail.com</div>
+                    <div style="font-size:14px; color:var(--primary); font-weight:700; margin-top:8px;">Account Active & Secured</div>
+                </div>
+
+                <div class="settings-header">App Appearance (12 Themes)</div>
+                <div class="theme-grid" id="themeGrid">
+                    <!-- Themes injected via JS -->
+                </div>
+
+                <div class="settings-header">Account Details</div>
+                <div class="list-item" style="border-radius: 0; border:none; border-bottom: 1px solid var(--border); margin:0;">
+                    <i class="material-icons" style="margin-right:15px; color:var(--text-muted);">security</i>
+                    <div class="list-info">
+                        <div class="list-title">Encryption Key</div>
+                        <div class="list-subtitle">ISB-24 Military Grade Active</div>
+                    </div>
+                </div>
+                <div class="list-item" onclick="logoutUser()" style="border-radius: 0; border:none; margin:0;">
+                    <i class="material-icons" style="margin-right:15px; color:#E91E63;">logout</i>
+                    <div class="list-info">
+                        <div class="list-title" style="color:#E91E63;">Log Out</div>
+                    </div>
                 </div>
             </div>
+        </div>
+
+        <!-- BOTTOM NAVIGATION -->
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="switchNav('chatsTab', this)"><i class="material-icons">chat_bubble</i><span>Chats</span></div>
+            <div class="nav-item" onclick="switchNav('updatesTab', this)"><i class="material-icons">donut_large</i><span>Updates</span></div>
+            <div class="nav-item" onclick="switchNav('callsTab', this)"><i class="material-icons">call</i><span>Calls</span></div>
+            <div class="nav-item" onclick="switchNav('settingsTab', this)"><i class="material-icons">settings</i><span>Settings</span></div>
         </div>
     </div>
 
     <!-- CHAT WINDOW OVERLAY -->
     <div id="chatWindow" class="chat-window">
         <div class="chat-header">
-            <i class="material-icons" style="cursor:pointer;" onclick="closeChat()">arrow_back</i>
-            <div class="avatar" style="width:40px; height:40px; font-size:18px;" id="chatAvatar">U</div>
+            <i class="material-icons" style="cursor:pointer;" onclick="closeChat()">arrow_back_ios_new</i>
+            <div class="avatar" style="width:42px; height:42px; font-size:18px; margin-right:10px;" id="chatAvatar">U</div>
             <div style="flex:1; overflow:hidden;">
-                <div style="font-size:16px; font-weight:bold; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="chatTitle">user@gmail.com</div>
-                <div style="font-size:12px; color:rgba(255,255,255,0.7);">ISB-24 E2E Encrypted</div>
+                <div style="font-size:17px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="chatTitle">user@gmail.com</div>
+                <div style="font-size:12px; color:var(--primary); font-weight:600;">ISB-24 Encrypted</div>
             </div>
+            <i class="material-icons">videocam</i>
+            <i class="material-icons">call</i>
         </div>
         <div class="chat-messages" id="chatMessagesBox"></div>
         
         <div class="chat-input-area">
             <div class="attach-btn" onclick="document.getElementById('fileAttachment').click()">
-                <i class="material-icons" style="font-size: 28px;">add_circle_outline</i>
+                <i class="material-icons">add</i>
             </div>
             <input type="file" id="fileAttachment" style="display:none;" onchange="handleFileSelect(event)">
             
-            <input type="text" id="chatInputMsg" placeholder="Type a message...">
+            <input type="text" id="chatInputMsg" placeholder="Message...">
             <button class="btn-send" onclick="sendChatMessage()"><i class="material-icons">send</i></button>
         </div>
     </div>
@@ -158,14 +233,14 @@
     <!-- NEW CHAT MODAL -->
     <div id="newChatModal" class="modal-overlay">
         <div class="modal-content">
-            <h3 style="margin-top:0;">Start Secure Chat</h3>
+            <h3 style="margin-top:0; font-size:20px; font-weight:800;">New Message</h3>
             <div class="input-group">
-                <label>Receiver's Gmail Address</label>
-                <input type="email" id="newChatEmail" placeholder="e.g. friend@gmail.com">
+                <label>Contact Email (Gmail)</label>
+                <input type="email" id="newChatEmail" placeholder="Enter Gmail Address...">
             </div>
             <div style="display:flex; justify-content:flex-end; gap:10px;">
-                <button style="padding:10px; background:transparent; border:none; color:var(--text-muted); cursor:pointer; font-weight:bold;" onclick="document.getElementById('newChatModal').style.display='none'">CANCEL</button>
-                <button style="padding:10px 20px; background:var(--primary); color:#fff; border:none; border-radius:5px; cursor:pointer; font-weight:bold;" onclick="startNewChat()">START</button>
+                <button style="padding:12px; background:transparent; border:none; color:var(--text-muted); cursor:pointer; font-weight:700;" onclick="document.getElementById('newChatModal').style.display='none'">CANCEL</button>
+                <button style="padding:12px 25px; background:var(--primary); color:var(--surface); border:none; border-radius:12px; cursor:pointer; font-weight:700;" onclick="startNewChat()">START CHAT</button>
             </div>
         </div>
     </div>
@@ -173,6 +248,13 @@
 <script>
     // --- आपकी असली मास्टर चाबी (Client ID) ---
     const ISB_CLIENT_ID = "1091629496669-5881hgv7d4t01eepcq60u8mmdkguc1cn.apps.googleusercontent.com";
+
+    const themes = [
+        { id: "default", color: "#3F51B5" }, { id: "dark", color: "#121212" }, { id: "telegram", color: "#2AABEE" },
+        { id: "sunset", color: "#FF5722" }, { id: "forest", color: "#2E7D32" }, { id: "ruby", color: "#E91E63" },
+        { id: "cyberpunk", color: "#00E5FF" }, { id: "coffee", color: "#795548" }, { id: "mint", color: "#00BFA5" },
+        { id: "gold", color: "#FFB300" }, { id: "orchid", color: "#9C27B0" }, { id: "amoled", color: "#000000" }
+    ];
 
     let currentUserEmail = null;
     let currentChatContact = null;
@@ -183,13 +265,22 @@
     function saveDB(name, data) { try { localStorage.setItem(name, JSON.stringify(data)); } catch(e) {} }
 
     window.onload = function() {
-        setTheme(localStorage.getItem('isb_theme') || 'dark');
+        // Theme Setup
+        let savedTheme = localStorage.getItem('isb_theme') || 'default';
+        applyTheme(savedTheme);
+        renderThemeGrid();
         
         currentUserEmail = localStorage.getItem("isb_email");
         if(currentUserEmail) {
             showMainApp();
         } else {
-            // Google API Render Code
+            // Google API Render Code (NO FAKE LOGIN)
+            setTimeout(() => {
+                if(typeof google === 'undefined' || !google.accounts) {
+                    document.getElementById("googleErrorMsg").style.display = "block";
+                }
+            }, 3000);
+
             if(typeof google !== 'undefined') {
                 try {
                     google.accounts.id.initialize({
@@ -198,9 +289,11 @@
                     });
                     google.accounts.id.renderButton(
                         document.getElementById("googleButtonContainer"),
-                        { theme: "outline", size: "large", width: "100%", text: "continue_with" }
+                        { theme: "filled_blue", size: "large", width: "100%", text: "continue_with", shape: "pill" }
                     );
-                } catch(e) { console.log("Google Auth blocked due to local context."); }
+                } catch(e) { 
+                    document.getElementById("googleErrorMsg").style.display = "block";
+                }
             }
         }
         document.getElementById("chatInputMsg").addEventListener("keypress", function(e) { if (e.key === "Enter") sendChatMessage(); });
@@ -212,16 +305,7 @@
             currentUserEmail = responsePayload.email;
             localStorage.setItem("isb_email", currentUserEmail);
             showMainApp();
-        } catch(e) { alert("Login Failed."); }
-    }
-
-    function mockGoogleLogin() {
-        let email = prompt("Testing Mode: Enter a Gmail ID to simulate login:", "biro@gmail.com");
-        if(email && email.includes("@")) {
-            localStorage.setItem("isb_email", email.trim().toLowerCase());
-            currentUserEmail = email.trim().toLowerCase();
-            showMainApp();
-        }
+        } catch(e) { alert("Login Failed Securely."); }
     }
 
     function decodeJwtResponse(token) {
@@ -249,22 +333,31 @@
         loadChatsList();
     }
 
-    function toggleTheme() {
-        let curr = document.body.getAttribute('data-theme');
-        let next = curr === 'dark' ? 'light' : 'dark';
-        document.body.setAttribute('data-theme', next);
-        localStorage.setItem('isb_theme', next);
-    }
-
-    function switchTab(tabId) {
+    function switchNav(tabId, el) {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(t => t.classList.remove('active'));
         document.getElementById(tabId).classList.add('active');
-        event.currentTarget.classList.add('active');
+        el.classList.add('active');
         if(tabId === 'chatsTab') loadChatsList();
     }
 
-    // --- ISB-24 BLACKBOX WORKERS (Encryption Core) ---
+    function renderThemeGrid() {
+        let grid = document.getElementById('themeGrid');
+        let currentTheme = localStorage.getItem('isb_theme') || 'default';
+        grid.innerHTML = "";
+        themes.forEach(t => {
+            let activeClass = t.id === currentTheme ? 'active' : '';
+            grid.innerHTML += `<div class="theme-circle ${activeClass}" style="background-color: ${t.color};" onclick="applyTheme('${t.id}')"></div>`;
+        });
+    }
+
+    function applyTheme(themeId) {
+        document.body.setAttribute('data-theme', themeId);
+        localStorage.setItem('isb_theme', themeId);
+        renderThemeGrid();
+    }
+
+    // --- ISB-24 BLACKBOX WORKERS (Core Encryption - Untouched) ---
     const keyWorkerCode = `self.onmessage=function(e){let pwd=e.data.password;let salt=new Uint8Array(e.data.salt);let bigKey=new Uint8Array(128);for(let i=0;i<128;i++){bigKey[i]=pwd.charCodeAt(i%pwd.length)^salt[i%salt.length]^(i%256);}self.postMessage({bigKey:bigKey.buffer},[bigKey.buffer]);};`;
     const mathWorkerCode = `self.onmessage=function(e){let buffer=new Uint8Array(e.data.buffer);let isEncrypt=e.data.action==='encrypt';let bigKey=new Uint8Array(e.data.bigKey);let chunkIdx=e.data.chunkIdx;let G1=0x12345678,G2=0x87654321,G3=0xDEADBEEF,G4=0xCAFEBABE;for(let i=0;i<128;i++){let c=bigKey[i];G1=(G1>>>1)^(c<<24);G2=(G2<<3)^c;G3^=(G1>>>5);G4=(G4<<1)^(G2>>>2);}G1^=chunkIdx;G2^=(Math.imul(chunkIdx,13)>>>0);G3^=(Math.imul(chunkIdx,17)>>>0);G4^=(Math.imul(chunkIdx,19)>>>0);let dv=new DataView(buffer.buffer,buffer.byteOffset,buffer.byteLength);let words=Math.floor(buffer.length/4);let baseWordIndex=chunkIdx*1048576;for(let i=0;i<words;i++){let sizeNum=baseWordIndex+i+1;let x=sizeNum;let x2=Math.imul(x,x)>>>0;let x3=Math.imul(x2,x)>>>0;let x4=Math.imul(x3,x)>>>0;let x5=Math.imul(x4,x)>>>0;let x6=Math.imul(x5,x)>>>0;let x7=Math.imul(x6,x)>>>0;let x8=Math.imul(x7,x)>>>0;let pMode=bigKey[sizeNum%128]%6;let powerVal=(x3&((pMode===0)?0xFFFFFFFF:0))|(x4&((pMode===1)?0xFFFFFFFF:0))|(x5&((pMode===2)?0xFFFFFFFF:0))|(x6&((pMode===3)?0xFFFFFFFF:0))|(x7&((pMode===4)?0xFFFFFFFF:0))|(x8&((pMode===5)?0xFFFFFFFF:0));let pVal=bigKey[(sizeNum+15)%128];let rotInner=(Math.imul(pVal,Math.imul(pVal,pVal))>>>0)%31+1;let rotOuter=(Math.imul(powerVal%1000,powerVal%1000)+rotInner)%31+1;G1=(G1+powerVal)>>>0;G2=(G2^G1)>>>0;G2=((G2<<rotInner)|(G2>>>(32-rotInner)))>>>0;G3=(G3+G2)>>>0;G4=(G4^G3)>>>0;G4=((G4<<rotOuter)|(G4>>>(32-rotOuter)))>>>0;let g32=(G1+G2+G3+G4)>>>0;let y=(g32%10000)+1;let y2=Math.imul(y,y)>>>0;let y3=Math.imul(y2,y)>>>0;let y4=Math.imul(y3,y)>>>0;let y5=Math.imul(y4,y)>>>0;let y6=Math.imul(y5,y)>>>0;let y7=Math.imul(y6,y)>>>0;let y8=Math.imul(y7,y)>>>0;let dpMode=bigKey[(sizeNum+64)%128]%6;let dPowerVal=(y3&((dpMode===0)?0xFFFFFFFF:0))|(y4&((dpMode===1)?0xFFFFFFFF:0))|(y5&((dpMode===2)?0xFFFFFFFF:0))|(y6&((dpMode===3)?0xFFFFFFFF:0))|(y7&((dpMode===4)?0xFFFFFFFF:0))|(y8&((dpMode===5)?0xFFFFFFFF:0));let dpVal=bigKey[(sizeNum+42)%128];let dRotInner=(Math.imul(dpVal,Math.imul(dpVal,dpVal))>>>0)%31+1;let dRotOuter=(Math.imul(dPowerVal%1000,dPowerVal%1000)+dRotInner)%31+1;g32=(g32+dPowerVal)>>>0;g32=(g32^(g32>>>15))>>>0;g32=((g32<<dRotInner)|(g32>>>(32-dRotInner)))>>>0;g32=((g32<<dRotOuter)|(g32>>>(32-dRotOuter)))>>>0;let pwdGarbage=(bigKey[(sizeNum*7)%128])|(bigKey[(sizeNum*11)%128]<<8)|(bigKey[(sizeNum*13)%128]<<16)|(bigKey[(sizeNum*17)%128]<<24);g32=(g32+pwdGarbage)>>>0;g32=(g32^(pwdGarbage>>>7))>>>0;let opMode=bigKey[(sizeNum+32)%128]%3;if(isEncrypt){let d32=dv.getUint32(i*4,true);let opA=(d32+g32)>>>0;let opS=(d32-g32)>>>0;let opX=(d32^g32)>>>0;d32=(opA&((opMode===0)?0xFFFFFFFF:0))|(opS&((opMode===1)?0xFFFFFFFF:0))|(opX&((opMode===2)?0xFFFFFFFF:0));dv.setUint32(i*4,d32,true);G3=(G3^d32)>>>0;}else{let c32=dv.getUint32(i*4,true);let opA=(c32-g32)>>>0;let opS=(c32+g32)>>>0;let opX=(c32^g32)>>>0;let p32=(opA&((opMode===0)?0xFFFFFFFF:0))|(opS&((opMode===1)?0xFFFFFFFF:0))|(opX&((opMode===2)?0xFFFFFFFF:0));dv.setUint32(i*4,p32,true);G3=(G3^c32)>>>0;}}let rem=buffer.length%4;if(rem>0){let off=buffer.length-rem;for(let i=0;i<rem;i++){let sizeNum=baseWordIndex+words+i+1;let x=sizeNum;let x2=Math.imul(x,x)>>>0;let x3=Math.imul(x2,x)>>>0;let x4=Math.imul(x3,x)>>>0;let x5=Math.imul(x4,x)>>>0;let x6=Math.imul(x5,x)>>>0;let x7=Math.imul(x6,x)>>>0;let x8=Math.imul(x7,x)>>>0;let pMode=bigKey[sizeNum%128]%6;let tVal=(pMode===0)?x3:(pMode===1)?x4:(pMode===2)?x5:(pMode===3)?x6:(pMode===4)?x7:x8;let pVal=bigKey[(sizeNum+5)%128];let rIn=(Math.imul(pVal,Math.imul(pVal,pVal))>>>0)%7+1;let rOut=(Math.imul(tVal%100,tVal%100)+rIn)%7+1;G1=(G1+tVal)>>>0;let gCombined=(G1^G2^G3^G4)>>>0;gCombined=((gCombined<<rIn)|(gCombined>>>(32-rIn)))>>>0;gCombined=((gCombined<<rOut)|(gCombined>>>(32-rOut)))>>>0;let pwdGarbageByte=bigKey[(sizeNum*7)%128];let gByte=((gCombined+pwdGarbageByte+(Math.imul(sizeNum%100,sizeNum%100)>>>0))&0xFF)^(pwdGarbageByte>>2);let opMode=bigKey[(sizeNum+32)%128]%3;if(isEncrypt){let dB=buffer[off+i];let oA=(dB+gByte)&0xFF;let oS=(dB-gByte+256)&0xFF;let oX=(dB^gByte)&0xFF;dB=(opMode===0)?oA:((opMode===1)?oS:oX);buffer[off+i]=dB;G3=(G3^dB)>>>0;}else{let cB=buffer[off+i];let oA=(cB-gByte+256)&0xFF;let oS=(cB+gByte)&0xFF;let oX=(cB^gByte)&0xFF;let pB=(opMode===0)?oA:((opMode===1)?oS:oX);buffer[off+i]=pB;G3=(G3^cB)>>>0;}}}self.postMessage({type:'chunk_done',buffer:buffer.buffer,chunkIdx:chunkIdx},[buffer.buffer]);};`;
 
@@ -284,7 +377,7 @@
                     if (isEncrypt) { let finalArr = new Uint8Array(32 + outBuf.length); finalArr.set(salt, 0); finalArr.set(outBuf, 32); resolve(btoa(String.fromCharCode.apply(null, finalArr))); } 
                     else { resolve(new TextDecoder().decode(outBuf)); }
                 };
-                mw.postMessage({buffer: buffer.buffer, action: isEncrypt ? 'encrypt' : 'decrypt', bigKey: bigKey, chunkIdx: 0}, [buffer.buffer, bigKey]);
+                mw.postMessage({buffer: buffer.buffer, action: isEncrypt ? 'encrypt' : 'bigKey', bigKey: bigKey, chunkIdx: 0}, [buffer.buffer, bigKey]);
             };
             kw.postMessage({password: password, salt: salt.buffer});
         });
@@ -293,13 +386,13 @@
     function handleFileSelect(event) {
         let file = event.target.files[0];
         if(!file) return;
-        if(file.size > 2 * 1024 * 1024) { alert("⚠️ File too large for local storage! Max size is 2MB."); return; }
+        if(file.size > 2 * 1024 * 1024) { alert("⚠️ Max File Size 2MB."); return; }
         let reader = new FileReader();
         reader.onload = function(e) {
             selectedFileData = e.target.result; 
             selectedFileName = file.name;
             let inputMsg = document.getElementById('chatInputMsg');
-            inputMsg.value = `[File Attached: ${file.name}]`;
+            inputMsg.value = `[File: ${file.name}]`;
             inputMsg.disabled = true; 
         };
         reader.readAsDataURL(file);
@@ -312,7 +405,7 @@
         msgs.forEach(m => {
             if(m.from === currentUserEmail || m.to === currentUserEmail) {
                 let other = (m.from === currentUserEmail) ? m.to : m.from;
-                let preview = m.payload.length > 500 ? "📁 Encrypted File..." : "🔒 Encrypted Message...";
+                let preview = m.payload.length > 500 ? "📁 Secure File" : "🔒 Encrypted Message";
                 if(!contacts[other]) contacts[other] = { email: other, lastMsg: preview, time: m.time };
                 else { contacts[other].time = m.time; contacts[other].lastMsg = preview; }
             }
@@ -326,12 +419,12 @@
                 <div class="avatar">${info.email.charAt(0)}</div>
                 <div class="list-info">
                     <div class="list-title">${info.email}</div>
-                    <div class="list-subtitle"><i class="material-icons" style="font-size:14px;">lock</i> ${info.lastMsg}</div>
+                    <div class="list-subtitle"><i class="material-icons" style="font-size:14px; color:var(--primary);">lock</i> ${info.lastMsg}</div>
                 </div>
                 <div class="list-time">${info.time.split(',')[1] || info.time}</div>
             </div>`;
         }
-        if(html === "") html = `<div style="text-align:center; padding:40px 20px; color:var(--text-muted); font-size:14px; line-height:1.6;">Your ISB Drive is empty.<br>Tap the message icon to start a secure P2P chat.</div>`;
+        if(html === "") html = `<div class="empty-state"><i class="material-icons">chat_bubble_outline</i><h3>No Messages Yet</h3><p>Tap the button below to start a secure chat.</p></div>`;
         document.getElementById("chatsList").innerHTML = html;
     }
 
@@ -368,7 +461,7 @@
         );
 
         if(chatHistory.length === 0) {
-            box.innerHTML = `<div style="text-align:center; padding:10px; background:rgba(0,0,0,0.5); color:#fff; border-radius:8px; font-size:12px; margin: 20px auto; width: 80%;">End-to-End ISB Encrypted.<br>No third party can read this.</div>`;
+            box.innerHTML = `<div style="text-align:center; padding:12px; background:rgba(0,0,0,0.05); border: 1px solid var(--border); color:var(--text-muted); border-radius:12px; font-size:12px; margin: 20px auto; width: 85%;">🔒 Messages are End-to-End ISB Encrypted. No third party can read them.</div>`;
             return;
         }
 
@@ -380,7 +473,7 @@
             let bubble = document.createElement('div');
             bubble.className = `bubble ${cls}`;
             bubble.id = `msg_${m.id}`;
-            bubble.innerHTML = `<span class="decrypting"><i class="material-icons">sync</i> Decrypting...</span> <span class="bubble-time">${timeStr}</span>`;
+            bubble.innerHTML = `<span style="font-size:12px;"><i class="material-icons" style="font-size:12px; vertical-align:middle;">sync</i> Decrypting...</span> <span class="bubble-time">${timeStr}</span>`;
             box.appendChild(bubble);
         });
         
@@ -397,14 +490,14 @@
                         let parts = decrypted.split("|||");
                         let fName = parts[1];
                         let fData = parts[2];
-                        b.innerHTML = `<div class="file-attachment" onclick="downloadAttachedFile('${fData}', '${fName}')"><i class="material-icons">insert_drive_file</i><div><div class="file-name">${fName}</div><div style="font-size:10px; color:var(--primary);">Tap to download</div></div></div><span class="bubble-time">${timeStr}</span>`;
+                        b.innerHTML = `<div style="display:flex; gap:10px; align-items:center; cursor:pointer; background:rgba(0,0,0,0.03); padding:10px; border-radius:8px;" onclick="downloadAttachedFile('${fData}', '${fName}')"><i class="material-icons" style="font-size:30px; color:var(--primary);">insert_drive_file</i><div><div style="font-weight:bold; font-size:14px; max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${fName}</div><div style="font-size:11px; color:var(--text-muted);">Tap to download</div></div></div><span class="bubble-time">${timeStr}</span>`;
                     } else {
                         b.innerHTML = `${decrypted} <span class="bubble-time">${timeStr}</span>`;
                     }
                 }
             } catch(e) {
                 let b = document.getElementById(`msg_${m.id}`);
-                if(b) b.innerHTML = `<span style="color:#ff0055;"><i class="material-icons" style="font-size:14px; vertical-align:middle;">error</i> Corrupted</span>`;
+                if(b) b.innerHTML = `<span style="color:#E91E63; font-size:13px;"><i class="material-icons" style="font-size:14px; vertical-align:middle;">error</i> Corrupted</span>`;
             }
         }
         box.scrollTop = box.scrollHeight;
@@ -451,13 +544,14 @@
 
     function syncDrive() {
         let icon = document.getElementById('syncIcon');
-        icon.style.animation = "spin 1s linear infinite";
+        icon.style.transform = "rotate(360deg)";
+        icon.style.transition = "transform 0.5s";
         setTimeout(() => {
-            icon.style.animation = "none";
+            icon.style.transform = "rotate(0deg)";
             loadChatsList();
             if(currentChatContact) renderChatMessages();
-        }, 1000);
+        }, 500);
     }
 </script>
 </body>
-</html>
+                    </html>
