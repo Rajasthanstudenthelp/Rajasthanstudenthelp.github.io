@@ -4,10 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, interactive-widget=resizes-content">
     <title>ISB-24 Premium Web3</title>
+    
+    <!-- Google Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    
+    <!-- PDF.js Engine -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    
+    <!-- Google Login API -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     
     <style>
@@ -28,13 +36,13 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body, html { height: 100%; height: 100dvh; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0;}
         
-        #authScreen, #mainApp { height: 100%; height: 100dvh; display: flex; flex-direction: column; }
+        #authScreen { height: 100%; height: 100dvh; }
+        #mainApp { height: 100%; height: 100dvh; display: flex; flex-direction: column; }
         
-        /* App Header */
         .app-bar { flex-shrink: 0; background-color: var(--surface); color: var(--primary); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 100; border-bottom: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.05);}
-        .app-title { font-size: 22px; font-weight: 800; }
+        .app-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
         .app-bar-icons { display: flex; gap: 15px; align-items: center; }
-        .app-bar i { font-size: 24px; cursor: pointer; color: var(--text-muted); }
+        .app-bar i { font-size: 24px; cursor: pointer; color: var(--text-muted); transition: color 0.2s; }
         .app-bar i:hover { color: var(--primary); }
 
         .container { flex: 1; overflow-y: auto; padding-bottom: 70px; }
@@ -44,53 +52,51 @@
         @keyframes spin { 100% { transform: rotate(360deg); } }
         .animate-spin { animation: spin 1s linear infinite; }
 
-        .list-item { display: flex; align-items: center; padding: 15px 20px; cursor: pointer; background: var(--surface); margin: 5px 10px; border-radius: 12px; border: 1px solid transparent;}
-        .avatar { width: 54px; height: 54px; background: var(--primary); color: var(--surface); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 22px; font-weight: bold; margin-right: 15px; flex-shrink: 0;}
+        .list-item { display: flex; align-items: center; padding: 15px 20px; cursor: pointer; background: var(--surface); transition: 0.2s; margin: 5px 10px; border-radius: 12px; border: 1px solid transparent;}
+        .list-item:hover { border: 1px solid var(--border); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.02);}
+        .avatar { width: 54px; height: 54px; background: var(--primary); color: var(--surface); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 22px; font-weight: bold; margin-right: 15px; text-transform: uppercase; box-shadow: 0 2px 5px rgba(0,0,0,0.1); flex-shrink: 0;}
         .status-ring { outline: 3px solid #25D366; outline-offset: 2px; }
         .list-info { flex: 1; overflow: hidden; }
         .list-title { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-        .list-subtitle { font-size: 14px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .list-subtitle { font-size: 14px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 5px;}
         .list-time { font-size: 12px; color: var(--text-muted); font-weight: 500; }
 
-        /* Floating Action Buttons */
         .fab { position: fixed; bottom: 85px; right: 20px; width: 60px; height: 60px; background: var(--primary); color: var(--surface); border-radius: 20px; display: flex; justify-content: center; align-items: center; box-shadow: 0 10px 20px rgba(0,0,0,0.15); cursor: pointer; z-index: 90;}
         .fab-secondary { bottom: 160px; background: var(--surface); color: var(--primary); border: 1px solid var(--border); }
         .fab-pencil { position: fixed; bottom: 160px; right: 28px; width: 45px; height: 45px; background: var(--surface); color: var(--text-muted); border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.15); cursor: pointer; z-index: 90; border: 1px solid var(--border);}
 
-        /* Bottom Nav */
-        .bottom-nav { flex-shrink: 0; background: var(--nav-bg); display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid var(--border); z-index: 100;}
+        .bottom-nav { flex-shrink: 0; background: var(--nav-bg); display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid var(--border); z-index: 100; box-shadow: 0 -2px 10px rgba(0,0,0,0.05);}
         .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); cursor: pointer; width: 33.3%;}
         .nav-item span { font-size: 11px; font-weight: 600; }
         .nav-item.active { color: var(--primary); }
 
-        /* Chat Window */
-        .chat-window { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg); z-index: 200; flex-direction: column;}
-        .chat-header { flex-shrink: 0; background: var(--surface); padding: 10px 15px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid var(--border);}
+        .chat-window { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg); z-index: 200; flex-direction: column; animation: slideIn 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;}
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        .chat-header { flex-shrink: 0; background: var(--surface); padding: 10px 15px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid var(--border); box-shadow: 0 2px 10px rgba(0,0,0,0.05);}
+        .chat-header i { color: var(--primary); font-size: 26px; cursor:pointer;}
         .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; scroll-behavior: smooth; }
+        
         .chat-input-area { flex-shrink: 0; background: var(--surface); padding: 10px 15px; display: flex; gap: 12px; align-items: center; border-top: 1px solid var(--border);}
         .attach-btn { width: 45px; height: 45px; display: flex; justify-content: center; align-items: center; color: var(--text-muted); background: var(--bg); cursor: pointer; border-radius: 50%; flex-shrink: 0;}
         .chat-input-area input[type="text"] { flex: 1; padding: 15px 20px; border-radius: 30px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 15px; outline: none;}
         .btn-send { width: 50px; height: 50px; background: var(--primary); color: var(--surface); border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; flex-shrink: 0;}
         #selectedFileBar { display: none; padding: 8px 15px; background: var(--surface); border-top: 1px solid var(--border); font-size: 13px; color: var(--primary); align-items: center; justify-content: space-between; }
 
-        /* Bubbles */
         .bubble { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 15px; line-height: 1.5; position: relative; word-wrap: break-word; box-shadow: 0 2px 5px rgba(0,0,0,0.05);}
         .bubble.sent { align-self: flex-end; background: var(--msg-sent); color: var(--text); border-bottom-right-radius: 4px;}
         .bubble.received { align-self: flex-start; background: var(--msg-recv); color: var(--text); border-bottom-left-radius: 4px; border: 1px solid var(--border);}
         .bubble-time { font-size: 11px; color: var(--text-muted); text-align: right; margin-top: 5px; display: block; opacity: 0.8;}
         .sender-name { font-size: 11px; font-weight: bold; color: var(--primary); margin-bottom: 4px; display: block;}
 
-        /* Auth Screen */
         .auth-container { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; background: linear-gradient(135deg, var(--bg) 0%, var(--surface) 100%); }
-        .auth-box { background: var(--surface); padding: 40px 30px; border-radius: 24px; width: 100%; max-width: 380px; text-align: center; border: 1px solid var(--border);}
+        .auth-box { background: var(--surface); padding: 40px 30px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); width: 100%; max-width: 380px; text-align: center; border: 1px solid var(--border);}
         
-        /* Modals */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; right:0; bottom:0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px);}
         .modal-content { background: var(--surface); width: 90%; max-width: 400px; border-radius: 20px; padding: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto;}
         .input-group label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase;}
         .input-group input, .input-group textarea { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg); color: var(--text); margin-bottom: 20px; outline:none; font-size:15px; font-family:inherit;}
         
-        /* --- WHATSAPP NEW UI STATUS TRAY --- */
+        /* WhatsApp Status Tray */
         .status-header { padding: 20px 20px 10px; font-size: 18px; font-weight: 800; color: var(--text); }
         .status-tray { display: flex; overflow-x: auto; gap: 12px; padding: 10px 20px; scroll-snap-type: x mandatory; }
         .status-tray::-webkit-scrollbar { display: none; }
@@ -100,22 +106,20 @@
         .status-card-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.8)); z-index: 1;}
         .status-card-add-icon { position:absolute; bottom:-2px; right:-2px; background:#25D366; color:white; border-radius:50%; width:18px; height:18px; display:flex; align-items:center; justify-content:center; font-size:14px; border:2px solid var(--surface);}
 
-        /* --- JS MEDIA ENGINE & STATUS VIEWER --- */
+        /* JS Media Engine Viewer */
         .wa-status-viewer { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: #000; z-index: 4000; flex-direction: column; color: white;}
         .wa-progress-container { display: flex; gap: 4px; padding: 10px 10px 0 10px; position: absolute; top: 0; width: 100%; z-index: 4002; }
         .wa-progress-segment { flex: 1; height: 3px; background: rgba(255,255,255,0.3); border-radius: 2px; overflow: hidden; }
         .wa-progress-fill { height: 100%; background: white; width: 0%; }
         .wa-header { display:flex; justify-content:space-between; align-items:center; padding:20px 15px; position:absolute; top:5px; width:100%; z-index:4002; background:linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);}
         .wa-content { flex: 1; position: relative; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; overflow: hidden;}
-        .wa-status-caption { position: absolute; bottom: 40px; width: 100%; text-align: center; padding: 10px 20px; background: rgba(0,0,0,0.6); font-size: 15px; word-wrap: break-word;}
+        .wa-status-caption { position: absolute; bottom: 40px; width: 100%; text-align: center; padding: 10px 20px; background: rgba(0,0,0,0.6); font-size: 15px; word-wrap: break-word; z-index:4002;}
         .wa-tap-left { position: absolute; top:0; left:0; width: 30%; height: 100%; z-index: 4001; cursor: pointer;}
         .wa-tap-right { position: absolute; top:0; right:0; width: 70%; height: 100%; z-index: 4001; cursor: pointer;}
         
-        .chat-media-btn { display:flex; gap:10px; align-items:center; cursor:pointer; background:rgba(0,0,0,0.03); padding:10px; border-radius:8px;}
-
-        /* Search Bars */
         .search-container { display: none; padding: 10px; background: var(--surface); border-bottom: 1px solid var(--border); }
         .search-input { width: 100%; padding: 10px 15px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg); color: var(--text); outline: none; font-size: 14px; }
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
         .theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 10px 20px; }
         .theme-circle { width: 50px; height: 50px; border-radius: 50%; cursor: pointer; border: 3px solid transparent;}
         .theme-circle.active { border-color: var(--text); transform: scale(1.1); }
@@ -123,7 +127,6 @@
 </head>
 <body data-theme="default">
 
-    <!-- AUTHENTICATION -->
     <div id="authScreen" class="auth-container">
         <div class="auth-box">
             <i class="material-icons shield-icon" style="font-size:70px; color:var(--primary);">fingerprint</i>
@@ -133,7 +136,6 @@
         </div>
     </div>
 
-    <!-- MAIN APP UI -->
     <div id="mainApp" style="display: none;">
         <div class="app-bar">
             <div class="app-title">ISB Messenger</div>
@@ -146,14 +148,12 @@
         <div id="mainSearchBar" class="search-container"><input type="text" id="mainSearchInput" class="search-input" onkeyup="filterMainChats()" placeholder="Search chats & groups..."></div>
 
         <div class="container">
-            <!-- CHATS TAB -->
             <div id="chatsTab" class="tab-content active">
                 <div id="chatsList"></div>
                 <div class="fab fab-secondary" onclick="openNewGroupModal()"><i class="material-icons">group_add</i></div>
                 <div class="fab" onclick="openNewChatModal()"><i class="material-icons">add_comment</i></div>
             </div>
 
-            <!-- STATUS TAB -->
             <div id="statusTab" class="tab-content">
                 <div class="status-header">अपडेट्स (Updates)</div>
                 <div class="status-tray" id="statusTray"></div>
@@ -164,7 +164,6 @@
                 <div class="fab" onclick="openImageStatusModal()"><i class="material-icons">camera_alt</i></div>
             </div>
 
-            <!-- SETTINGS TAB -->
             <div id="settingsTab" class="tab-content">
                 <div style="text-align:center; padding: 40px 20px 20px;">
                     <div class="avatar" style="margin: 0 auto 15px auto; width:100px; height:100px; font-size:40px; border: 4px solid var(--surface);" id="profileAvatar">U</div>
@@ -183,7 +182,7 @@
         </div>
     </div>
 
-    <!-- CHAT WINDOW OVERLAY -->
+    <!-- CHAT WINDOW -->
     <div id="chatWindow" class="chat-window">
         <div class="chat-header">
             <i class="material-icons" onclick="closeChat()">arrow_back_ios_new</i>
@@ -205,7 +204,7 @@
         </div>
     </div>
 
-    <!-- JS MEDIA VIEWER FOR CHAT MEDIA -->
+    <!-- UNIVERSAL MEDIA VIEWER ENGINE -->
     <div id="waStatusViewer" class="wa-status-viewer">
         <div class="wa-progress-container" id="waProgressBarContainer"></div>
         <div class="wa-header">
@@ -214,23 +213,20 @@
                 <div class="avatar" id="waStatusAvatar" style="width:40px; height:40px; font-size:18px; border:none; box-shadow:none;">U</div>
                 <div style="display:flex; flex-direction:column;"><span id="waStatusName" style="font-weight:700; font-size:16px;">Name</span><span id="waStatusTime" style="font-size:12px; opacity:0.8;">Time</span></div>
             </div>
-            <i class="material-icons" style="z-index:4005;" id="waStatusDownloadBtn">download</i>
+            <i class="material-icons" style="z-index:4005; cursor:pointer;" id="waStatusDownloadBtn">download</i>
         </div>
         <div class="wa-content" id="waStatusContent"></div>
-        <div class="wa-tap-left" onclick="prevWaStatus()"></div>
-        <div class="wa-tap-right" onclick="nextWaStatus()"></div>
+        <div class="wa-tap-left" id="waTapLeft" onclick="prevWaStatus()"></div>
+        <div class="wa-tap-right" id="waTapRight" onclick="nextWaStatus()"></div>
     </div>
 
     <!-- MODALS -->
     <div id="newChatModal" class="modal-overlay"><div class="modal-content"><h3 style="margin-top:0;">New Message</h3><div class="input-group"><label>Gmail</label><input type="email" id="newChatEmail" placeholder="Enter Gmail..."></div><div style="display:flex; justify-content:flex-end; gap:10px;"><button style="padding:12px; background:transparent; border:none; color:var(--text-muted); cursor:pointer;" onclick="document.getElementById('newChatModal').style.display='none'">CANCEL</button><button style="padding:12px 25px; background:var(--primary); color:white; border:none; border-radius:12px;" onclick="startNewChat()">START</button></div></div></div>
     <div id="newGroupModal" class="modal-overlay"><div class="modal-content"><h3 style="margin-top:0;">New Group</h3><div class="input-group"><label>Group Name</label><input type="text" id="newGroupName" placeholder="E.g., My Family"></div><div class="input-group"><label>Emails</label><textarea id="newGroupEmails" rows="3" placeholder="friend1@gmail.com, friend2@gmail.com"></textarea></div><div style="display:flex; justify-content:flex-end; gap:10px;"><button style="padding:12px; background:transparent; border:none; color:var(--text-muted); cursor:pointer;" onclick="document.getElementById('newGroupModal').style.display='none'">CANCEL</button><button style="padding:12px 25px; background:var(--primary); color:white; border:none; border-radius:12px;" onclick="createGroup()">CREATE</button></div></div></div>
-    
     <div id="textStatusModal" class="modal-overlay"><div class="modal-content"><h3 style="margin-top:0;">Type Status</h3><div class="input-group"><textarea id="statusTextOnly" rows="4" placeholder="What's on your mind?"></textarea></div><div style="display:flex; justify-content:flex-end; gap:10px;"><button style="padding:12px; background:transparent; border:none; color:var(--text-muted); cursor:pointer;" onclick="document.getElementById('textStatusModal').style.display='none'">CANCEL</button><button style="padding:12px 25px; background:var(--primary); color:white; border:none; border-radius:12px;" onclick="postStatus('text')">POST</button></div></div></div>
-    
     <div id="imageStatusModal" class="modal-overlay"><div class="modal-content"><h3 style="margin-top:0;">Upload Status</h3><div class="input-group"><label>Select Media</label><input type="file" id="statusFile" accept="image/*,video/*" onchange="handleStatusFile(event)"><div id="statusFileName" style="font-size:12px; color:var(--primary);"></div></div><div class="input-group"><label>Caption</label><input type="text" id="statusCaption" placeholder="Caption..."></div><div style="display:flex; justify-content:flex-end; gap:10px;"><button style="padding:12px; background:transparent; border:none; color:var(--text-muted); cursor:pointer;" onclick="document.getElementById('imageStatusModal').style.display='none'">CANCEL</button><button style="padding:12px 25px; background:var(--primary); color:white; border:none; border-radius:12px;" onclick="postStatus('image')">UPLOAD</button></div></div></div>
 
 <script>
-    /* PDF.js Configuration */
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
     const ISB_CLIENT_ID = "1091629496669-5881hgv7d4t01eepcq60u8mmdkguc1cn.apps.googleusercontent.com";
@@ -251,7 +247,7 @@
     let waUserStatusGroup = [];
     let waActiveIndex = 0;
     let waTimer = null;
-    let waIsChatMedia = false; // Flag to differentiate chat media from status
+    let waIsChatMedia = false; 
 
     window.onload = function() {
         applyTheme(localStorage.getItem('isb_theme') || 'default');
@@ -273,7 +269,6 @@
         } catch(e) { alert("Login Failed"); }
     }
     function logoutUser() { localStorage.removeItem("isb_email"); location.reload(); }
-    
     function showMainApp() {
         document.getElementById('authScreen').style.display = 'none'; document.getElementById('mainApp').style.display = 'flex';
         document.getElementById('profileEmail').innerText = currentUserEmail; document.getElementById('profileAvatar').innerText = currentUserEmail.charAt(0).toUpperCase();
@@ -338,7 +333,7 @@
         });
     }
 
-    // --- JS BLOB ENGINE (No freezing, 100% native play) ---
+    // --- JS BLOB ENGINE (For Video Auto-play with Sound) ---
     function getMediaBlobUrl(dataURI) {
         try {
             let arr = dataURI.split(','), mime = arr[0].match(/:(.*?);/)[1], bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
@@ -427,7 +422,6 @@
                 let isVid = m.decryptedData.startsWith("data:video/");
                 let content = "";
                 
-                // --- CHAT IMAGE/VIDEO PREVIEW (Using JS Blob) ---
                 if(isImg || isVid) {
                     let bUrl = getMediaBlobUrl(m.decryptedData);
                     if(isImg) {
@@ -437,7 +431,10 @@
                     }
                 } else {
                     let iconType = m.decryptedData.startsWith("data:application/pdf") ? "picture_as_pdf" : "insert_drive_file";
-                    content = `<div class="chat-media-btn" onclick="openMediaViewer('${m.id}', 'msg')"><i class="material-icons" style="font-size:30px; color:var(--primary);">${iconType}</i><div><div style="font-weight:bold; font-size:14px; max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${m.decryptedName}</div><div style="font-size:11px; color:var(--text-muted);">Tap to open</div></div></div>`;
+                    content = `<div style="display:flex; gap:10px; align-items:center; cursor:pointer; background:rgba(0,0,0,0.03); padding:10px; border-radius:8px;" onclick="openMediaViewer('${m.id}', 'msg')">
+                        <i class="material-icons" style="font-size:30px; color:var(--primary);">${iconType}</i>
+                        <div><div style="font-weight:bold; font-size:14px; max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${m.decryptedName}</div><div style="font-size:11px; color:var(--text-muted);">Tap to open</div></div>
+                    </div>`;
                 }
                 document.getElementById(`msg_${m.id}`).innerHTML = `${senderHtml}${content}<span class="bubble-time">${timeStr}</span>`;
             } else { document.getElementById(`msg_${m.id}`).innerHTML = `${senderHtml}${decrypted} <span class="bubble-time">${timeStr}</span>`; }
@@ -460,7 +457,7 @@
     }
     function downloadAttachedFile(base64Data, filename) { const a = document.createElement("a"); a.href = getMediaBlobUrl(base64Data); a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
 
-    // --- WHATSAPP NEW UI STATUS SYSTEM ---
+    // --- STATUS SYSTEM ---
     function openTextStatusModal() { document.getElementById('textStatusModal').style.display = 'flex'; document.getElementById('statusTextOnly').value = ""; }
     function openImageStatusModal() { document.getElementById('imageStatusModal').style.display = 'flex'; statusFileData = null; document.getElementById('statusFileName').innerText = ""; document.getElementById('statusCaption').value = ""; document.getElementById('statusFile').value = "";}
     
@@ -510,7 +507,6 @@
         let userGroups = {};
         window.statusPlaylist.forEach(s => { if(!userGroups[s.from]) userGroups[s.from] = []; userGroups[s.from].push(s); });
 
-        // 1. HORIZONTAL TRAY
         let trayHtml = `
         <div class="status-card" onclick="openImageStatusModal()">
             <div class="status-card-avatar" style="border:none;"><div style="background:var(--bg); width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative;">${currentUserEmail.charAt(0).toUpperCase()}<div class="status-card-add-icon">+</div></div></div>
@@ -528,7 +524,6 @@
         }
         document.getElementById('statusTray').innerHTML = trayHtml;
 
-        // 2. VERTICAL RECENT LIST
         let listHtml = "";
         for(let user in userGroups) {
             if(user === currentUserEmail) continue; 
@@ -538,11 +533,13 @@
         document.getElementById('statusList').innerHTML = listHtml || `<div style="padding:20px; text-align:center; color:var(--text-muted); font-size:14px;">No recent status updates.</div>`;
     }
 
-    // --- UNIVERSAL MEDIA VIEWER ENGINE (JS BLOB) ---
+    // --- UNIVERSAL MEDIA VIEWER ENGINE (AUTO-UNMUTE FIX) ---
+    let currentPdf = null; let currentPdfPage = 1;
+
     async function openMediaViewer(msgId, source) {
         waIsChatMedia = (source === 'msg');
         document.getElementById('waStatusViewer').style.display = 'flex';
-        document.getElementById('waProgressBarContainer').innerHTML = ''; // Hide lines for chat media
+        document.getElementById('waProgressBarContainer').innerHTML = ''; 
         
         let m = (source === 'msg') ? APP_STATE.msgs.find(x => x.id === msgId) : window.statusPlaylist.find(x => x.id === msgId);
         let fData = m.decryptedData, fName = m.decryptedName;
@@ -554,46 +551,58 @@
         let dBtn = document.getElementById('waStatusDownloadBtn');
         if(source === 'msg') {
             dBtn.style.display = 'block'; dBtn.onclick = () => downloadAttachedFile(fData, fName);
-            document.querySelector('.wa-tap-left').style.display = 'none'; document.querySelector('.wa-tap-right').style.display = 'none';
+            document.getElementById('waTapLeft').style.display = 'none'; document.getElementById('waTapRight').style.display = 'none';
         } else {
             dBtn.style.display = 'none';
-            document.querySelector('.wa-tap-left').style.display = 'block'; document.querySelector('.wa-tap-right').style.display = 'block';
+            document.getElementById('waTapLeft').style.display = 'block'; document.getElementById('waTapRight').style.display = 'block';
         }
 
         let contentBox = document.getElementById('waStatusContent');
         contentBox.innerHTML = `<i class="material-icons animate-spin" style="font-size:50px;">sync</i>`;
 
-        // 1. Text Status
         if(fData === "txt") {
             contentBox.innerHTML = `<div style="width:100%; height:100%; display:flex; justify-content:center; align-items:center; background:var(--primary); padding:30px; font-size:28px; text-align:center; word-wrap:break-word;">${fName}</div>`;
             return;
         }
 
-        // JS Blob Engine for Media
         let bUrl = getMediaBlobUrl(fData);
 
-        // 2. Video Player
+        // 1. Video Player (Auto-Unmute Fix)
         if(fData.startsWith("data:video/")) {
-            contentBox.innerHTML = `<video id="isbVideoPlayer" autoplay playsinline ${source==='msg'?'controls':''} style="max-width:100%; max-height:100%; width:100%; object-fit:contain;"><source src="${bUrl}"></video>`;
+            contentBox.innerHTML = `<video id="isbVideoPlayer" playsinline style="max-width:100%; max-height:100%; width:100%; object-fit:contain;"></video>`;
+            let video = document.getElementById('isbVideoPlayer');
+            video.src = bUrl;
+            video.muted = false; // Auto Unmute!
+            
             if(fName && source !== 'msg') contentBox.innerHTML += `<div class="wa-status-caption">${fName}</div>`;
             
-            // Smart Timer Logic for Video Status
+            try {
+                let playPromise = video.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.log("Autoplay blocked");
+                        video.controls = true; // Fallback
+                    });
+                }
+            } catch(e) { video.controls = true; }
+
             if(!waIsChatMedia) {
-                let vid = document.getElementById('isbVideoPlayer');
-                vid.onended = () => { nextWaStatus(); };
-                vid.onloadedmetadata = () => {
+                video.onended = () => { nextWaStatus(); };
+                video.onloadedmetadata = () => {
                     clearTimeout(waTimer);
                     let fillBar = document.getElementById(`waFill_${waActiveIndex}`);
-                    if(fillBar) { fillBar.style.transition = `width ${vid.duration}s linear`; fillBar.classList.add('filling'); }
+                    if(fillBar) { fillBar.style.transition = `width ${video.duration}s linear`; fillBar.classList.add('filling'); }
                 };
+            } else {
+                video.controls = true; // Show controls in normal chat
             }
         } 
-        // 3. Image
+        // 2. Image
         else if (fData.startsWith("data:image/")) {
             contentBox.innerHTML = `<img src="${bUrl}" style="max-width:100%; max-height:100%; object-fit:contain;">`;
             if(fName && source !== 'msg') contentBox.innerHTML += `<div class="wa-status-caption">${fName}</div>`;
         } 
-        // 4. PDF
+        // 3. PDF
         else if (fData.startsWith("data:application/pdf")) {
             contentBox.innerHTML = `
                 <div style="position:absolute; top:80px; background:rgba(0,0,0,0.8); width:100%; display:flex; justify-content:center; padding:10px; gap:20px; z-index:4005;">
@@ -624,7 +633,7 @@
     }
     function changePdfPage(offset) { if(!currentPdf) return; let newPage = currentPdfPage + offset; if(newPage >= 1 && newPage <= currentPdf.numPages) { currentPdfPage = newPage; renderPdfPage(currentPdfPage); } }
 
-    // --- WHATSAPP VIEWER LOGIC ---
+    // --- STATUS VIEWER LOGIC ---
     function viewUserStatus(userEmail) {
         waActiveUser = userEmail; waUserStatusGroup = window.statusPlaylist.filter(s => s.from === userEmail);
         if(waUserStatusGroup.length === 0) return;
@@ -657,7 +666,7 @@
                 document.getElementById(`waFill_${waActiveIndex}`).style.transition = "width 5s linear";
                 document.getElementById(`waFill_${waActiveIndex}`).classList.add('filling');
             }
-            waTimer = setTimeout(() => { nextWaStatus(); }, 5000); // 5 sec for text
+            waTimer = setTimeout(() => { nextWaStatus(); }, 5000);
         }
     }
 
@@ -668,4 +677,4 @@
     function syncDrive() { let icon = document.getElementById('syncIcon'); icon.style.transform = "rotate(360deg)"; setTimeout(() => { icon.style.transform = "rotate(0deg)"; loadChatsList(); loadStatusList(); }, 500); }
 </script>
 </body>
-    </html>
+                                                                                                       </html>
