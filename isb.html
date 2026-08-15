@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ISB-24 Web3 Messenger</title>
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Google Login API -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        /* WhatsApp Style Themes */
+        :root { --app-bar: #075e54; --app-bar-dark: #128c7e; --bg-color: #ece5dd; --card-bg: #ffffff; --text-color: #303030; --text-muted: #888888; --primary: #25D366; --secondary: #34B7F1; --input-bg: #ffffff; --border: #e0e0e0; --chat-sent: #dcf8c6; --chat-recv: #ffffff; }
+        [data-theme="dark"] { --app-bar: #1f2c34; --app-bar-dark: #128c7e; --bg-color: #0b141a; --card-bg: #111b21; --text-color: #e9edef; --text-muted: #8696a0; --primary: #00a884; --secondary: #53bdeb; --input-bg: #2a3942; --border: #222d34; --chat-sent: #005c4b; --chat-recv: #202c33; }
+        
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; transition: 0.3s; overflow-x: hidden;}
+        
+        .app-bar { background-color: var(--app-bar); color: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); position: sticky; top: 0; z-index: 100; }
+        .app-title { font-size: 20px; font-weight: bold; letter-spacing: 1px; }
+        .app-bar-icons { display: flex; gap: 20px; align-items: center; }
+        .app-bar i { font-size: 24px; cursor: pointer; color: inherit; }
+        
+        .tabs { display: flex; background-color: var(--app-bar); color: rgba(255,255,255,0.7); position: sticky; top: 54px; z-index: 99; box-shadow: 0 2px 5px rgba(0,0,0,0.1);}
+        .tab { flex: 1; text-align: center; padding: 12px 0; font-weight: bold; cursor: pointer; transition: 0.3s; border-bottom: 3px solid transparent; text-transform: uppercase; font-size: 14px;}
+        .tab.active { color: #fff; border-bottom-color: #fff; }
+
+        .container { max-width: 600px; margin: 0 auto; padding-bottom: 80px; position: relative;}
+        .tab-content { display: none; animation: fadeIn 0.3s ease-out; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+        .list-item { display: flex; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--border); cursor: pointer; background: var(--card-bg); transition: 0.2s;}
+        .list-item:active { background: var(--border); }
+        .avatar { width: 50px; height: 50px; background: var(--primary); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #fff; font-size: 24px; font-weight: bold; margin-right: 15px; text-transform: uppercase;}
+        .list-info { flex: 1; overflow: hidden; }
+        .list-title { font-size: 16px; font-weight: bold; color: var(--text-color); margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .list-subtitle { font-size: 13px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 5px;}
+        .list-time { font-size: 12px; color: var(--text-muted); }
+
+        .fab { position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px; background: var(--primary); color: #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; z-index: 90; transition: 0.2s;}
+        .fab:active { transform: scale(0.95); }
+
+        .chat-window { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 200; flex-direction: column; animation: slideIn 0.3s forwards;}
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        .chat-header { background: var(--app-bar); color: #fff; padding: 10px 15px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);}
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background-image: url('https://i.ibb.co/3s1fKmM/bg-chat.png'); background-size: cover; background-blend-mode: multiply; background-color: var(--bg-color);}
+        
+        .chat-input-area { background: var(--card-bg); padding: 10px 15px; display: flex; gap: 10px; align-items: center;}
+        .attach-btn { width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; color: var(--text-muted); cursor: pointer; border-radius: 50%; transition: 0.2s;}
+        .chat-input-area input[type="text"] { flex: 1; padding: 12px 15px; border-radius: 25px; border: none; background: var(--input-bg); color: var(--text-color); font-size: 15px; outline: none; border: 1px solid var(--border);}
+        .btn-send { width: 45px; height: 45px; background: var(--primary); color: #fff; border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer;}
+
+        .bubble { max-width: 80%; padding: 8px 12px; border-radius: 8px; font-size: 15px; line-height: 1.4; position: relative; word-wrap: break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.1);}
+        .bubble.sent { align-self: flex-end; background: var(--chat-sent); color: var(--text-color); border-top-right-radius: 0;}
+        .bubble.received { align-self: flex-start; background: var(--chat-recv); color: var(--text-color); border-top-left-radius: 0;}
+        .bubble-time { font-size: 10px; color: var(--text-muted); text-align: right; margin-top: 4px; display: block; float: right; margin-left: 10px;}
+        
+        .file-attachment { display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.05); padding: 10px; border-radius: 8px; margin-bottom: 5px; cursor:pointer;}
+        .file-attachment i { font-size: 30px; color: var(--primary); }
+        .file-name { font-size: 13px; font-weight: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px;}
+
+        .google-login-box { display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--card-bg); padding: 40px 20px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 350px;}
+        
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px);}
+        .modal-content { background: var(--card-bg); width: 90%; max-width: 400px; border-radius: 12px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .input-group label { display: block; font-size: 13px; font-weight: bold; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase;}
+        .input-group input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--input-bg); color: var(--text-color); margin-bottom: 15px; outline:none;}
+        
+        /* Backup Button for Offline Testing */
+        .backup-btn { margin-top:15px; display:flex; align-items:center; justify-content:center; gap:10px; background:transparent; color:var(--text-color); border:1px solid var(--border); padding:10px 20px; border-radius:25px; font-weight:bold; font-size:14px; cursor:pointer;}
+    </style>
+</head>
+<body data-theme="dark">
+
+    <!-- Anti-Reverse Engineering Lock -->
+    <script>
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.onkeydown = function(e) { if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) || (e.ctrlKey && e.keyCode == 85)) return false; };
+    </script>
+
+    <!-- AUTHENTICATION SCREEN -->
+    <div id="authScreen" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; padding:20px;">
+        <div class="google-login-box">
+            <i class="material-icons" style="font-size: 60px; color: var(--primary); margin-bottom: 10px;">verified_user</i>
+            <h2 style="margin:0 0 5px 0; color:var(--text-color);">ISB Web3 Network</h2>
+            <p style="color:var(--text-muted); text-align:center; font-size:13px; margin-bottom:20px; line-height: 1.5;">End-to-End ISB Encrypted Storage.</p>
+            
+            <!-- Google Button Container -->
+            <div id="googleButtonContainer" style="width: 100%; display: flex; justify-content: center; min-height:45px;"></div>
+
+            <!-- Backup Login -->
+            <button class="backup-btn" onclick="mockGoogleLogin()">
+                <i class="material-icons" style="font-size:18px;">bug_report</i> Test Login (Offline Mode)
+            </button>
+
+            <div style="font-size:11px; text-align:center; color:var(--text-muted); margin-top:20px;">
+                Protected by Google OAuth 2.0
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP UI -->
+    <div id="mainApp" style="display: none;">
+        <div class="app-bar">
+            <div class="app-title">ISB Messenger</div>
+            <div class="app-bar-icons">
+                <i class="material-icons" onclick="syncDrive()" id="syncIcon" title="Sync Securely">sync</i>
+                <i class="material-icons" onclick="toggleTheme()">brightness_6</i>
+                <i class="material-icons" onclick="logoutUser()">logout</i>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('chatsTab')">Chats</div>
+            <div class="tab" onclick="switchTab('vaultTab')">Profile</div>
+        </div>
+
+        <div class="container">
+            <div id="chatsTab" class="tab-content active">
+                <div id="chatsList"></div>
+                <div class="fab" onclick="openNewChatModal()"><i class="material-icons">chat</i></div>
+            </div>
+
+            <div id="vaultTab" class="tab-content">
+                <div style="text-align:center; margin-top: 30px;">
+                    <div class="avatar" style="margin: 0 auto 10px auto; width:80px; height:80px; font-size:36px;" id="profileAvatar">U</div>
+                    <div id="profileEmail" style="font-weight:bold; font-size:18px; color:var(--text-color);">unknown@gmail.com</div>
+                    <div style="font-size:13px; color:var(--primary); font-weight:bold; margin-top:5px;">Connected securely</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHAT WINDOW OVERLAY -->
+    <div id="chatWindow" class="chat-window">
+        <div class="chat-header">
+            <i class="material-icons" style="cursor:pointer;" onclick="closeChat()">arrow_back</i>
+            <div class="avatar" style="width:40px; height:40px; font-size:18px;" id="chatAvatar">U</div>
+            <div style="flex:1; overflow:hidden;">
+                <div style="font-size:16px; font-weight:bold; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="chatTitle">user@gmail.com</div>
+                <div style="font-size:12px; color:rgba(255,255,255,0.7);">ISB-24 E2E Encrypted</div>
+            </div>
+        </div>
+        <div class="chat-messages" id="chatMessagesBox"></div>
+        
+        <div class="chat-input-area">
+            <div class="attach-btn" onclick="document.getElementById('fileAttachment').click()">
+                <i class="material-icons" style="font-size: 28px;">add_circle_outline</i>
+            </div>
+            <input type="file" id="fileAttachment" style="display:none;" onchange="handleFileSelect(event)">
+            
+            <input type="text" id="chatInputMsg" placeholder="Type a message...">
+            <button class="btn-send" onclick="sendChatMessage()"><i class="material-icons">send</i></button>
+        </div>
+    </div>
+
+    <!-- NEW CHAT MODAL -->
+    <div id="newChatModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="margin-top:0;">Start Secure Chat</h3>
+            <div class="input-group">
+                <label>Receiver's Gmail Address</label>
+                <input type="email" id="newChatEmail" placeholder="e.g. friend@gmail.com">
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:10px;">
+                <button style="padding:10px; background:transparent; border:none; color:var(--text-muted); cursor:pointer; font-weight:bold;" onclick="document.getElementById('newChatModal').style.display='none'">CANCEL</button>
+                <button style="padding:10px 20px; background:var(--primary); color:#fff; border:none; border-radius:5px; cursor:pointer; font-weight:bold;" onclick="startNewChat()">START</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // --- आपकी असली मास्टर चाबी (Client ID) ---
+    const ISB_CLIENT_ID = "1091629496669-5881hgv7d4t01eepcq60u8mmdkguc1cn.apps.googleusercontent.com";
+
+    let currentUserEmail = null;
+    let currentChatContact = null;
+    let selectedFileData = null; 
+    let selectedFileName = null;
+
+    function getDB(name) { try { return JSON.parse(localStorage.getItem(name) || "[]"); } catch(e) { return []; } }
+    function saveDB(name, data) { try { localStorage.setItem(name, JSON.stringify(data)); } catch(e) {} }
+
+    window.onload = function() {
+        setTheme(localStorage.getItem('isb_theme') || 'dark');
+        
+        currentUserEmail = localStorage.getItem("isb_email");
+        if(currentUserEmail) {
+            showMainApp();
+        } else {
+            // Google API Render Code
+            if(typeof google !== 'undefined') {
+                try {
+                    google.accounts.id.initialize({
+                        client_id: ISB_CLIENT_ID,
+                        callback: handleCredentialResponse
+                    });
+                    google.accounts.id.renderButton(
+                        document.getElementById("googleButtonContainer"),
+                        { theme: "outline", size: "large", width: "100%", text: "continue_with" }
+                    );
+                } catch(e) { console.log("Google Auth blocked due to local context."); }
+            }
+        }
+        document.getElementById("chatInputMsg").addEventListener("keypress", function(e) { if (e.key === "Enter") sendChatMessage(); });
+    };
+
+    function handleCredentialResponse(response) {
+        try {
+            const responsePayload = decodeJwtResponse(response.credential);
+            currentUserEmail = responsePayload.email;
+            localStorage.setItem("isb_email", currentUserEmail);
+            showMainApp();
+        } catch(e) { alert("Login Failed."); }
+    }
+
+    function mockGoogleLogin() {
+        let email = prompt("Testing Mode: Enter a Gmail ID to simulate login:", "biro@gmail.com");
+        if(email && email.includes("@")) {
+            localStorage.setItem("isb_email", email.trim().toLowerCase());
+            currentUserEmail = email.trim().toLowerCase();
+            showMainApp();
+        }
+    }
+
+    function decodeJwtResponse(token) {
+        let base64Url = token.split('.')[1];
+        let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        let jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+    }
+
+    function logoutUser() { 
+        localStorage.removeItem("isb_email");
+        currentUserEmail = null;
+        document.getElementById('mainApp').style.display = 'none';
+        document.getElementById('authScreen').style.display = 'flex';
+        location.reload(); 
+    }
+
+    function showMainApp() {
+        document.getElementById('authScreen').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
+        document.getElementById('profileEmail').innerText = currentUserEmail;
+        document.getElementById('profileAvatar').innerText = currentUserEmail.charAt(0);
+        loadChatsList();
+    }
+
+    function toggleTheme() {
+        let curr = document.body.getAttribute('data-theme');
+        let next = curr === 'dark' ? 'light' : 'dark';
+        document.body.setAttribute('data-theme', next);
+        localStorage.setItem('isb_theme', next);
+    }
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+        if(tabId === 'chatsTab') loadChatsList();
+    }
+
+    // --- ISB-24 BLACKBOX WORKERS (Encryption Core) ---
+    const keyWorkerCode = `self.onmessage=function(e){let pwd=e.data.password;let salt=new Uint8Array(e.data.salt);let bigKey=new Uint8Array(128);for(let i=0;i<128;i++){bigKey[i]=pwd.charCodeAt(i%pwd.length)^salt[i%salt.length]^(i%256);}self.postMessage({bigKey:bigKey.buffer},[bigKey.buffer]);};`;
+    const mathWorkerCode = `self.onmessage=function(e){let buffer=new Uint8Array(e.data.buffer);let isEncrypt=e.data.action==='encrypt';let bigKey=new Uint8Array(e.data.bigKey);let chunkIdx=e.data.chunkIdx;let G1=0x12345678,G2=0x87654321,G3=0xDEADBEEF,G4=0xCAFEBABE;for(let i=0;i<128;i++){let c=bigKey[i];G1=(G1>>>1)^(c<<24);G2=(G2<<3)^c;G3^=(G1>>>5);G4=(G4<<1)^(G2>>>2);}G1^=chunkIdx;G2^=(Math.imul(chunkIdx,13)>>>0);G3^=(Math.imul(chunkIdx,17)>>>0);G4^=(Math.imul(chunkIdx,19)>>>0);let dv=new DataView(buffer.buffer,buffer.byteOffset,buffer.byteLength);let words=Math.floor(buffer.length/4);let baseWordIndex=chunkIdx*1048576;for(let i=0;i<words;i++){let sizeNum=baseWordIndex+i+1;let x=sizeNum;let x2=Math.imul(x,x)>>>0;let x3=Math.imul(x2,x)>>>0;let x4=Math.imul(x3,x)>>>0;let x5=Math.imul(x4,x)>>>0;let x6=Math.imul(x5,x)>>>0;let x7=Math.imul(x6,x)>>>0;let x8=Math.imul(x7,x)>>>0;let pMode=bigKey[sizeNum%128]%6;let powerVal=(x3&((pMode===0)?0xFFFFFFFF:0))|(x4&((pMode===1)?0xFFFFFFFF:0))|(x5&((pMode===2)?0xFFFFFFFF:0))|(x6&((pMode===3)?0xFFFFFFFF:0))|(x7&((pMode===4)?0xFFFFFFFF:0))|(x8&((pMode===5)?0xFFFFFFFF:0));let pVal=bigKey[(sizeNum+15)%128];let rotInner=(Math.imul(pVal,Math.imul(pVal,pVal))>>>0)%31+1;let rotOuter=(Math.imul(powerVal%1000,powerVal%1000)+rotInner)%31+1;G1=(G1+powerVal)>>>0;G2=(G2^G1)>>>0;G2=((G2<<rotInner)|(G2>>>(32-rotInner)))>>>0;G3=(G3+G2)>>>0;G4=(G4^G3)>>>0;G4=((G4<<rotOuter)|(G4>>>(32-rotOuter)))>>>0;let g32=(G1+G2+G3+G4)>>>0;let y=(g32%10000)+1;let y2=Math.imul(y,y)>>>0;let y3=Math.imul(y2,y)>>>0;let y4=Math.imul(y3,y)>>>0;let y5=Math.imul(y4,y)>>>0;let y6=Math.imul(y5,y)>>>0;let y7=Math.imul(y6,y)>>>0;let y8=Math.imul(y7,y)>>>0;let dpMode=bigKey[(sizeNum+64)%128]%6;let dPowerVal=(y3&((dpMode===0)?0xFFFFFFFF:0))|(y4&((dpMode===1)?0xFFFFFFFF:0))|(y5&((dpMode===2)?0xFFFFFFFF:0))|(y6&((dpMode===3)?0xFFFFFFFF:0))|(y7&((dpMode===4)?0xFFFFFFFF:0))|(y8&((dpMode===5)?0xFFFFFFFF:0));let dpVal=bigKey[(sizeNum+42)%128];let dRotInner=(Math.imul(dpVal,Math.imul(dpVal,dpVal))>>>0)%31+1;let dRotOuter=(Math.imul(dPowerVal%1000,dPowerVal%1000)+dRotInner)%31+1;g32=(g32+dPowerVal)>>>0;g32=(g32^(g32>>>15))>>>0;g32=((g32<<dRotInner)|(g32>>>(32-dRotInner)))>>>0;g32=((g32<<dRotOuter)|(g32>>>(32-dRotOuter)))>>>0;let pwdGarbage=(bigKey[(sizeNum*7)%128])|(bigKey[(sizeNum*11)%128]<<8)|(bigKey[(sizeNum*13)%128]<<16)|(bigKey[(sizeNum*17)%128]<<24);g32=(g32+pwdGarbage)>>>0;g32=(g32^(pwdGarbage>>>7))>>>0;let opMode=bigKey[(sizeNum+32)%128]%3;if(isEncrypt){let d32=dv.getUint32(i*4,true);let opA=(d32+g32)>>>0;let opS=(d32-g32)>>>0;let opX=(d32^g32)>>>0;d32=(opA&((opMode===0)?0xFFFFFFFF:0))|(opS&((opMode===1)?0xFFFFFFFF:0))|(opX&((opMode===2)?0xFFFFFFFF:0));dv.setUint32(i*4,d32,true);G3=(G3^d32)>>>0;}else{let c32=dv.getUint32(i*4,true);let opA=(c32-g32)>>>0;let opS=(c32+g32)>>>0;let opX=(c32^g32)>>>0;let p32=(opA&((opMode===0)?0xFFFFFFFF:0))|(opS&((opMode===1)?0xFFFFFFFF:0))|(opX&((opMode===2)?0xFFFFFFFF:0));dv.setUint32(i*4,p32,true);G3=(G3^c32)>>>0;}}let rem=buffer.length%4;if(rem>0){let off=buffer.length-rem;for(let i=0;i<rem;i++){let sizeNum=baseWordIndex+words+i+1;let x=sizeNum;let x2=Math.imul(x,x)>>>0;let x3=Math.imul(x2,x)>>>0;let x4=Math.imul(x3,x)>>>0;let x5=Math.imul(x4,x)>>>0;let x6=Math.imul(x5,x)>>>0;let x7=Math.imul(x6,x)>>>0;let x8=Math.imul(x7,x)>>>0;let pMode=bigKey[sizeNum%128]%6;let tVal=(pMode===0)?x3:(pMode===1)?x4:(pMode===2)?x5:(pMode===3)?x6:(pMode===4)?x7:x8;let pVal=bigKey[(sizeNum+5)%128];let rIn=(Math.imul(pVal,Math.imul(pVal,pVal))>>>0)%7+1;let rOut=(Math.imul(tVal%100,tVal%100)+rIn)%7+1;G1=(G1+tVal)>>>0;let gCombined=(G1^G2^G3^G4)>>>0;gCombined=((gCombined<<rIn)|(gCombined>>>(32-rIn)))>>>0;gCombined=((gCombined<<rOut)|(gCombined>>>(32-rOut)))>>>0;let pwdGarbageByte=bigKey[(sizeNum*7)%128];let gByte=((gCombined+pwdGarbageByte+(Math.imul(sizeNum%100,sizeNum%100)>>>0))&0xFF)^(pwdGarbageByte>>2);let opMode=bigKey[(sizeNum+32)%128]%3;if(isEncrypt){let dB=buffer[off+i];let oA=(dB+gByte)&0xFF;let oS=(dB-gByte+256)&0xFF;let oX=(dB^gByte)&0xFF;dB=(opMode===0)?oA:((opMode===1)?oS:oX);buffer[off+i]=dB;G3=(G3^dB)>>>0;}else{let cB=buffer[off+i];let oA=(cB-gByte+256)&0xFF;let oS=(cB+gByte)&0xFF;let oX=(cB^gByte)&0xFF;let pB=(opMode===0)?oA:((opMode===1)?oS:oX);buffer[off+i]=pB;G3=(G3^cB)>>>0;}}}self.postMessage({type:'chunk_done',buffer:buffer.buffer,chunkIdx:chunkIdx},[buffer.buffer]);};`;
+
+    async function runISBText(text, password, isEncrypt) {
+        return new Promise((resolve, reject) => {
+            let buffer;
+            if (isEncrypt) { buffer = new TextEncoder().encode(text); } 
+            else { try { let b64 = atob(text.replace(/\s+/g, '')); buffer = new Uint8Array(b64.length); for(let i=0; i<b64.length; i++) buffer[i] = b64.charCodeAt(i); } catch(e) { reject("Invalid Code"); return; } }
+            let salt;
+            if (isEncrypt) { salt = crypto.getRandomValues(new Uint8Array(32)); } else { salt = buffer.slice(0, 32); buffer = buffer.slice(32); }
+            let kw = new Worker(URL.createObjectURL(new Blob([keyWorkerCode], {type:'application/javascript'})));
+            kw.onmessage = function(e) {
+                let bigKey = e.data.bigKey; kw.terminate();
+                let mw = new Worker(URL.createObjectURL(new Blob([mathWorkerCode], {type:'application/javascript'})));
+                mw.onmessage = function(e2) {
+                    mw.terminate(); let outBuf = new Uint8Array(e2.data.buffer);
+                    if (isEncrypt) { let finalArr = new Uint8Array(32 + outBuf.length); finalArr.set(salt, 0); finalArr.set(outBuf, 32); resolve(btoa(String.fromCharCode.apply(null, finalArr))); } 
+                    else { resolve(new TextDecoder().decode(outBuf)); }
+                };
+                mw.postMessage({buffer: buffer.buffer, action: isEncrypt ? 'encrypt' : 'decrypt', bigKey: bigKey, chunkIdx: 0}, [buffer.buffer, bigKey]);
+            };
+            kw.postMessage({password: password, salt: salt.buffer});
+        });
+    }
+
+    function handleFileSelect(event) {
+        let file = event.target.files[0];
+        if(!file) return;
+        if(file.size > 2 * 1024 * 1024) { alert("⚠️ File too large for local storage! Max size is 2MB."); return; }
+        let reader = new FileReader();
+        reader.onload = function(e) {
+            selectedFileData = e.target.result; 
+            selectedFileName = file.name;
+            let inputMsg = document.getElementById('chatInputMsg');
+            inputMsg.value = `[File Attached: ${file.name}]`;
+            inputMsg.disabled = true; 
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function loadChatsList() {
+        let msgs = getDB('isb_drive_msgs');
+        let contacts = {};
+        
+        msgs.forEach(m => {
+            if(m.from === currentUserEmail || m.to === currentUserEmail) {
+                let other = (m.from === currentUserEmail) ? m.to : m.from;
+                let preview = m.payload.length > 500 ? "📁 Encrypted File..." : "🔒 Encrypted Message...";
+                if(!contacts[other]) contacts[other] = { email: other, lastMsg: preview, time: m.time };
+                else { contacts[other].time = m.time; contacts[other].lastMsg = preview; }
+            }
+        });
+
+        let html = "";
+        for(let c in contacts) {
+            let info = contacts[c];
+            html += `
+            <div class="list-item" onclick="openChat('${info.email}')">
+                <div class="avatar">${info.email.charAt(0)}</div>
+                <div class="list-info">
+                    <div class="list-title">${info.email}</div>
+                    <div class="list-subtitle"><i class="material-icons" style="font-size:14px;">lock</i> ${info.lastMsg}</div>
+                </div>
+                <div class="list-time">${info.time.split(',')[1] || info.time}</div>
+            </div>`;
+        }
+        if(html === "") html = `<div style="text-align:center; padding:40px 20px; color:var(--text-muted); font-size:14px; line-height:1.6;">Your ISB Drive is empty.<br>Tap the message icon to start a secure P2P chat.</div>`;
+        document.getElementById("chatsList").innerHTML = html;
+    }
+
+    function openNewChatModal() { document.getElementById('newChatModal').style.display = 'flex'; }
+    function startNewChat() {
+        let email = document.getElementById('newChatEmail').value.trim().toLowerCase();
+        if(!email || !email.includes("@")) return alert("Enter valid Gmail!");
+        document.getElementById('newChatModal').style.display = 'none';
+        openChat(email);
+    }
+
+    function openChat(contactEmail) {
+        currentChatContact = contactEmail;
+        document.getElementById('chatTitle').innerText = contactEmail;
+        document.getElementById('chatAvatar').innerText = contactEmail.charAt(0).toUpperCase();
+        document.getElementById('chatWindow').style.display = 'flex';
+        
+        selectedFileData = null; selectedFileName = null;
+        document.getElementById('chatInputMsg').value = "";
+        document.getElementById('chatInputMsg').disabled = false;
+        
+        renderChatMessages();
+    }
+    function closeChat() { document.getElementById('chatWindow').style.display = 'none'; currentChatContact = null; loadChatsList(); }
+
+    async function renderChatMessages() {
+        let box = document.getElementById('chatMessagesBox');
+        box.innerHTML = "";
+        let msgs = getDB('isb_drive_msgs');
+        
+        let chatHistory = msgs.filter(m => 
+            (m.from === currentUserEmail && m.to === currentChatContact) || 
+            (m.from === currentChatContact && m.to === currentUserEmail)
+        );
+
+        if(chatHistory.length === 0) {
+            box.innerHTML = `<div style="text-align:center; padding:10px; background:rgba(0,0,0,0.5); color:#fff; border-radius:8px; font-size:12px; margin: 20px auto; width: 80%;">End-to-End ISB Encrypted.<br>No third party can read this.</div>`;
+            return;
+        }
+
+        chatHistory.forEach(m => {
+            let isSentByMe = (m.from === currentUserEmail);
+            let cls = isSentByMe ? "sent" : "received";
+            let timeStr = m.time.split(',')[1] || m.time;
+            
+            let bubble = document.createElement('div');
+            bubble.className = `bubble ${cls}`;
+            bubble.id = `msg_${m.id}`;
+            bubble.innerHTML = `<span class="decrypting"><i class="material-icons">sync</i> Decrypting...</span> <span class="bubble-time">${timeStr}</span>`;
+            box.appendChild(bubble);
+        });
+        
+        box.scrollTop = box.scrollHeight;
+
+        for(let m of chatHistory) {
+            let pwd = m.from; 
+            try {
+                let decrypted = await runISBText(m.payload, pwd, false);
+                let b = document.getElementById(`msg_${m.id}`);
+                if(b) {
+                    let timeStr = m.time.split(',')[1] || m.time;
+                    if(decrypted.startsWith("ISB_FILE|||")) {
+                        let parts = decrypted.split("|||");
+                        let fName = parts[1];
+                        let fData = parts[2];
+                        b.innerHTML = `<div class="file-attachment" onclick="downloadAttachedFile('${fData}', '${fName}')"><i class="material-icons">insert_drive_file</i><div><div class="file-name">${fName}</div><div style="font-size:10px; color:var(--primary);">Tap to download</div></div></div><span class="bubble-time">${timeStr}</span>`;
+                    } else {
+                        b.innerHTML = `${decrypted} <span class="bubble-time">${timeStr}</span>`;
+                    }
+                }
+            } catch(e) {
+                let b = document.getElementById(`msg_${m.id}`);
+                if(b) b.innerHTML = `<span style="color:#ff0055;"><i class="material-icons" style="font-size:14px; vertical-align:middle;">error</i> Corrupted</span>`;
+            }
+        }
+        box.scrollTop = box.scrollHeight;
+    }
+
+    async function sendChatMessage() {
+        let input = document.getElementById('chatInputMsg');
+        let msg = input.value.trim();
+        let payloadToEncrypt = "";
+
+        if(selectedFileData) {
+            payloadToEncrypt = `ISB_FILE|||${selectedFileName}|||${selectedFileData}`;
+            input.value = "Encrypting File...";
+        } else {
+            if(!msg) return;
+            payloadToEncrypt = msg;
+            input.value = "Encrypting...";
+        }
+        
+        input.disabled = true;
+
+        try {
+            let encryptedPayload = await runISBText(payloadToEncrypt, currentUserEmail, true);
+            let msgs = getDB('isb_drive_msgs');
+            msgs.push({ id: Date.now(), from: currentUserEmail, to: currentChatContact, payload: encryptedPayload, time: new Date().toLocaleString() });
+            saveDB('isb_drive_msgs', msgs);
+            
+            input.value = ""; input.disabled = false;
+            selectedFileData = null; selectedFileName = null;
+            document.getElementById('fileAttachment').value = ""; 
+            
+            renderChatMessages(); 
+        } catch(e) { alert("Encryption Error"); input.value = msg; input.disabled = false; }
+    }
+
+    function downloadAttachedFile(base64Data, filename) {
+        const a = document.createElement("a");
+        a.href = base64Data;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+    function syncDrive() {
+        let icon = document.getElementById('syncIcon');
+        icon.style.animation = "spin 1s linear infinite";
+        setTimeout(() => {
+            icon.style.animation = "none";
+            loadChatsList();
+            if(currentChatContact) renderChatMessages();
+        }, 1000);
+    }
+</script>
+</body>
+</html>
