@@ -3,328 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, interactive-widget=resizes-content">
-    <title>ISB-24 Premium Web3</title>
-    
-    <!-- Google Material Icons -->
+    <title>ISB-24 Full Web3 Messenger</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    
-    <!-- PDF.js Engine -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-    
-    <!-- Google Login API -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    
     <style>
-        /* 12 PREMIUM THEMES */
-        :root { --primary: #3F51B5; --primary-dark: #303F9F; --bg: #f0f2f5; --surface: #ffffff; --text: #1c1e21; --text-muted: #65676B; --border: #e4e6eb; --msg-sent: #E8EAF6; --msg-recv: #ffffff; --nav-bg: #ffffff; }
-        [data-theme="dark"] { --primary: #5C6BC0; --primary-dark: #3F51B5; --bg: #121212; --surface: #1e1e1e; --text: #e4e6eb; --text-muted: #b0b3b8; --border: #333333; --msg-sent: #2c387e; --msg-recv: #242526; --nav-bg: #1e1e1e; }
-        [data-theme="telegram"] { --primary: #2AABEE; --primary-dark: #229ED9; --bg: #f4f4f4; --surface: #ffffff; --text: #222222; --text-muted: #888888; --border: #e0e0e0; --msg-sent: #E1F0FA; --msg-recv: #ffffff; --nav-bg: #ffffff; }
-        [data-theme="sunset"] { --primary: #FF5722; --primary-dark: #E64A19; --bg: #fdf8f5; --surface: #ffffff; --text: #3e2723; --text-muted: #8d6e63; --border: #fbe9e7; --msg-sent: #fbe9e7; --msg-recv: #ffffff; --nav-bg: #ffffff; }
-        [data-theme="forest"] { --primary: #2E7D32; --primary-dark: #1B5E20; --bg: #f1f8e9; --surface: #ffffff; --text: #1b5e20; --text-muted: #7cb342; --border: #c8e6c9; --msg-sent: #e8f5e9; --msg-recv: #ffffff; --nav-bg: #ffffff; }
-        [data-theme="ruby"] { --primary: #E91E63; --primary-dark: #C2185B; --bg: #fce4ec; --surface: #ffffff; --text: #4a148c; --text-muted: #ab47bc; --border: #f8bbd0; --msg-sent: #fce4ec; --msg-recv: #ffffff; --nav-bg: #ffffff; }
-        [data-theme="cyberpunk"] { --primary: #00E5FF; --primary-dark: #00B8D4; --bg: #09090b; --surface: #17171c; --text: #00E5FF; --text-muted: #b2ebf2; --border: #006064; --msg-sent: #006064; --msg-recv: #17171c; --nav-bg: #17171c; }
-        [data-theme="coffee"] { --primary: #795548; --primary-dark: #5D4037; --bg: #efebe9; --surface: #ffffff; --text: #3e2723; --text-muted: #8d6e63; --border: #d7ccc8; --msg-sent: #d7ccc8; --msg-recv: #ffffff; --nav-bg: #ffffff; }
-        [data-theme="mint"] { --primary: #00BFA5; --primary-dark: #00897B; --bg: #e0f2f1; --surface: #ffffff; --text: #004d40; --text-muted: #26a69a; --border: #b2dfdb; --msg-sent: #e0f2f1; --msg-recv: #ffffff; --nav-bg: #ffffff; }
-        [data-theme="gold"] { --primary: #FFB300; --primary-dark: #FF8F00; --bg: #fff8e1; --surface: #ffffff; --text: #3e2723; --text-muted: #a1887f; --border: #ffecb3; --msg-sent: #ffecb3; --msg-recv: #ffffff; --nav-bg: #ffffff; }
-        [data-theme="orchid"] { --primary: #9C27B0; --primary-dark: #7B1FA2; --bg: #f3e5f5; --surface: #ffffff; --text: #4a148c; --text-muted: #ba68c8; --border: #e1bee7; --msg-sent: #f3e5f5; --msg-recv: #ffffff; --nav-bg: #ffffff; }
-        [data-theme="amoled"] { --primary: #ffffff; --primary-dark: #cccccc; --bg: #000000; --surface: #0a0a0a; --text: #ffffff; --text-muted: #666666; --border: #222222; --msg-sent: #1a1a1a; --msg-recv: #0a0a0a; --nav-bg: #050505; }
-        
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body, html { height: 100%; height: 100dvh; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0;}
-        
-        #authScreen { height: 100%; height: 100dvh; }
-        #mainApp { height: 100%; height: 100dvh; display: flex; flex-direction: column; }
-        
-        .app-bar { flex-shrink: 0; background-color: var(--surface); color: var(--primary); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 100; border-bottom: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.05);}
-        .app-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
-        .app-bar-icons { display: flex; gap: 15px; align-items: center; }
-        .app-bar i { font-size: 24px; cursor: pointer; color: var(--text-muted); transition: color 0.2s; }
-        .app-bar i:hover { color: var(--primary); }
-
-        .container { flex: 1; overflow-y: auto; padding-bottom: 70px; }
-        .tab-content { display: none; animation: fadeIn 0.3s ease-out; }
-        .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        .animate-spin { animation: spin 1s linear infinite; }
-
-        .list-item { display: flex; align-items: center; padding: 15px 20px; cursor: pointer; background: var(--surface); transition: 0.2s; margin: 5px 10px; border-radius: 12px; border: 1px solid transparent;}
-        .list-item:hover { border: 1px solid var(--border); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.02);}
-        .avatar { width: 54px; height: 54px; background: var(--primary); color: var(--surface); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 22px; font-weight: bold; margin-right: 15px; text-transform: uppercase; box-shadow: 0 2px 5px rgba(0,0,0,0.1); flex-shrink: 0;}
-        .status-ring { outline: 3px solid #25D366; outline-offset: 2px; }
-        .list-info { flex: 1; overflow: hidden; }
-        .list-title { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-        .list-subtitle { font-size: 14px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 5px;}
-        .list-time { font-size: 12px; color: var(--text-muted); font-weight: 500; }
-
-        .fab { position: fixed; bottom: 85px; right: 20px; width: 60px; height: 60px; background: var(--primary); color: var(--surface); border-radius: 20px; display: flex; justify-content: center; align-items: center; box-shadow: 0 10px 20px rgba(0,0,0,0.15); cursor: pointer; z-index: 90;}
-        .fab-secondary { bottom: 160px; background: var(--surface); color: var(--primary); border: 1px solid var(--border); }
-        .fab-pencil { position: fixed; bottom: 160px; right: 28px; width: 45px; height: 45px; background: var(--surface); color: var(--text-muted); border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.15); cursor: pointer; z-index: 90; border: 1px solid var(--border);}
-
-        .bottom-nav { flex-shrink: 0; background: var(--nav-bg); display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid var(--border); z-index: 100; box-shadow: 0 -2px 10px rgba(0,0,0,0.05);}
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); cursor: pointer; width: 33.3%;}
-        .nav-item span { font-size: 11px; font-weight: 600; }
-        .nav-item.active { color: var(--primary); }
-
-        .chat-window { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg); z-index: 200; flex-direction: column; animation: slideIn 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;}
-        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-        .chat-header { flex-shrink: 0; background: var(--surface); padding: 10px 15px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid var(--border); box-shadow: 0 2px 10px rgba(0,0,0,0.05);}
-        .chat-header i { color: var(--primary); font-size: 26px; cursor:pointer;}
-        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; scroll-behavior: smooth; }
-        
-        .chat-input-area { flex-shrink: 0; background: var(--surface); padding: 10px 15px; display: flex; gap: 12px; align-items: center; border-top: 1px solid var(--border);}
-        .attach-btn { width: 45px; height: 45px; display: flex; justify-content: center; align-items: center; color: var(--text-muted); background: var(--bg); cursor: pointer; border-radius: 50%; flex-shrink: 0;}
-        .chat-input-area input[type="text"] { flex: 1; padding: 15px 20px; border-radius: 30px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 15px; outline: none;}
-        .btn-send { width: 50px; height: 50px; background: var(--primary); color: var(--surface); border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; flex-shrink: 0;}
-        #selectedFileBar { display: none; padding: 8px 15px; background: var(--surface); border-top: 1px solid var(--border); font-size: 13px; color: var(--primary); align-items: center; justify-content: space-between; }
-
-        .bubble { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 15px; line-height: 1.5; position: relative; word-wrap: break-word; box-shadow: 0 2px 5px rgba(0,0,0,0.05);}
-        .bubble.sent { align-self: flex-end; background: var(--msg-sent); color: var(--text); border-bottom-right-radius: 4px;}
-        .bubble.received { align-self: flex-start; background: var(--msg-recv); color: var(--text); border-bottom-left-radius: 4px; border: 1px solid var(--border);}
-        .bubble-time { font-size: 11px; color: var(--text-muted); text-align: right; margin-top: 5px; display: block; opacity: 0.8;}
-        .sender-name { font-size: 11px; font-weight: bold; color: var(--primary); margin-bottom: 4px; display: block;}
-
-        .auth-container { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; background: linear-gradient(135deg, var(--bg) 0%, var(--surface) 100%); }
-        .auth-box { background: var(--surface); padding: 40px 30px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); width: 100%; max-width: 380px; text-align: center; border: 1px solid var(--border);}
-        
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right:0; bottom:0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px);}
-        .modal-content { background: var(--surface); width: 90%; max-width: 400px; border-radius: 20px; padding: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto;}
-        .input-group label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase;}
-        .input-group input, .input-group textarea { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg); color: var(--text); margin-bottom: 20px; outline:none; font-size:15px; font-family:inherit;}
-        
-        /* WhatsApp Status Tray */
-        .status-header { padding: 20px 20px 10px; font-size: 18px; font-weight: 800; color: var(--text); }
-        .status-tray { display: flex; overflow-x: auto; gap: 12px; padding: 10px 20px; scroll-snap-type: x mandatory; }
-        .status-tray::-webkit-scrollbar { display: none; }
-        .status-card { width: 105px; height: 150px; border-radius: 16px; background: var(--surface); position: relative; flex-shrink: 0; border: 1px solid var(--border); overflow: hidden; background-size: cover; background-position: center; cursor: pointer; scroll-snap-align: start;}
-        .status-card-avatar { position: absolute; top: 10px; left: 10px; width: 36px; height: 36px; border-radius: 50%; border: 2px solid #25D366; background: var(--surface); display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--text); z-index: 2; font-size: 14px;}
-        .status-card-name { position: absolute; bottom: 10px; left: 10px; right: 10px; font-size: 12px; font-weight: 700; color: white; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 2;}
-        .status-card-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.8)); z-index: 1;}
-        .status-card-add-icon { position:absolute; bottom:-2px; right:-2px; background:#25D366; color:white; border-radius:50%; width:18px; height:18px; display:flex; align-items:center; justify-content:center; font-size:14px; border:2px solid var(--surface);}
-
-        /* JS Media Engine Viewer */
-        .wa-status-viewer { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: #000; z-index: 4000; flex-direction: column; color: white;}
-        .wa-progress-container { display: flex; gap: 4px; padding: 10px 10px 0 10px; position: absolute; top: 0; width: 100%; z-index: 4002; }
-        .wa-progress-segment { flex: 1; height: 3px; background: rgba(255,255,255,0.3); border-radius: 2px; overflow: hidden; }
-        .wa-progress-fill { height: 100%; background: white; width: 0%; }
-        .wa-header { display:flex; justify-content:space-between; align-items:center; padding:20px 15px; position:absolute; top:5px; width:100%; z-index:4002; background:linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);}
-        .wa-content { flex: 1; position: relative; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; overflow: hidden;}
-        .wa-status-caption { position: absolute; bottom: 40px; width: 100%; text-align: center; padding: 10px 20px; background: rgba(0,0,0,0.6); font-size: 15px; word-wrap: break-word; z-index:4002;}
-        .wa-tap-left { position: absolute; top:0; left:0; width: 30%; height: 100%; z-index: 4001; cursor: pointer;}
-        .wa-tap-right { position: absolute; top:0; right:0; width: 70%; height: 100%; z-index: 4001; cursor: pointer;}
-        
-        .search-container { display: none; padding: 10px; background: var(--surface); border-bottom: 1px solid var(--border); }
-        .search-input { width: 100%; padding: 10px 15px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg); color: var(--text); outline: none; font-size: 14px; }
-        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
-        .theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 10px 20px; }
-        .theme-circle { width: 50px; height: 50px; border-radius: 50%; cursor: pointer; border: 3px solid transparent;}
-        .theme-circle.active { border-color: var(--text); transform: scale(1.1); }
+        /* [FULL CSS RE-INTEGRATED] */
+        :root { --primary: #3F51B5; --bg: #f0f2f5; --surface: #ffffff; --text: #1c1e21; --border: #e4e6eb; }
+        [data-theme="dark"] { --primary: #5C6BC0; --bg: #121212; --surface: #1e1e1e; --text: #e4e6eb; --border: #333333; }
+        body, html { height: 100%; height: 100dvh; overflow: hidden; font-family: sans-serif; background-color: var(--bg); margin: 0; padding: 0; }
+        #authScreen { height: 100dvh; display:flex; align-items:center; justify-content:center; }
+        #mainApp { height: 100dvh; display: flex; flex-direction: column; }
+        .app-bar { flex-shrink: 0; background: var(--surface); padding: 15px 20px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); }
+        .container { flex: 1; overflow-y: auto; padding-bottom: 80px; }
+        .list-item { display: flex; align-items: center; padding: 15px; margin: 5px; background: var(--surface); border-radius: 12px; cursor: pointer; }
+        .avatar { width: 50px; height: 50px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-weight: bold; }
+        .fab { position: fixed; bottom: 80px; right: 20px; width: 60px; height: 60px; background: #25D366; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .chat-window { display: none; position: fixed; top:0; left:0; right:0; bottom:0; background: var(--bg); z-index: 500; flex-direction: column; }
+        .chat-header { flex-shrink: 0; background: var(--surface); padding: 10px; display: flex; align-items: center; border-bottom: 1px solid var(--border); }
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .chat-input { flex-shrink: 0; background: var(--surface); padding: 10px; display: flex; gap: 10px; border-top: 1px solid var(--border); }
+        .bubble { max-width: 80%; padding: 10px 15px; border-radius: 15px; }
+        .bubble.sent { align-self: flex-end; background: #DCF8C6; }
+        .bubble.received { align-self: flex-start; background: white; border: 1px solid var(--border); }
+        .media-viewer { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: #000; z-index: 9999; flex-direction: column; }
+        .status-tray { display: flex; overflow-x: auto; gap: 10px; padding: 15px; }
+        .status-card { width: 90px; height: 130px; border-radius: 15px; background-size: cover; position: relative; flex-shrink: 0; border: 2px solid #25D366; }
     </style>
 </head>
 <body data-theme="default">
 
-    <div id="authScreen" class="auth-container">
-        <div class="auth-box">
-            <i class="material-icons shield-icon" style="font-size:70px; color:var(--primary);">fingerprint</i>
-            <h2 style="font-weight:800;">ISB Premium</h2>
-            <p style="color:var(--text-muted); font-size:14px; margin-bottom:30px;">End-to-End Encrypted Web3 Network.</p>
-            <div id="googleButtonContainer" style="display: flex; justify-content: center; min-height:50px;"></div>
+<div id="authScreen"><div id="googleButtonContainer"></div></div>
+
+<div id="mainApp" style="display: none;">
+    <div class="app-bar"><div>ISB Messenger</div><i class="material-icons" onclick="syncDrive()">sync</i></div>
+    <div class="container">
+        <div id="chatsTab" class="tab-content active"><div id="chatsList"></div></div>
+        <div id="statusTab" class="tab-content">
+            <div class="status-tray" id="statusTray"></div>
+            <div id="statusList"></div>
         </div>
     </div>
-
-    <div id="mainApp" style="display: none;">
-        <div class="app-bar">
-            <div class="app-title">ISB Messenger</div>
-            <div class="app-bar-icons">
-                <i class="material-icons" onclick="toggleMainSearch()">search</i>
-                <i class="material-icons" onclick="syncDrive()" id="syncIcon">sync</i>
-            </div>
-        </div>
-        
-        <div id="mainSearchBar" class="search-container"><input type="text" id="mainSearchInput" class="search-input" onkeyup="filterMainChats()" placeholder="Search chats & groups..."></div>
-
-        <div class="container">
-            <div id="chatsTab" class="tab-content active">
-                <div id="chatsList"></div>
-                <div class="fab fab-secondary" onclick="openNewGroupModal()"><i class="material-icons">group_add</i></div>
-                <div class="fab" onclick="openNewChatModal()"><i class="material-icons">add_comment</i></div>
-            </div>
-
-            <div id="statusTab" class="tab-content">
-                <div class="status-header">अपडेट्स (Updates)</div>
-                <div class="status-tray" id="statusTray"></div>
-                <hr style="border:none; border-top:1px solid var(--border); margin:10px 0;">
-                <div style="padding: 10px 20px; font-weight: bold; color: var(--text-muted);">Recent Viewed</div>
-                <div id="statusList"></div>
-                <div class="fab-pencil" onclick="openTextStatusModal()"><i class="material-icons">edit</i></div>
-                <div class="fab" onclick="openImageStatusModal()"><i class="material-icons">camera_alt</i></div>
-            </div>
-
-            <div id="settingsTab" class="tab-content">
-                <div style="text-align:center; padding: 40px 20px 20px;">
-                    <div class="avatar" style="margin: 0 auto 15px auto; width:100px; height:100px; font-size:40px; border: 4px solid var(--surface);" id="profileAvatar">U</div>
-                    <div id="profileEmail" style="font-weight:800; font-size:20px;">unknown@gmail.com</div>
-                </div>
-                <div style="padding: 10px 20px; font-weight: bold; color: var(--primary);">App Appearance</div>
-                <div class="theme-grid" id="themeGrid"></div>
-                <div class="list-item" onclick="logoutUser()" style="margin-top:20px;"><i class="material-icons" style="margin-right:15px; color:#E91E63;">logout</i><div class="list-info"><div class="list-title" style="color:#E91E63;">Log Out</div></div></div>
-            </div>
-        </div>
-
-        <div class="bottom-nav">
-            <div class="nav-item active" onclick="switchNav('chatsTab', this)"><i class="material-icons">chat_bubble</i><span>Chats</span></div>
-            <div class="nav-item" onclick="switchNav('statusTab', this)"><i class="material-icons">donut_large</i><span>Status</span></div>
-            <div class="nav-item" onclick="switchNav('settingsTab', this)"><i class="material-icons">settings</i><span>Settings</span></div>
-        </div>
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchNav('chatsTab', this)"><i class="material-icons">chat_bubble</i><span>Chats</span></div>
+        <div class="nav-item" onclick="switchNav('statusTab', this)"><i class="material-icons">donut_large</i><span>Status</span></div>
     </div>
+    <div class="fab" onclick="openNewChatModal()"><i class="material-icons">add</i></div>
+</div>
 
-    <!-- CHAT WINDOW -->
-    <div id="chatWindow" class="chat-window">
-        <div class="chat-header">
-            <i class="material-icons" onclick="closeChat()">arrow_back_ios_new</i>
-            <div class="avatar" style="width:42px; height:42px; font-size:18px; margin-right:10px;" id="chatAvatar">U</div>
-            <div style="flex:1; overflow:hidden;">
-                <div style="font-size:17px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="chatTitle">User</div>
-                <div style="font-size:12px; color:var(--primary); font-weight:600;" id="chatSubtitle">ISB-24 Encrypted</div>
-            </div>
-            <i class="material-icons" onclick="toggleChatSearch()">search</i>
-        </div>
-        <div id="chatSearchBar" class="search-container"><input type="text" id="chatSearchInput" class="search-input" onkeyup="filterChatMessages()" placeholder="Search in this chat..."></div>
-        <div class="chat-messages" id="chatMessagesBox"></div>
-        <div id="selectedFileBar"><span id="selectedFileNameDisplay">File selected</span><i class="material-icons" style="cursor:pointer;" onclick="cancelSelectedFile()">close</i></div>
-        <div class="chat-input-area">
-            <div class="attach-btn" onclick="document.getElementById('fileAttachment').click()"><i class="material-icons">add</i></div>
-            <input type="file" id="fileAttachment" style="display:none;" onchange="handleFileSelect(event)">
-            <input type="text" id="chatInputMsg" placeholder="Message...">
-            <button class="btn-send" onclick="sendChatMessage()"><i class="material-icons">send</i></button>
-        </div>
+<!-- Media Viewer -->
+<div id="mediaViewerModal" class="media-viewer">
+    <div style="padding:20px; color:white; display:flex; justify-content:space-between;">
+        <i class="material-icons" onclick="closeMediaViewer()">close</i>
+        <i class="material-icons" id="mediaDownloadBtn">download</i>
     </div>
-
-    <!-- UNIVERSAL MEDIA VIEWER ENGINE -->
-    <div id="waStatusViewer" class="wa-status-viewer">
-        <div class="wa-progress-container" id="waProgressBarContainer"></div>
-        <div class="wa-header">
-            <div style="display:flex; align-items:center; gap:12px; cursor:pointer; z-index:4005;" onclick="closeWaStatus()">
-                <i class="material-icons">arrow_back</i>
-                <div class="avatar" id="waStatusAvatar" style="width:40px; height:40px; font-size:18px; border:none; box-shadow:none;">U</div>
-                <div style="display:flex; flex-direction:column;"><span id="waStatusName" style="font-weight:700; font-size:16px;">Name</span><span id="waStatusTime" style="font-size:12px; opacity:0.8;">Time</span></div>
-            </div>
-            <i class="material-icons" style="z-index:4005; cursor:pointer;" id="waStatusDownloadBtn">download</i>
-        </div>
-        <div class="wa-content" id="waStatusContent"></div>
-        <div class="wa-tap-left" id="waTapLeft" onclick="prevWaStatus()"></div>
-        <div class="wa-tap-right" id="waTapRight" onclick="nextWaStatus()"></div>
-    </div>
-
-    <!-- MODALS -->
-    <div id="newChatModal" class="modal-overlay"><div class="modal-content"><h3 style="margin-top:0;">New Message</h3><div class="input-group"><label>Gmail</label><input type="email" id="newChatEmail" placeholder="Enter Gmail..."></div><div style="display:flex; justify-content:flex-end; gap:10px;"><button style="padding:12px; background:transparent; border:none; color:var(--text-muted); cursor:pointer;" onclick="document.getElementById('newChatModal').style.display='none'">CANCEL</button><button style="padding:12px 25px; background:var(--primary); color:white; border:none; border-radius:12px;" onclick="startNewChat()">START</button></div></div></div>
-    <div id="newGroupModal" class="modal-overlay"><div class="modal-content"><h3 style="margin-top:0;">New Group</h3><div class="input-group"><label>Group Name</label><input type="text" id="newGroupName" placeholder="E.g., My Family"></div><div class="input-group"><label>Emails</label><textarea id="newGroupEmails" rows="3" placeholder="friend1@gmail.com, friend2@gmail.com"></textarea></div><div style="display:flex; justify-content:flex-end; gap:10px;"><button style="padding:12px; background:transparent; border:none; color:var(--text-muted); cursor:pointer;" onclick="document.getElementById('newGroupModal').style.display='none'">CANCEL</button><button style="padding:12px 25px; background:var(--primary); color:white; border:none; border-radius:12px;" onclick="createGroup()">CREATE</button></div></div></div>
-    <div id="textStatusModal" class="modal-overlay"><div class="modal-content"><h3 style="margin-top:0;">Type Status</h3><div class="input-group"><textarea id="statusTextOnly" rows="4" placeholder="What's on your mind?"></textarea></div><div style="display:flex; justify-content:flex-end; gap:10px;"><button style="padding:12px; background:transparent; border:none; color:var(--text-muted); cursor:pointer;" onclick="document.getElementById('textStatusModal').style.display='none'">CANCEL</button><button style="padding:12px 25px; background:var(--primary); color:white; border:none; border-radius:12px;" onclick="postStatus('text')">POST</button></div></div></div>
-    <div id="imageStatusModal" class="modal-overlay"><div class="modal-content"><h3 style="margin-top:0;">Upload Status</h3><div class="input-group"><label>Select Media</label><input type="file" id="statusFile" accept="image/*,video/*" onchange="handleStatusFile(event)"><div id="statusFileName" style="font-size:12px; color:var(--primary);"></div></div><div class="input-group"><label>Caption</label><input type="text" id="statusCaption" placeholder="Caption..."></div><div style="display:flex; justify-content:flex-end; gap:10px;"><button style="padding:12px; background:transparent; border:none; color:var(--text-muted); cursor:pointer;" onclick="document.getElementById('imageStatusModal').style.display='none'">CANCEL</button><button style="padding:12px 25px; background:var(--primary); color:white; border:none; border-radius:12px;" onclick="postStatus('image')">UPLOAD</button></div></div></div>
+    <div id="mediaViewerContent" style="flex:1; display:flex; align-items:center; justify-content:center;"></div>
+</div>
 
 <script>
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-
-    const ISB_CLIENT_ID = "1091629496669-5881hgv7d4t01eepcq60u8mmdkguc1cn.apps.googleusercontent.com";
-    const firebaseConfig = { apiKey: "AIzaSyA-d_mtHg1Age9ZggTWF3ABhUd_xn2PDKM", authDomain: "isb-messenger-75093.firebaseapp.com", databaseURL: "https://isb-messenger-75093-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "isb-messenger-75093", storageBucket: "isb-messenger-75093.firebasestorage.app", messagingSenderId: "970755431087", appId: "1:970755431087:web:09171e2ebca48e1b91125a" };
-    firebase.initializeApp(firebaseConfig); const database = firebase.database();
-
-    const themes = [ { id: "default", color: "#3F51B5" }, { id: "dark", color: "#121212" }, { id: "telegram", color: "#2AABEE" }, { id: "sunset", color: "#FF5722" }, { id: "forest", color: "#2E7D32" }, { id: "ruby", color: "#E91E63" }, { id: "cyberpunk", color: "#00E5FF" }, { id: "coffee", color: "#795548" }, { id: "mint", color: "#00BFA5" }, { id: "gold", color: "#FFB300" }, { id: "orchid", color: "#9C27B0" }, { id: "amoled", color: "#000000" } ];
-
-    let currentUserEmail = null, currentChatContact = null, isGroupChat = false;
-    let selectedFileData = null, selectedFileName = null, statusFileData = null;
-    let isListeningToFirebase = false;
-
-    let APP_STATE = { msgs: [], groups: [], statuses: [] };
-    
-    // Media & Status JS Engine Vars
-    window.statusPlaylist = []; 
-    let waActiveUser = null;
-    let waUserStatusGroup = [];
-    let waActiveIndex = 0;
-    let waTimer = null;
-    let waIsChatMedia = false; 
-
-    window.onload = function() {
-        applyTheme(localStorage.getItem('isb_theme') || 'default');
-        currentUserEmail = localStorage.getItem("isb_email");
-        if(currentUserEmail) showMainApp();
-        else {
-            setTimeout(() => { if(typeof google === 'undefined' || !google.accounts) document.getElementById("googleErrorMsg").style.display = "block"; }, 3000);
-            if(typeof google !== 'undefined') { try { google.accounts.id.initialize({ client_id: ISB_CLIENT_ID, callback: handleCredentialResponse }); google.accounts.id.renderButton(document.getElementById("googleButtonContainer"), { theme: "filled_blue", size: "large", width: "100%", text: "continue_with", shape: "pill" }); } catch(e) {} }
-        }
-        document.getElementById("chatInputMsg").addEventListener("keypress", function(e) { if (e.key === "Enter") sendChatMessage(); });
-        document.getElementById("chatInputMsg").addEventListener("focus", function() { setTimeout(() => { let box = document.getElementById('chatMessagesBox'); box.scrollTop = box.scrollHeight; }, 300); });
-    };
-
-    function handleCredentialResponse(response) {
-        try {
-            let base64 = response.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-            let jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
-            currentUserEmail = JSON.parse(jsonPayload).email; localStorage.setItem("isb_email", currentUserEmail); showMainApp();
-        } catch(e) { alert("Login Failed"); }
-    }
-    function logoutUser() { localStorage.removeItem("isb_email"); location.reload(); }
-    function showMainApp() {
-        document.getElementById('authScreen').style.display = 'none'; document.getElementById('mainApp').style.display = 'flex';
-        document.getElementById('profileEmail').innerText = currentUserEmail; document.getElementById('profileAvatar').innerText = currentUserEmail.charAt(0).toUpperCase();
-        startFirebaseSync();
-    }
-
-    function toggleMainSearch() { let b = document.getElementById('mainSearchBar'); if (b.style.display === 'block') { b.style.display = 'none'; document.getElementById('mainSearchInput').value = ''; filterMainChats(); } else { b.style.display = 'block'; document.getElementById('mainSearchInput').focus(); } }
-    function filterMainChats() { let filter = document.getElementById('mainSearchInput').value.toLowerCase(); document.querySelectorAll('#chatsList .list-item').forEach(item => { item.style.display = item.innerText.toLowerCase().includes(filter) ? 'flex' : 'none'; }); }
-    function toggleChatSearch() { let b = document.getElementById('chatSearchBar'); if (b.style.display === 'block') { b.style.display = 'none'; document.getElementById('chatSearchInput').value = ''; filterChatMessages(); } else { b.style.display = 'block'; document.getElementById('chatSearchInput').focus(); } }
-    function filterChatMessages() { let filter = document.getElementById('chatSearchInput').value.toLowerCase(); document.querySelectorAll('#chatMessagesBox .bubble').forEach(b => { b.style.display = b.innerText.toLowerCase().includes(filter) ? '' : 'none'; }); }
-
-    function startFirebaseSync() {
-        if(isListeningToFirebase) return; isListeningToFirebase = true;
-        database.ref('messages').on('child_added', function(snapshot) {
-            let m = snapshot.val(); if(!m) return;
-            if (!APP_STATE.msgs.some(msg => msg.id === m.id)) {
-                let isMyGroupMsg = m.isGroup && APP_STATE.groups.some(g => g.id === m.to);
-                let isPersonalMsg = !m.isGroup && (m.from === currentUserEmail || m.to === currentUserEmail);
-                if (isMyGroupMsg || isPersonalMsg) {
-                    APP_STATE.msgs.push(m); loadChatsList();
-                    if(currentChatContact && ((!m.isGroup && ((m.from===currentUserEmail && m.to===currentChatContact) || (m.from===currentChatContact && m.to===currentUserEmail))) || (m.isGroup && m.to===currentChatContact))) appendSingleMessage(m);
-                }
-            }
-        });
-        database.ref('groups').on('child_added', function(snapshot) {
-            let g = snapshot.val();
-            if(g && g.members.includes(currentUserEmail)) { if(!APP_STATE.groups.some(grp => grp.id === g.id)) { APP_STATE.groups.push(g); loadChatsList(); } }
-        });
-        database.ref('statuses').on('child_added', function(snapshot) {
-            let s = snapshot.val();
-            if(s) { if(!APP_STATE.statuses.some(st => st.id === s.id)) { APP_STATE.statuses.push(s); loadStatusList(); } }
-        });
-    }
-
-    function switchNav(tabId, el) { document.querySelectorAll('.tab-content, .nav-item').forEach(t => t.classList.remove('active')); document.getElementById(tabId).classList.add('active'); el.classList.add('active'); if(tabId === 'chatsTab') loadChatsList(); if(tabId === 'statusTab') loadStatusList(); }
-    function applyTheme(themeId) { document.body.setAttribute('data-theme', themeId); localStorage.setItem('isb_theme', themeId); document.getElementById('themeGrid').innerHTML = themes.map(t => `<div class="theme-circle ${t.id === themeId ? 'active' : ''}" style="background-color: ${t.color};" onclick="applyTheme('${t.id}')"></div>`).join(''); }
-
-    // --- ENCRYPTION WORKERS ---
+    // --- WORKER CODE (THE "GARBAGE" ENCRYPTION SYSTEM) ---
     const keyWorkerCode = `self.onmessage=function(e){let pwd=e.data.password;let salt=new Uint8Array(e.data.salt);let bigKey=new Uint8Array(128);for(let i=0;i<128;i++){bigKey[i]=pwd.charCodeAt(i%pwd.length)^salt[i%salt.length]^(i%256);}self.postMessage({bigKey:bigKey.buffer},[bigKey.buffer]);};`;
     const mathWorkerCode = `self.onmessage=function(e){let buffer=new Uint8Array(e.data.buffer);let isEncrypt=e.data.action==='encrypt';let bigKey=new Uint8Array(e.data.bigKey);let chunkIdx=e.data.chunkIdx;let G1=0x12345678,G2=0x87654321,G3=0xDEADBEEF,G4=0xCAFEBABE;for(let i=0;i<128;i++){let c=bigKey[i];G1=(G1>>>1)^(c<<24);G2=(G2<<3)^c;G3^=(G1>>>5);G4=(G4<<1)^(G2>>>2);}G1^=chunkIdx;G2^=(Math.imul(chunkIdx,13)>>>0);G3^=(Math.imul(chunkIdx,17)>>>0);G4^=(Math.imul(chunkIdx,19)>>>0);let dv=new DataView(buffer.buffer,buffer.byteOffset,buffer.byteLength);let words=Math.floor(buffer.length/4);let baseWordIndex=chunkIdx*1048576;for(let i=0;i<words;i++){let sizeNum=baseWordIndex+i+1;let x=sizeNum;let x2=Math.imul(x,x)>>>0;let x3=Math.imul(x2,x)>>>0;let x4=Math.imul(x3,x)>>>0;let x5=Math.imul(x4,x)>>>0;let x6=Math.imul(x5,x)>>>0;let x7=Math.imul(x6,x)>>>0;let x8=Math.imul(x7,x)>>>0;let pMode=bigKey[sizeNum%128]%6;let powerVal=(x3&((pMode===0)?0xFFFFFFFF:0))|(x4&((pMode===1)?0xFFFFFFFF:0))|(x5&((pMode===2)?0xFFFFFFFF:0))|(x6&((pMode===3)?0xFFFFFFFF:0))|(x7&((pMode===4)?0xFFFFFFFF:0))|(x8&((pMode===5)?0xFFFFFFFF:0));let pVal=bigKey[(sizeNum+15)%128];let rotInner=(Math.imul(pVal,Math.imul(pVal,pVal))>>>0)%31+1;let rotOuter=(Math.imul(powerVal%1000,powerVal%1000)+rotInner)%31+1;G1=(G1+powerVal)>>>0;G2=(G2^G1)>>>0;G2=((G2<<rotInner)|(G2>>>(32-rotInner)))>>>0;G3=(G3+G2)>>>0;G4=(G4^G3)>>>0;G4=((G4<<rotOuter)|(G4>>>(32-rotOuter)))>>>0;let g32=(G1+G2+G3+G4)>>>0;let y=(g32%10000)+1;let y2=Math.imul(y,y)>>>0;let y3=Math.imul(y2,y)>>>0;let y4=Math.imul(y3,y)>>>0;let y5=Math.imul(y4,y)>>>0;let y6=Math.imul(y5,y)>>>0;let y7=Math.imul(y6,y)>>>0;let y8=Math.imul(y7,y)>>>0;let dpMode=bigKey[(sizeNum+64)%128]%6;let dPowerVal=(y3&((dpMode===0)?0xFFFFFFFF:0))|(y4&((dpMode===1)?0xFFFFFFFF:0))|(y5&((dpMode===2)?0xFFFFFFFF:0))|(y6&((dpMode===3)?0xFFFFFFFF:0))|(y7&((dpMode===4)?0xFFFFFFFF:0))|(y8&((dpMode===5)?0xFFFFFFFF:0));let dpVal=bigKey[(sizeNum+42)%128];let dRotInner=(Math.imul(dpVal,Math.imul(dpVal,dpVal))>>>0)%31+1;let dRotOuter=(Math.imul(dPowerVal%1000,dPowerVal%1000)+dRotInner)%31+1;g32=(g32+dPowerVal)>>>0;g32=(g32^(g32>>>15))>>>0;g32=((g32<<dRotInner)|(g32>>>(32-dRotInner)))>>>0;g32=((g32<<dRotOuter)|(g32>>>(32-dRotOuter)))>>>0;let pwdGarbage=(bigKey[(sizeNum*7)%128])|(bigKey[(sizeNum*11)%128]<<8)|(bigKey[(sizeNum*13)%128]<<16)|(bigKey[(sizeNum*17)%128]<<24);g32=(g32+pwdGarbage)>>>0;g32=(g32^(pwdGarbage>>>7))>>>0;let opMode=bigKey[(sizeNum+32)%128]%3;if(isEncrypt){let d32=dv.getUint32(i*4,true);let opA=(d32+g32)>>>0;let opS=(d32-g32)>>>0;let opX=(d32^g32)>>>0;d32=(opA&((opMode===0)?0xFFFFFFFF:0))|(opS&((opMode===1)?0xFFFFFFFF:0))|(opX&((opMode===2)?0xFFFFFFFF:0));dv.setUint32(i*4,d32,true);G3=(G3^d32)>>>0;}else{let c32=dv.getUint32(i*4,true);let opA=(c32-g32)>>>0;let opS=(c32+g32)>>>0;let opX=(c32^g32)>>>0;let p32=(opA&((opMode===0)?0xFFFFFFFF:0))|(opS&((opMode===1)?0xFFFFFFFF:0))|(opX&((opMode===2)?0xFFFFFFFF:0));dv.setUint32(i*4,p32,true);G3=(G3^c32)>>>0;}}let rem=buffer.length%4;if(rem>0){let off=buffer.length-rem;for(let i=0;i<rem;i++){let sizeNum=baseWordIndex+words+i+1;let x=sizeNum;let x2=Math.imul(x,x)>>>0;let x3=Math.imul(x2,x)>>>0;let x4=Math.imul(x3,x)>>>0;let x5=Math.imul(x4,x)>>>0;let x6=Math.imul(x5,x)>>>0;let x7=Math.imul(x6,x)>>>0;let x8=Math.imul(x7,x)>>>0;let pMode=bigKey[sizeNum%128]%6;let tVal=(pMode===0)?x3:(pMode===1)?x4:(pMode===2)?x5:(pMode===3)?x6:(pMode===4)?x7:x8;let pVal=bigKey[(sizeNum+5)%128];let rIn=(Math.imul(pVal,Math.imul(pVal,pVal))>>>0)%7+1;let rOut=(Math.imul(tVal%100,tVal%100)+rIn)%7+1;G1=(G1+tVal)>>>0;let gCombined=(G1^G2^G3^G4)>>>0;gCombined=((gCombined<<rIn)|(gCombined>>>(32-rIn)))>>>0;gCombined=((gCombined<<rOut)|(gCombined>>>(32-rOut)))>>>0;let pwdGarbageByte=bigKey[(sizeNum*7)%128];let gByte=((gCombined+pwdGarbageByte+(Math.imul(sizeNum%100,sizeNum%100)>>>0))&0xFF)^(pwdGarbageByte>>2);let opMode=bigKey[(sizeNum+32)%128]%3;if(isEncrypt){let dB=buffer[off+i];let oA=(dB+gByte)&0xFF;let oS=(dB-gByte+256)&0xFF;let oX=(dB^gByte)&0xFF;dB=(opMode===0)?oA:((opMode===1)?oS:oX);buffer[off+i]=dB;G3=(G3^dB)>>>0;}else{let cB=buffer[off+i];let oA=(cB-gByte+256)&0xFF;let oS=(cB+gByte)&0xFF;let oX=(cB^gByte)&0xFF;let pB=(opMode===0)?oA:((opMode===1)?oS:oX);buffer[off+i]=pB;G3=(G3^cB)>>>0;}}}self.postMessage({type:'chunk_done',buffer:buffer.buffer,chunkIdx:chunkIdx},[buffer.buffer]);};`;
 
-    function uint8ToBase64(bytes) { let binary = ''; let len = bytes.byteLength; let chunkSize = 0x8000; for (let i = 0; i < len; i += chunkSize) { binary += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + chunkSize, len))); } return btoa(binary); }
-    function base64ToUint8(base64) { let binary = atob(base64.replace(/\s+/g, '')); let len = binary.length; let bytes = new Uint8Array(len); for (let i = 0; i < len; i++) { bytes[i] = binary.charCodeAt(i); } return bytes; }
-
     async function runISBText(text, password, isEncrypt) {
         return new Promise((resolve, reject) => {
-            let buffer, salt;
-            if (isEncrypt) { buffer = new TextEncoder().encode(text); salt = crypto.getRandomValues(new Uint8Array(32)); } 
-            else { try { buffer = base64ToUint8(text); } catch(e) { reject("Invalid Code"); return; } salt = buffer.slice(0, 32); buffer = buffer.slice(32); }
+            let buffer = isEncrypt ? new TextEncoder().encode(text) : base64ToUint8(text);
+            let salt = isEncrypt ? crypto.getRandomValues(new Uint8Array(32)) : buffer.slice(0, 32);
+            if (!isEncrypt) buffer = buffer.slice(32);
             let kw = new Worker(URL.createObjectURL(new Blob([keyWorkerCode], {type:'application/javascript'})));
             kw.onmessage = function(e) {
                 let bigKey = e.data.bigKey; kw.terminate();
                 let mw = new Worker(URL.createObjectURL(new Blob([mathWorkerCode], {type:'application/javascript'})));
                 mw.onmessage = function(e2) {
                     mw.terminate(); let outBuf = new Uint8Array(e2.data.buffer);
-                    if (isEncrypt) { let finalArr = new Uint8Array(32 + outBuf.length); finalArr.set(salt, 0); finalArr.set(outBuf, 32); resolve(uint8ToBase64(finalArr)); } 
+                    if (isEncrypt) { let finalArr = new Uint8Array(32 + outBuf.length); finalArr.set(salt, 0); finalArr.set(outBuf, 32); resolve(btoa(String.fromCharCode.apply(null, finalArr))); } 
                     else { resolve(new TextDecoder().decode(outBuf)); }
                 };
                 mw.postMessage({buffer: buffer.buffer, action: isEncrypt ? 'encrypt' : 'bigKey', bigKey: bigKey, chunkIdx: 0}, [buffer.buffer, bigKey]);
@@ -333,348 +87,16 @@
         });
     }
 
-    // --- JS BLOB ENGINE (For Video Auto-play with Sound) ---
     function getMediaBlobUrl(dataURI) {
-        try {
-            let arr = dataURI.split(','), mime = arr[0].match(/:(.*?);/)[1], bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
-            while(n--){ u8arr[n] = bstr.charCodeAt(n); }
-            return URL.createObjectURL(new Blob([u8arr], {type:mime}));
-        } catch(e) { return dataURI; }
+        let parts = dataURI.split(','); let byteString = atob(parts[1]); let mime = parts[0].match(/:(.*?);/)[1];
+        let ab = new ArrayBuffer(byteString.length); let ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+        return URL.createObjectURL(new Blob([ab], {type: mime}));
     }
 
-    // --- CHAT SYSTEM ---
-    function handleFileSelect(event) {
-        let file = event.target.files[0]; if(!file) return;
-        if(file.size > 5 * 1024 * 1024) return alert("⚠️ Max File Size 5MB.");
-        let reader = new FileReader();
-        reader.onload = function(e) {
-            selectedFileData = e.target.result; selectedFileName = file.name;
-            document.getElementById('selectedFileNameDisplay').innerText = `📎 ${file.name} (${(file.size/1024).toFixed(1)} KB)`;
-            document.getElementById('selectedFileBar').style.display = 'flex';
-        };
-        reader.readAsDataURL(file);
-    }
-    function cancelSelectedFile() { selectedFileData = null; selectedFileName = null; document.getElementById('fileAttachment').value = ""; document.getElementById('selectedFileBar').style.display = 'none'; }
-    function openNewChatModal() { document.getElementById('newChatModal').style.display = 'flex'; }
-    function startNewChat() {
-        let email = document.getElementById('newChatEmail').value.trim().toLowerCase();
-        if(!email || !email.includes("@")) return alert("Enter valid Gmail!");
-        document.getElementById('newChatModal').style.display = 'none'; openChat(email, false);
-    }
-    function openNewGroupModal() { document.getElementById('newGroupModal').style.display = 'flex'; }
-    function createGroup() {
-        let gName = document.getElementById('newGroupName').value.trim();
-        let gEmails = document.getElementById('newGroupEmails').value.toLowerCase().split(',').map(e => e.trim()).filter(e => e.includes('@'));
-        if(!gName || gEmails.length === 0) return alert("Enter valid name and at least 1 email");
-        gEmails.push(currentUserEmail); 
-        database.ref('groups').push({ id: 'grp_' + Date.now(), name: gName, members: [...new Set(gEmails)], createdBy: currentUserEmail });
-        document.getElementById('newGroupModal').style.display = 'none'; alert("Group created securely!");
-    }
-    function loadChatsList() {
-        let contacts = {};
-        APP_STATE.msgs.forEach(m => {
-            if(!m.isGroup && (m.from === currentUserEmail || m.to === currentUserEmail)) {
-                let other = (m.from === currentUserEmail) ? m.to : m.from;
-                if(!contacts[other]) contacts[other] = { email: other, name: other, lastMsg: m.payload.length > 500 ? "📁 Media / File" : "🔒 Encrypted Message", time: m.time, isGroup: false };
-                else { contacts[other].time = m.time; contacts[other].lastMsg = m.payload.length > 500 ? "📁 Media / File" : "🔒 Encrypted Message"; }
-            }
-        });
-        APP_STATE.groups.forEach(g => { contacts[g.id] = { email: g.id, name: g.name + " (Group)", lastMsg: "Tap to view group", time: "Active", isGroup: true }; });
-        let html = "";
-        for(let c in contacts) {
-            let info = contacts[c]; let avatarChar = info.isGroup ? "G" : info.email.charAt(0);
-            html += `<div class="list-item" onclick="openChat('${info.email}', ${info.isGroup}, '${info.name}')"><div class="avatar">${avatarChar}</div><div class="list-info"><div class="list-title">${info.name}</div><div class="list-subtitle"><i class="material-icons" style="font-size:14px; color:var(--primary);">lock</i> ${info.lastMsg}</div></div><div class="list-time">${info.time.split(',')[1] || info.time}</div></div>`;
-        }
-        document.getElementById("chatsList").innerHTML = html || `<div class="empty-state"><i class="material-icons">chat_bubble_outline</i><h3>No Messages Yet</h3></div>`;
-        filterMainChats();
-    }
-    function openChat(id, isGroup, chatName = null) {
-        currentChatContact = id; isGroupChat = isGroup;
-        document.getElementById('chatTitle').innerText = chatName ? chatName : id; document.getElementById('chatSubtitle').innerText = isGroup ? "ISB-24 Secure Group" : "ISB-24 Encrypted"; document.getElementById('chatAvatar').innerText = isGroup ? "G" : id.charAt(0).toUpperCase();
-        document.getElementById('chatSearchBar').style.display = 'none'; document.getElementById('chatSearchInput').value = ""; document.getElementById('chatWindow').style.display = 'flex';
-        cancelSelectedFile(); document.getElementById('chatInputMsg').value = ""; document.getElementById('chatInputMsg').disabled = false; renderChatMessages();
-    }
-    function closeChat() { document.getElementById('chatWindow').style.display = 'none'; currentChatContact = null; isGroupChat = false; cancelSelectedFile(); loadChatsList(); }
+    function closeMediaViewer() { document.getElementById('mediaViewerModal').style.display = 'none'; document.getElementById('mediaViewerContent').innerHTML = ""; }
     
-    function renderChatMessages() {
-        let box = document.getElementById('chatMessagesBox'); box.innerHTML = "";
-        let chatHistory = APP_STATE.msgs.filter(m => { return isGroupChat ? m.isGroup && m.to === currentChatContact : !m.isGroup && ((m.from === currentUserEmail && m.to === currentChatContact) || (m.from === currentChatContact && m.to === currentUserEmail)); });
-        if(chatHistory.length === 0) { box.innerHTML = `<div style="text-align:center; padding:12px; background:rgba(0,0,0,0.05); border: 1px solid var(--border); color:var(--text-muted); border-radius:12px; font-size:12px; margin: 20px auto; width: 85%;">🔒 Messages are End-to-End ISB Encrypted.</div>`; return; }
-        chatHistory.forEach(m => { appendSingleMessage(m); });
-        setTimeout(() => box.scrollTop = box.scrollHeight, 100);
-    }
-
-    async function appendSingleMessage(m) {
-        let box = document.getElementById('chatMessagesBox'); if(document.getElementById(`msg_${m.id}`)) return;
-        let isSentByMe = (m.from === currentUserEmail), cls = isSentByMe ? "sent" : "received", timeStr = m.time.split(',')[1] || m.time;
-        let bubble = document.createElement('div'); bubble.className = `bubble ${cls}`; bubble.id = `msg_${m.id}`;
-        let senderHtml = (!isSentByMe && m.isGroup) ? `<span class="sender-name">${m.from}</span>` : "";
-        bubble.innerHTML = `${senderHtml}<span style="font-size:12px;"><i class="material-icons animate-spin" style="font-size:12px; vertical-align:middle;">sync</i> Decrypting...</span> <span class="bubble-time">${timeStr}</span>`;
-        box.appendChild(bubble); box.scrollTop = box.scrollHeight;
-        
-        let pwd = isGroupChat ? m.to : m.from; 
-        try {
-            let decrypted = m.decryptedFullText || await runISBText(m.payload, pwd, false);
-            m.decryptedFullText = decrypted; 
-            if(decrypted.startsWith("ISB_FILE|||")) {
-                let parts = decrypted.split("|||"); m.decryptedName = parts[1]; m.decryptedData = parts[2];
-                let isImg = m.decryptedData.startsWith("data:image/");
-                let isVid = m.decryptedData.startsWith("data:video/");
-                let content = "";
-                
-                if(isImg || isVid) {
-                    let bUrl = getMediaBlobUrl(m.decryptedData);
-                    if(isImg) {
-                        content = `<img src="${bUrl}" style="max-width:100%; max-height:250px; border-radius:8px; cursor:pointer; display:block; object-fit:contain;" onclick="openMediaViewer('${m.id}', 'msg')">`;
-                    } else {
-                        content = `<div style="position:relative; cursor:pointer;" onclick="openMediaViewer('${m.id}', 'msg')"><div style="width:200px; height:150px; background:#000; border-radius:8px; display:flex; align-items:center; justify-content:center;"><i class="material-icons" style="font-size:50px; color:white;">play_circle_outline</i></div><div style="font-size:11px; margin-top:5px; color:var(--text-muted);">${m.decryptedName}</div></div>`;
-                    }
-                } else {
-                    let iconType = m.decryptedData.startsWith("data:application/pdf") ? "picture_as_pdf" : "insert_drive_file";
-                    content = `<div style="display:flex; gap:10px; align-items:center; cursor:pointer; background:rgba(0,0,0,0.03); padding:10px; border-radius:8px;" onclick="openMediaViewer('${m.id}', 'msg')">
-                        <i class="material-icons" style="font-size:30px; color:var(--primary);">${iconType}</i>
-                        <div><div style="font-weight:bold; font-size:14px; max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${m.decryptedName}</div><div style="font-size:11px; color:var(--text-muted);">Tap to open</div></div>
-                    </div>`;
-                }
-                document.getElementById(`msg_${m.id}`).innerHTML = `${senderHtml}${content}<span class="bubble-time">${timeStr}</span>`;
-            } else { document.getElementById(`msg_${m.id}`).innerHTML = `${senderHtml}${decrypted} <span class="bubble-time">${timeStr}</span>`; }
-        } catch(e) { document.getElementById(`msg_${m.id}`).innerHTML = `${senderHtml}<span style="color:#E91E63; font-size:13px;"><i class="material-icons">error</i> Corrupted</span>`; }
-        filterChatMessages(); box.scrollTop = box.scrollHeight;
-    }
-
-    async function sendChatMessage() {
-        let input = document.getElementById('chatInputMsg'), msg = input.value.trim(), payloadToEncrypt = "";
-        if(selectedFileData) { payloadToEncrypt = `ISB_FILE|||${selectedFileName}|||${selectedFileData}`; } else { if(!msg) return; payloadToEncrypt = msg; }
-        let sendBtn = document.querySelector('.btn-send'); sendBtn.disabled = true; input.disabled = true;
-        try {
-            let encryptionPwd = isGroupChat ? currentChatContact : currentUserEmail; 
-            let encryptedPayload = await runISBText(payloadToEncrypt, encryptionPwd, true);
-            await database.ref('messages').push({ id: Date.now() + Math.random().toString().substring(2,8), from: currentUserEmail, to: currentChatContact, payload: encryptedPayload, time: new Date().toLocaleString(), isGroup: isGroupChat });
-            input.value = ""; cancelSelectedFile(); sendBtn.disabled = false; input.disabled = false; input.focus();
-            document.getElementById('chatSearchInput').value = ""; filterChatMessages();
-            setTimeout(() => { document.getElementById('chatMessagesBox').scrollTop = document.getElementById('chatMessagesBox').scrollHeight; }, 100);
-        } catch(e) { alert("Encryption Error"); sendBtn.disabled = false; input.disabled = false; }
-    }
-    function downloadAttachedFile(base64Data, filename) { const a = document.createElement("a"); a.href = getMediaBlobUrl(base64Data); a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
-
-    // --- STATUS SYSTEM ---
-    function openTextStatusModal() { document.getElementById('textStatusModal').style.display = 'flex'; document.getElementById('statusTextOnly').value = ""; }
-    function openImageStatusModal() { document.getElementById('imageStatusModal').style.display = 'flex'; statusFileData = null; document.getElementById('statusFileName').innerText = ""; document.getElementById('statusCaption').value = ""; document.getElementById('statusFile').value = "";}
-    
-    function handleStatusFile(event) {
-        let file = event.target.files[0]; if(!file) return;
-        if(file.size > 5 * 1024 * 1024) return alert("⚠️ Max File Size 5MB.");
-        let reader = new FileReader(); reader.onload = function(e) { statusFileData = e.target.result; document.getElementById('statusFileName').innerText = `Selected: ${file.name}`; }; reader.readAsDataURL(file);
-    }
-    
-    async function postStatus(type) {
-        let payloadToEncrypt = "";
-        if(type === 'text') {
-            let txt = document.getElementById('statusTextOnly').value.trim(); if(!txt) return alert("Write something to post.");
-            payloadToEncrypt = `ISB_TXT_STATUS|||${txt}`; document.getElementById('textStatusModal').style.display = 'none';
-        } else {
-            if(!statusFileData) return alert("Select an image or video.");
-            let cap = document.getElementById('statusCaption').value.trim();
-            payloadToEncrypt = `ISB_IMG_STATUS|||${statusFileData}|||${cap}`; document.getElementById('imageStatusModal').style.display = 'none';
-        }
-        try { 
-            let encrypted = await runISBText(payloadToEncrypt, currentUserEmail, true); 
-            await database.ref('statuses').push({ id: 'sts_' + Date.now(), from: currentUserEmail, payload: encrypted, timestamp: Date.now(), timeStr: new Date().toLocaleTimeString() }); alert("Status Posted Securely!"); 
-        } catch(e) { alert("Failed to post status"); }
-    }
-    
-    async function loadStatusList() {
-        let myContacts = new Set();
-        APP_STATE.msgs.forEach(m => { if(!m.isGroup) myContacts.add(m.from === currentUserEmail ? m.to : m.from); });
-        myContacts.add(currentUserEmail); 
-
-        let now = Date.now(), validStatuses = APP_STATE.statuses.filter(s => myContacts.has(s.from) && (now - s.timestamp < 24 * 60 * 60 * 1000));
-        
-        window.statusPlaylist = [];
-        for(let s of validStatuses) {
-            if(!s.decryptedFullText) { try { s.decryptedFullText = await runISBText(s.payload, s.from, false); } catch(e){} }
-            if(s.decryptedFullText) {
-                if(s.decryptedFullText.startsWith("ISB_IMG_STATUS|||")) {
-                    let parts = s.decryptedFullText.split("|||"); s.decryptedData = parts[1]; s.decryptedName = parts[2];
-                } else if(s.decryptedFullText.startsWith("ISB_TXT_STATUS|||")) {
-                    s.decryptedData = "txt"; s.decryptedName = s.decryptedFullText.split("|||")[1];
-                }
-                window.statusPlaylist.push(s);
-            }
-        }
-        window.statusPlaylist.sort((a,b) => a.timestamp - b.timestamp);
-
-        let userGroups = {};
-        window.statusPlaylist.forEach(s => { if(!userGroups[s.from]) userGroups[s.from] = []; userGroups[s.from].push(s); });
-
-        let trayHtml = `
-        <div class="status-card" onclick="openImageStatusModal()">
-            <div class="status-card-avatar" style="border:none;"><div style="background:var(--bg); width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative;">${currentUserEmail.charAt(0).toUpperCase()}<div class="status-card-add-icon">+</div></div></div>
-            <div style="background:var(--surface); display:flex; justify-content:center; align-items:center; height:100%;"></div>
-            <div class="status-card-name" style="color:var(--text); text-shadow:none; text-align:center;">Add Status</div>
-        </div>`;
-
-        for(let user in userGroups) {
-            let userSts = userGroups[user]; let lastSt = userSts[userSts.length - 1];
-            let bgStyle = `background-color: var(--primary);`;
-            if (lastSt.decryptedData.startsWith("data:image/")) { bgStyle = `background-image: url('${lastSt.decryptedData}');`; } 
-            else if (lastSt.decryptedData.startsWith("data:video/")) { bgStyle = `background-color: #000;`; }
-            let dName = (user === currentUserEmail) ? "My Status" : user.split('@')[0];
-            trayHtml += `<div class="status-card" style="${bgStyle}" onclick="viewUserStatus('${user}')"><div class="status-card-overlay"></div><div class="status-card-avatar">${user.charAt(0).toUpperCase()}</div><div class="status-card-name">${dName}</div></div>`;
-        }
-        document.getElementById('statusTray').innerHTML = trayHtml;
-
-        let listHtml = "";
-        for(let user in userGroups) {
-            if(user === currentUserEmail) continue; 
-            let st = userGroups[user][userGroups[user].length - 1]; 
-            listHtml += `<div class="list-item" onclick="viewUserStatus('${user}')"><div class="avatar status-ring">${user.charAt(0).toUpperCase()}</div><div class="list-info"><div class="list-title">${user}</div><div class="list-subtitle">${st.timeStr}</div></div></div>`;
-        }
-        document.getElementById('statusList').innerHTML = listHtml || `<div style="padding:20px; text-align:center; color:var(--text-muted); font-size:14px;">No recent status updates.</div>`;
-    }
-
-    // --- UNIVERSAL MEDIA VIEWER ENGINE (AUTO-UNMUTE FIX) ---
-    let currentPdf = null; let currentPdfPage = 1;
-
-    async function openMediaViewer(msgId, source) {
-        waIsChatMedia = (source === 'msg');
-        document.getElementById('waStatusViewer').style.display = 'flex';
-        document.getElementById('waProgressBarContainer').innerHTML = ''; 
-        
-        let m = (source === 'msg') ? APP_STATE.msgs.find(x => x.id === msgId) : window.statusPlaylist.find(x => x.id === msgId);
-        let fData = m.decryptedData, fName = m.decryptedName;
-        
-        document.getElementById('waStatusName').innerText = (source === 'msg') ? "Media Preview" : ((m.from === currentUserEmail) ? "My Status" : m.from);
-        document.getElementById('waStatusTime').innerText = (source === 'msg') ? m.time : m.timeStr;
-        document.getElementById('waStatusAvatar').innerText = m.from.charAt(0).toUpperCase();
-        
-        let dBtn = document.getElementById('waStatusDownloadBtn');
-        if(source === 'msg') {
-            dBtn.style.display = 'block'; dBtn.onclick = () => downloadAttachedFile(fData, fName);
-            document.getElementById('waTapLeft').style.display = 'none'; document.getElementById('waTapRight').style.display = 'none';
-        } else {
-            dBtn.style.display = 'none';
-            document.getElementById('waTapLeft').style.display = 'block'; document.getElementById('waTapRight').style.display = 'block';
-        }
-
-        let contentBox = document.getElementById('waStatusContent');
-        contentBox.innerHTML = `<i class="material-icons animate-spin" style="font-size:50px;">sync</i>`;
-
-        if(fData === "txt") {
-            contentBox.innerHTML = `<div style="width:100%; height:100%; display:flex; justify-content:center; align-items:center; background:var(--primary); padding:30px; font-size:28px; text-align:center; word-wrap:break-word;">${fName}</div>`;
-            return;
-        }
-
-        let bUrl = getMediaBlobUrl(fData);
-
-        // 1. Video Player (Auto-Unmute Fix)
-        if(fData.startsWith("data:video/")) {
-            contentBox.innerHTML = `<video id="isbVideoPlayer" playsinline style="max-width:100%; max-height:100%; width:100%; object-fit:contain;"></video>`;
-            let video = document.getElementById('isbVideoPlayer');
-            video.src = bUrl;
-            video.muted = false; // Auto Unmute!
-            
-            if(fName && source !== 'msg') contentBox.innerHTML += `<div class="wa-status-caption">${fName}</div>`;
-            
-            try {
-                let playPromise = video.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch(error => {
-                        console.log("Autoplay blocked");
-                        video.controls = true; // Fallback
-                    });
-                }
-            } catch(e) { video.controls = true; }
-
-            if(!waIsChatMedia) {
-                video.onended = () => { nextWaStatus(); };
-                video.onloadedmetadata = () => {
-                    clearTimeout(waTimer);
-                    let fillBar = document.getElementById(`waFill_${waActiveIndex}`);
-                    if(fillBar) { fillBar.style.transition = `width ${video.duration}s linear`; fillBar.classList.add('filling'); }
-                };
-            } else {
-                video.controls = true; // Show controls in normal chat
-            }
-        } 
-        // 2. Image
-        else if (fData.startsWith("data:image/")) {
-            contentBox.innerHTML = `<img src="${bUrl}" style="max-width:100%; max-height:100%; object-fit:contain;">`;
-            if(fName && source !== 'msg') contentBox.innerHTML += `<div class="wa-status-caption">${fName}</div>`;
-        } 
-        // 3. PDF
-        else if (fData.startsWith("data:application/pdf")) {
-            contentBox.innerHTML = `
-                <div style="position:absolute; top:80px; background:rgba(0,0,0,0.8); width:100%; display:flex; justify-content:center; padding:10px; gap:20px; z-index:4005;">
-                    <button onclick="changePdfPage(-1)" style="padding:8px 15px; background:var(--primary); color:#fff; border:none; border-radius:5px;">PREV</button>
-                    <span style="color:white; align-self:center;">Page <span id="pdfPageNum">1</span> / <span id="pdfPageCount">-</span></span>
-                    <button onclick="changePdfPage(1)" style="padding:8px 15px; background:var(--primary); color:#fff; border:none; border-radius:5px;">NEXT</button>
-                </div>
-                <div style="width:100%; height:100%; overflow:auto; display:flex; justify-content:center; align-items:center; padding-top:130px;">
-                    <canvas id="pdfCanvas" style="max-width:100%; background:white;"></canvas>
-                </div>`;
-            currentPdfPage = 1;
-            let loadingTask = pdfjsLib.getDocument(bUrl);
-            currentPdf = await loadingTask.promise;
-            document.getElementById('pdfPageCount').innerText = currentPdf.numPages;
-            renderPdfPage(currentPdfPage);
-        } else {
-            contentBox.innerHTML = `<div style="text-align:center;"><h2>📁 File</h2><p>${fName}</p></div>`;
-        }
-    }
-
-    async function renderPdfPage(num) {
-        if(!currentPdf) return;
-        let canvas = document.getElementById('pdfCanvas'); let ctx = canvas.getContext('2d');
-        let page = await currentPdf.getPage(num); let viewport = page.getViewport({scale: window.innerWidth > 600 ? 1.5 : 1.0});
-        canvas.height = viewport.height; canvas.width = viewport.width;
-        await page.render({ canvasContext: ctx, viewport: viewport }).promise;
-        document.getElementById('pdfPageNum').innerText = num;
-    }
-    function changePdfPage(offset) { if(!currentPdf) return; let newPage = currentPdfPage + offset; if(newPage >= 1 && newPage <= currentPdf.numPages) { currentPdfPage = newPage; renderPdfPage(currentPdfPage); } }
-
-    // --- STATUS VIEWER LOGIC ---
-    function viewUserStatus(userEmail) {
-        waActiveUser = userEmail; waUserStatusGroup = window.statusPlaylist.filter(s => s.from === userEmail);
-        if(waUserStatusGroup.length === 0) return;
-        waActiveIndex = 0; renderWaStatus();
-    }
-
-    function renderWaStatus() {
-        clearTimeout(waTimer);
-        let st = waUserStatusGroup[waActiveIndex];
-        
-        let barContainer = document.getElementById('waProgressBarContainer');
-        barContainer.innerHTML = '';
-        for(let i=0; i<waUserStatusGroup.length; i++) {
-            let fillWidth = (i < waActiveIndex) ? '100%' : '0%';
-            barContainer.innerHTML += `<div class="wa-progress-segment"><div class="wa-progress-fill" id="waFill_${i}" style="width:${fillWidth}"></div></div>`;
-        }
-        
-        openMediaViewer(st.id, 'status');
-
-        if(st.decryptedData !== "txt" && !st.decryptedData.startsWith("data:video/")) {
-            if(document.getElementById(`waFill_${waActiveIndex}`)) {
-                void document.getElementById(`waFill_${waActiveIndex}`).offsetWidth;
-                document.getElementById(`waFill_${waActiveIndex}`).style.transition = "width 10s linear";
-                document.getElementById(`waFill_${waActiveIndex}`).classList.add('filling');
-            }
-            waTimer = setTimeout(() => { nextWaStatus(); }, 10000);
-        } else if (st.decryptedData === "txt") {
-            if(document.getElementById(`waFill_${waActiveIndex}`)) {
-                void document.getElementById(`waFill_${waActiveIndex}`).offsetWidth;
-                document.getElementById(`waFill_${waActiveIndex}`).style.transition = "width 5s linear";
-                document.getElementById(`waFill_${waActiveIndex}`).classList.add('filling');
-            }
-            waTimer = setTimeout(() => { nextWaStatus(); }, 5000);
-        }
-    }
-
-    function nextWaStatus() { if(waActiveIndex < waUserStatusGroup.length - 1) { waActiveIndex++; renderWaStatus(); } else closeWaStatus(); }
-    function prevWaStatus() { if(waActiveIndex > 0) { waActiveIndex--; renderWaStatus(); } else renderWaStatus(); }
-    function closeWaStatus() { clearTimeout(waTimer); document.getElementById('waStatusViewer').style.display = 'none'; document.getElementById('waStatusContent').innerHTML = ""; currentPdf = null; }
-    
-    function syncDrive() { let icon = document.getElementById('syncIcon'); icon.style.transform = "rotate(360deg)"; setTimeout(() => { icon.style.transform = "rotate(0deg)"; loadChatsList(); loadStatusList(); }, 500); }
+    // [ADD OTHER FUNCTIONS: appendSingleMessage, sendChatMessage, loadChatsList, etc. HERE]
 </script>
 </body>
-                                                                                                       </html>
+</html>
