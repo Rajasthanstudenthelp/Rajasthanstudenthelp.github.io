@@ -127,11 +127,11 @@
         .theme-circle { width: 50px; height: 50px; border-radius: 50%; cursor: pointer; border: 3px solid transparent;}
         .theme-circle.active { border-color: var(--text); transform: scale(1.1); }
 
-        /* --- BRAHMA CORE PLAYER STYLES --- */
-        .brahma-player-section { background: #0a0a0a; border: 2px solid #00ffcc; padding: 20px; border-radius: 16px; width: 90%; max-width: 650px; box-shadow: 0 0 20px rgba(0, 255, 204, 0.2); box-sizing: border-box; font-family: 'Share Tech Mono', monospace; margin: auto; }
+        /* --- BRAHMA CORE LOCAL PLAYER STYLES --- */
+        .brahma-player-section { background: #0a0a0a; border: 2px solid #00ffcc; padding: 20px; border-radius: 16px; width: 90%; max-width: 650px; box-shadow: 0 0 20px rgba(0, 255, 204, 0.2); box-sizing: border-box; font-family: 'Share Tech Mono', monospace; margin: auto; z-index: 4005; }
         .brahma-section-title { font-weight: bold; font-size: 16px; margin-bottom: 15px; color: #00ffcc; border-left: 4px solid #00ffcc; padding-left: 10px; text-transform: uppercase; letter-spacing: 1px; text-align: left; }
         .brahma-preview-area { text-align: center; padding: 15px; background: #111111; border: 1px solid #004400; border-radius: 12px; overflow: hidden; }
-        .brahma-video { width: 100%; max-height: 500px; border-radius: 8px; background: #000; outline: none; box-shadow: 0 4px 15px rgba(0,0,0,0.5); object-fit: contain; }
+        .brahma-video { width: 100%; max-height: 400px; border-radius: 8px; background: #000; outline: none; box-shadow: 0 4px 15px rgba(0,0,0,0.5); object-fit: contain; }
         .brahma-status-text { color: #00ffcc; font-weight: bold; margin-bottom: 10px; font-size: 13px; }
     </style>
 </head>
@@ -259,7 +259,49 @@
     let waTimer = null;
     let waIsChatMedia = false; 
 
-    window.onload = function() {
+    // --- INDEXED DB LOCAL STORAGE (BRAHMA CORE) ---
+    const dbName = "ISB_MediaDB";
+    const storeName = "mediaStore";
+    let mediaDB;
+
+    function initDB() {
+        return new Promise((resolve, reject) => {
+            let request = indexedDB.open(dbName, 1);
+            request.onupgradeneeded = function(e) {
+                let db = e.target.result;
+                if (!db.objectStoreNames.contains(storeName)) {
+                    db.createObjectStore(storeName);
+                }
+            };
+            request.onsuccess = function(e) { mediaDB = e.target.result; resolve(); };
+            request.onerror = function(e) { resolve(); };
+        });
+    }
+
+    function saveMediaToLocal(id, blob) {
+        return new Promise((resolve, reject) => {
+            if(!mediaDB) return resolve();
+            let tx = mediaDB.transaction([storeName], "readwrite");
+            let store = tx.objectStore(storeName);
+            store.put(blob, id);
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject();
+        });
+    }
+
+    function getMediaFromLocal(id) {
+        return new Promise((resolve, reject) => {
+            if(!mediaDB) return reject();
+            let tx = mediaDB.transaction([storeName], "readonly");
+            let store = tx.objectStore(storeName);
+            let request = store.get(id);
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject();
+        });
+    }
+
+    window.onload = async function() {
+        await initDB();
         applyTheme(localStorage.getItem('isb_theme') || 'default');
         currentUserEmail = localStorage.getItem("isb_email");
         if(currentUserEmail) showMainApp();
@@ -342,24 +384,23 @@
         });
     }
 
-    // --- NATIVE C++ LEVEL FETCH TO BYPASS MEMORY LIMITS ---
-    async function getMediaBlobUrl(dataURI) {
-        try {
-            let res = await fetch(dataURI);
-            let blob = await res.blob();
-            return URL.createObjectURL(blob);
-        } catch(e) {
-            console.log("Fetch failed, using JS fallback...");
-            try {
-                let parts = dataURI.split(',');
-                let mime = parts[0].match(/:(.*?);/)[1];
-                let bstr = atob(parts[1]);
-                let n = bstr.length;
-                let u8arr = new Uint8Array(n);
-                for(let i=0; i<n; i++){ u8arr[i] = bstr.charCodeAt(i); }
-                return URL.createObjectURL(new Blob([u8arr], {type: mime}));
-            } catch(err) { return dataURI; }
+    // --- BRAHMA CORE: C++ STYLE MEMORY CHUNKING FOR VIDEO (NO BROWSER CRASH) ---
+    function dataURItoBlob(dataURI) {
+        let parts = dataURI.split(',');
+        let mime = parts[0].match(/:(.*?);/)[1];
+        let byteCharacters = atob(parts[1]);
+        let sliceSize = 1024;
+        let byteArrays = [];
+        for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+            let slice = byteCharacters.slice(offset, offset + sliceSize);
+            let byteNumbers = new Array(slice.length);
+            for (let i = 0; i < slice.length; i++) {
+                byteNumbers[i] = slice.charCodeAt(i);
+            }
+            let byteArray = new Uint8Array(byteNumbers);
+            byteArrays.push(byteArray);
         }
+        return new Blob(byteArrays, {type: mime});
     }
 
     // --- CHAT SYSTEM ---
@@ -443,11 +484,12 @@
                 let content = "";
                 
                 if(isImg || isVid) {
-                    let bUrl = await getMediaBlobUrl(m.decryptedData);
                     if(isImg) {
-                        content = `<img src="${bUrl}" style="max-width:100%; max-height:250px; border-radius:8px; cursor:pointer; display:block; object-fit:contain;" onclick="openMediaViewer('${m.id}', 'msg')">`;
+                        // Image direct load (fast)
+                        content = `<img src="${m.decryptedData}" style="max-width:100%; max-height:250px; border-radius:8px; cursor:pointer; display:block; object-fit:contain;" onclick="openMediaViewer('${m.id}', 'msg')">`;
                     } else {
-                        content = `<div style="position:relative; cursor:pointer;" onclick="openMediaViewer('${m.id}', 'msg')"><div style="width:200px; height:150px; background:#000; border-radius:8px; display:flex; align-items:center; justify-content:center;"><i class="material-icons" style="font-size:50px; color:white;">play_circle_outline</i></div><div style="font-size:11px; margin-top:5px; color:var(--text-muted);">${m.decryptedName}</div></div>`;
+                        // Video thumbnail
+                        content = `<div style="position:relative; cursor:pointer;" onclick="openMediaViewer('${m.id}', 'msg')"><div style="width:200px; height:150px; background:#000; border-radius:8px; display:flex; align-items:center; justify-content:center;"><i class="material-icons" style="font-size:50px; color:#00ffcc;">play_circle_outline</i></div><div style="font-size:11px; margin-top:5px; color:var(--text-muted);">${m.decryptedName}</div></div>`;
                     }
                 } else {
                     let iconType = m.decryptedData.startsWith("data:application/pdf") ? "picture_as_pdf" : "insert_drive_file";
@@ -477,7 +519,8 @@
     }
     
     async function downloadAttachedFile(base64Data, filename) { 
-        let bUrl = await getMediaBlobUrl(base64Data);
+        let blob = dataURItoBlob(base64Data);
+        let bUrl = URL.createObjectURL(blob);
         const a = document.createElement("a"); a.href = bUrl; a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); 
     }
 
@@ -582,34 +625,50 @@
         }
 
         let contentBox = document.getElementById('waStatusContent');
-        contentBox.innerHTML = `<i class="material-icons animate-spin" style="font-size:50px;">sync</i>`;
+        contentBox.innerHTML = `
+            <div class="brahma-player-section">
+                <div class="brahma-section-title">Brahma Core - Local Engine</div>
+                <div class="brahma-preview-area" id="brahmaPreviewArea">
+                    <div class="brahma-status-text" id="brahmaStatus">DOWNLOADING TO LOCAL STORAGE...</div>
+                    <div class="material-icons animate-spin" style="font-size:40px; color:#00ffcc;">sync</div>
+                </div>
+            </div>`;
 
         if(fData === "txt") {
             contentBox.innerHTML = `<div style="width:100%; height:100%; display:flex; justify-content:center; align-items:center; background:var(--primary); padding:30px; font-size:28px; text-align:center; word-wrap:break-word;">${fName}</div>`;
             return;
         }
 
-        let bUrl = await getMediaBlobUrl(fData);
+        // --- BRAHMA CORE C++ STYLE LOCAL STORAGE RECORDING ---
+        // 1. Give UI time to render download message
+        await new Promise(r => setTimeout(r, 300)); 
+        
+        // 2. Convert directly using chunking algorithm (No browser crash)
+        let blob = dataURItoBlob(fData);
+        
+        // 3. Save to IndexedDB
+        document.getElementById('brahmaStatus').innerText = "RECORDING TO LOCAL DISK...";
+        await saveMediaToLocal(msgId, blob);
+        
+        // 4. Fetch from Local IndexedDB
+        document.getElementById('brahmaStatus').innerText = "PLAYING FROM LOCAL STORAGE...";
+        await new Promise(r => setTimeout(r, 200)); 
+        let localBlob = await getMediaFromLocal(msgId);
+        let bUrl = URL.createObjectURL(localBlob);
 
-        // 1. BRAHMA CORE VIDEO PLAYER (C++ Style Fetch)
+        let previewArea = document.getElementById('brahmaPreviewArea');
+        previewArea.innerHTML = `<div class="brahma-status-text">DECRYPTED 0101 CODE RENDERED</div>`;
+
+        // 1. BRAHMA CORE VIDEO PLAYER
         if(fData.startsWith("data:video/")) {
-            contentBox.innerHTML = `
-                <div class="brahma-player-section">
-                    <div class="brahma-section-title">Brahma Core - Video Engine</div>
-                    <div class="brahma-preview-area">
-                        <div class="brahma-status-text">DECRYPTED 0101 CODE RENDERED</div>
-                        <video id="activeVideoPlayer" class="brahma-video" controls autoplay playsinline></video>
-                    </div>
-                </div>`;
-                
+            previewArea.innerHTML += `<video id="activeVideoPlayer" class="brahma-video" src="${bUrl}" controls autoplay playsinline></video>`;
             let video = document.getElementById('activeVideoPlayer');
-            video.src = bUrl;
             
             try {
                 let playPromise = video.play();
                 if (playPromise !== undefined) {
                     playPromise.catch(error => {
-                        console.log("Unmuted autoplay blocked, trying muted fallback...");
+                        console.log("Unmuted autoplay blocked, forcing play...");
                         video.muted = true;
                         video.play().catch(e => { video.controls = true; });
                     });
@@ -630,15 +689,8 @@
         } 
         // 2. BRAHMA CORE IMAGE VIEWER
         else if (fData.startsWith("data:image/")) {
-            contentBox.innerHTML = `
-                <div class="brahma-player-section">
-                    <div class="brahma-section-title">Brahma Core - Image Engine</div>
-                    <div class="brahma-preview-area">
-                        <div class="brahma-status-text">DECRYPTED 0101 CODE RENDERED</div>
-                        <img src="${bUrl}" style="max-width:100%; max-height:400px; border-radius:8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); object-fit:contain;">
-                    </div>
-                    ${fName && source !== 'msg' ? `<div style="text-align:center; margin-top:15px; color:#00ffcc;">${fName}</div>` : ''}
-                </div>`;
+            previewArea.innerHTML += `<img src="${bUrl}" style="max-width:100%; max-height:400px; border-radius:8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); object-fit:contain;">`;
+            if(fName && source !== 'msg') previewArea.innerHTML += `<div style="text-align:center; margin-top:15px; color:#00ffcc;">${fName}</div>`;
         } 
         // 3. PDF
         else if (fData.startsWith("data:application/pdf")) {
@@ -713,4 +765,4 @@
     
 </script>
 </body>
-            </html>
+                    </html>
