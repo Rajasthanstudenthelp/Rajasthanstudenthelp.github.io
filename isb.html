@@ -19,6 +19,9 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     
     <style>
+        /* BRAHMA CORE FONTS */
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
         /* 12 PREMIUM THEMES */
         :root { --primary: #3F51B5; --primary-dark: #303F9F; --bg: #f0f2f5; --surface: #ffffff; --text: #1c1e21; --text-muted: #65676B; --border: #e4e6eb; --msg-sent: #E8EAF6; --msg-recv: #ffffff; --nav-bg: #ffffff; }
         [data-theme="dark"] { --primary: #5C6BC0; --primary-dark: #3F51B5; --bg: #121212; --surface: #1e1e1e; --text: #e4e6eb; --text-muted: #b0b3b8; --border: #333333; --msg-sent: #2c387e; --msg-recv: #242526; --nav-bg: #1e1e1e; }
@@ -61,7 +64,7 @@
         .list-subtitle { font-size: 14px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 5px;}
         .list-time { font-size: 12px; color: var(--text-muted); font-weight: 500; }
 
-        .fab { position: fixed; bottom: 85px; right: 20px; width: 60px; height: 60px; background: var(--primary); color: var(--surface); border-radius: 20px; display: flex; justify-content: center; align-items: center; box-shadow: 0 10px 20px rgba(0,0,0,0.15); cursor: pointer; z-index: 90;}
+        .fab { position: fixed; bottom: 85px; right: 20px; width: 60px; height: 60px; background: #25D366; color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 10px 20px rgba(0,0,0,0.15); cursor: pointer; z-index: 90;}
         .fab-secondary { bottom: 160px; background: var(--surface); color: var(--primary); border: 1px solid var(--border); }
         .fab-pencil { position: fixed; bottom: 160px; right: 28px; width: 45px; height: 45px; background: var(--surface); color: var(--text-muted); border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.15); cursor: pointer; z-index: 90; border: 1px solid var(--border);}
 
@@ -123,6 +126,13 @@
         .theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 10px 20px; }
         .theme-circle { width: 50px; height: 50px; border-radius: 50%; cursor: pointer; border: 3px solid transparent;}
         .theme-circle.active { border-color: var(--text); transform: scale(1.1); }
+
+        /* --- BRAHMA CORE PLAYER STYLES --- */
+        .brahma-player-section { background: #0a0a0a; border: 2px solid #00ffcc; padding: 20px; border-radius: 16px; width: 90%; max-width: 650px; box-shadow: 0 0 20px rgba(0, 255, 204, 0.2); box-sizing: border-box; font-family: 'Share Tech Mono', monospace; margin: auto; }
+        .brahma-section-title { font-weight: bold; font-size: 16px; margin-bottom: 15px; color: #00ffcc; border-left: 4px solid #00ffcc; padding-left: 10px; text-transform: uppercase; letter-spacing: 1px; text-align: left; }
+        .brahma-preview-area { text-align: center; padding: 15px; background: #111111; border: 1px solid #004400; border-radius: 12px; overflow: hidden; }
+        .brahma-video { width: 100%; max-height: 500px; border-radius: 8px; background: #000; outline: none; box-shadow: 0 4px 15px rgba(0,0,0,0.5); object-fit: contain; }
+        .brahma-status-text { color: #00ffcc; font-weight: bold; margin-bottom: 10px; font-size: 13px; }
     </style>
 </head>
 <body data-theme="default">
@@ -241,6 +251,7 @@
 
     let APP_STATE = { msgs: [], groups: [], statuses: [] };
     
+    // Media & Status JS Engine Vars
     window.statusPlaylist = []; 
     let waActiveUser = null;
     let waUserStatusGroup = [];
@@ -331,35 +342,24 @@
         });
     }
 
-    // --- C++ STYLE MEMORY CHUNKING FOR VIDEO (NO BROWSER CRASH) ---
+    // --- NATIVE C++ LEVEL FETCH TO BYPASS MEMORY LIMITS ---
     async function getMediaBlobUrl(dataURI) {
-        return new Promise((resolve) => {
+        try {
+            let res = await fetch(dataURI);
+            let blob = await res.blob();
+            return URL.createObjectURL(blob);
+        } catch(e) {
+            console.log("Fetch failed, using JS fallback...");
             try {
                 let parts = dataURI.split(',');
                 let mime = parts[0].match(/:(.*?);/)[1];
-                let b64Data = parts[1];
-
-                let byteCharacters = atob(b64Data.replace(/[^A-Za-z0-9+/=]/g, ''));
-                let byteArrays = [];
-                let sliceSize = 1024 * 8; // Process in 8KB chunks (C++ style memory logic)
-
-                for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-                    let slice = byteCharacters.slice(offset, offset + sliceSize);
-                    let byteNumbers = new Array(slice.length);
-                    for (let i = 0; i < slice.length; i++) {
-                        byteNumbers[i] = slice.charCodeAt(i);
-                    }
-                    let byteArray = new Uint8Array(byteNumbers);
-                    byteArrays.push(byteArray);
-                }
-
-                let blob = new Blob(byteArrays, {type: mime});
-                resolve(URL.createObjectURL(blob));
-            } catch(e) {
-                console.error("Blob memory error", e);
-                resolve(dataURI); 
-            }
-        });
+                let bstr = atob(parts[1]);
+                let n = bstr.length;
+                let u8arr = new Uint8Array(n);
+                for(let i=0; i<n; i++){ u8arr[i] = bstr.charCodeAt(i); }
+                return URL.createObjectURL(new Blob([u8arr], {type: mime}));
+            } catch(err) { return dataURI; }
+        }
     }
 
     // --- CHAT SYSTEM ---
@@ -557,7 +557,7 @@
         document.getElementById('statusList').innerHTML = listHtml || `<div class="empty-state"><i class="material-icons">chat_bubble_outline</i><h3>No Messages Yet</h3></div>`;
     }
 
-    // --- UNIVERSAL PURE JS MEDIA VIEWER ENGINE ---
+    // --- BRAHMA CORE: UNIVERSAL MEDIA VIEWER ENGINE ---
     let currentPdf = null; let currentPdfPage = 1;
 
     async function openMediaViewer(msgId, source) {
@@ -582,43 +582,34 @@
         }
 
         let contentBox = document.getElementById('waStatusContent');
-        while (contentBox.firstChild) { contentBox.removeChild(contentBox.firstChild); }
+        contentBox.innerHTML = `<i class="material-icons animate-spin" style="font-size:50px;">sync</i>`;
 
         if(fData === "txt") {
-            let div = document.createElement('div');
-            div.style.cssText = "width:100%; height:100%; display:flex; justify-content:center; align-items:center; background:var(--primary); padding:30px; font-size:28px; text-align:center; word-wrap:break-word;";
-            div.innerText = fName;
-            contentBox.appendChild(div);
+            contentBox.innerHTML = `<div style="width:100%; height:100%; display:flex; justify-content:center; align-items:center; background:var(--primary); padding:30px; font-size:28px; text-align:center; word-wrap:break-word;">${fName}</div>`;
             return;
         }
 
-        let bUrl = await getMediaBlobUrl(fData); // PURE JS MEMORY CHUNKING API
+        let bUrl = await getMediaBlobUrl(fData);
 
-        // 1. Video Player (Pure DOM Fix)
+        // 1. BRAHMA CORE VIDEO PLAYER (C++ Style Fetch)
         if(fData.startsWith("data:video/")) {
-            let video = document.createElement('video');
+            contentBox.innerHTML = `
+                <div class="brahma-player-section">
+                    <div class="brahma-section-title">Brahma Core - Video Engine</div>
+                    <div class="brahma-preview-area">
+                        <div class="brahma-status-text">DECRYPTED 0101 CODE RENDERED</div>
+                        <video id="activeVideoPlayer" class="brahma-video" controls autoplay playsinline></video>
+                    </div>
+                </div>`;
+                
+            let video = document.getElementById('activeVideoPlayer');
             video.src = bUrl;
-            video.playsInline = true;
-            video.style.maxWidth = '100%';
-            video.style.maxHeight = '100%';
-            video.style.width = '100%';
-            video.style.objectFit = 'contain';
             
-            contentBox.appendChild(video);
-
-            if(fName && source !== 'msg') {
-                let caption = document.createElement('div');
-                caption.className = 'wa-status-caption';
-                caption.innerText = fName;
-                contentBox.appendChild(caption);
-            }
-
             try {
                 let playPromise = video.play();
                 if (playPromise !== undefined) {
                     playPromise.catch(error => {
                         console.log("Unmuted autoplay blocked, trying muted fallback...");
-                        video.controls = true;
                         video.muted = true;
                         video.play().catch(e => { video.controls = true; });
                     });
@@ -635,25 +626,19 @@
                         fillBar.classList.add('filling'); 
                     }
                 };
-            } else {
-                video.controls = true;
             }
         } 
-        // 2. Image
+        // 2. BRAHMA CORE IMAGE VIEWER
         else if (fData.startsWith("data:image/")) {
-            let img = document.createElement('img');
-            img.src = bUrl;
-            img.style.maxWidth = '100%';
-            img.style.maxHeight = '100%';
-            img.style.objectFit = 'contain';
-            contentBox.appendChild(img);
-            
-            if(fName && source !== 'msg') {
-                let caption = document.createElement('div');
-                caption.className = 'wa-status-caption';
-                caption.innerText = fName;
-                contentBox.appendChild(caption);
-            }
+            contentBox.innerHTML = `
+                <div class="brahma-player-section">
+                    <div class="brahma-section-title">Brahma Core - Image Engine</div>
+                    <div class="brahma-preview-area">
+                        <div class="brahma-status-text">DECRYPTED 0101 CODE RENDERED</div>
+                        <img src="${bUrl}" style="max-width:100%; max-height:400px; border-radius:8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); object-fit:contain;">
+                    </div>
+                    ${fName && source !== 'msg' ? `<div style="text-align:center; margin-top:15px; color:#00ffcc;">${fName}</div>` : ''}
+                </div>`;
         } 
         // 3. PDF
         else if (fData.startsWith("data:application/pdf")) {
@@ -728,4 +713,4 @@
     
 </script>
 </body>
-                                                                               </html>
+            </html>
