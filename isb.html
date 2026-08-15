@@ -2,13 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- कीबोर्ड और स्क्रीन फिक्स करने के लिए Viewport को अपडेट किया गया -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, interactive-widget=resizes-content">
     <title>ISB-24 Premium Web3</title>
     <!-- Google Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     
-    <!-- Firebase SDK (Live Cloud Engine) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     
@@ -16,23 +15,22 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     
     <style>
-        /* 12 PREMIUM THEMES (100% ORIGINAL) */
-        :root { /* 1. Royal Indigo (Default Day) */ --primary: #3F51B5; --primary-dark: #303F9F; --bg: #f0f2f5; --surface: #ffffff; --text: #1c1e21; --text-muted: #65676B; --border: #e4e6eb; --msg-sent: #E8EAF6; --msg-recv: #ffffff; --nav-bg: #ffffff; }
-        [data-theme="dark"] { /* 2. Midnight Dark */ --primary: #5C6BC0; --primary-dark: #3F51B5; --bg: #121212; --surface: #1e1e1e; --text: #e4e6eb; --text-muted: #b0b3b8; --border: #333333; --msg-sent: #2c387e; --msg-recv: #242526; --nav-bg: #1e1e1e; }
-        [data-theme="telegram"] { /* 3. Ocean Blue */ --primary: #2AABEE; --primary-dark: #229ED9; --bg: #f4f4f4; --surface: #ffffff; --text: #222222; --text-muted: #888888; --border: #e0e0e0; --msg-sent: #E1F0FA; --msg-recv: #ffffff; --nav-bg: #ffffff; }
-        [data-theme="sunset"] { /* 4. Sunset Orange */ --primary: #FF5722; --primary-dark: #E64A19; --bg: #fdf8f5; --surface: #ffffff; --text: #3e2723; --text-muted: #8d6e63; --border: #fbe9e7; --msg-sent: #fbe9e7; --msg-recv: #ffffff; --nav-bg: #ffffff; }
-        [data-theme="forest"] { /* 5. Deep Forest */ --primary: #2E7D32; --primary-dark: #1B5E20; --bg: #f1f8e9; --surface: #ffffff; --text: #1b5e20; --text-muted: #7cb342; --border: #c8e6c9; --msg-sent: #e8f5e9; --msg-recv: #ffffff; --nav-bg: #ffffff; }
-        [data-theme="ruby"] { /* 6. Ruby Red */ --primary: #E91E63; --primary-dark: #C2185B; --bg: #fce4ec; --surface: #ffffff; --text: #4a148c; --text-muted: #ab47bc; --border: #f8bbd0; --msg-sent: #fce4ec; --msg-recv: #ffffff; --nav-bg: #ffffff; }
-        [data-theme="cyberpunk"] { /* 7. Cyberpunk */ --primary: #00E5FF; --primary-dark: #00B8D4; --bg: #09090b; --surface: #17171c; --text: #00E5FF; --text-muted: #b2ebf2; --border: #006064; --msg-sent: #006064; --msg-recv: #17171c; --nav-bg: #17171c; }
-        [data-theme="coffee"] { /* 8. Classic Coffee */ --primary: #795548; --primary-dark: #5D4037; --bg: #efebe9; --surface: #ffffff; --text: #3e2723; --text-muted: #8d6e63; --border: #d7ccc8; --msg-sent: #d7ccc8; --msg-recv: #ffffff; --nav-bg: #ffffff; }
-        [data-theme="mint"] { /* 9. Fresh Mint */ --primary: #00BFA5; --primary-dark: #00897B; --bg: #e0f2f1; --surface: #ffffff; --text: #004d40; --text-muted: #26a69a; --border: #b2dfdb; --msg-sent: #e0f2f1; --msg-recv: #ffffff; --nav-bg: #ffffff; }
-        [data-theme="gold"] { /* 10. Royal Gold */ --primary: #FFB300; --primary-dark: #FF8F00; --bg: #fff8e1; --surface: #ffffff; --text: #3e2723; --text-muted: #a1887f; --border: #ffecb3; --msg-sent: #ffecb3; --msg-recv: #ffffff; --nav-bg: #ffffff; }
-        [data-theme="orchid"] { /* 11. Dark Orchid */ --primary: #9C27B0; --primary-dark: #7B1FA2; --bg: #f3e5f5; --surface: #ffffff; --text: #4a148c; --text-muted: #ba68c8; --border: #e1bee7; --msg-sent: #f3e5f5; --msg-recv: #ffffff; --nav-bg: #ffffff; }
-        [data-theme="amoled"] { /* 12. Pitch Black (AMOLED) */ --primary: #ffffff; --primary-dark: #cccccc; --bg: #000000; --surface: #0a0a0a; --text: #ffffff; --text-muted: #666666; --border: #222222; --msg-sent: #1a1a1a; --msg-recv: #0a0a0a; --nav-bg: #050505; }
+        /* 12 PREMIUM THEMES */
+        :root { --primary: #3F51B5; --primary-dark: #303F9F; --bg: #f0f2f5; --surface: #ffffff; --text: #1c1e21; --text-muted: #65676B; --border: #e4e6eb; --msg-sent: #E8EAF6; --msg-recv: #ffffff; --nav-bg: #ffffff; }
+        [data-theme="dark"] { --primary: #5C6BC0; --primary-dark: #3F51B5; --bg: #121212; --surface: #1e1e1e; --text: #e4e6eb; --text-muted: #b0b3b8; --border: #333333; --msg-sent: #2c387e; --msg-recv: #242526; --nav-bg: #1e1e1e; }
+        [data-theme="telegram"] { --primary: #2AABEE; --primary-dark: #229ED9; --bg: #f4f4f4; --surface: #ffffff; --text: #222222; --text-muted: #888888; --border: #e0e0e0; --msg-sent: #E1F0FA; --msg-recv: #ffffff; --nav-bg: #ffffff; }
+        [data-theme="sunset"] { --primary: #FF5722; --primary-dark: #E64A19; --bg: #fdf8f5; --surface: #ffffff; --text: #3e2723; --text-muted: #8d6e63; --border: #fbe9e7; --msg-sent: #fbe9e7; --msg-recv: #ffffff; --nav-bg: #ffffff; }
+        [data-theme="forest"] { --primary: #2E7D32; --primary-dark: #1B5E20; --bg: #f1f8e9; --surface: #ffffff; --text: #1b5e20; --text-muted: #7cb342; --border: #c8e6c9; --msg-sent: #e8f5e9; --msg-recv: #ffffff; --nav-bg: #ffffff; }
+        [data-theme="ruby"] { --primary: #E91E63; --primary-dark: #C2185B; --bg: #fce4ec; --surface: #ffffff; --text: #4a148c; --text-muted: #ab47bc; --border: #f8bbd0; --msg-sent: #fce4ec; --msg-recv: #ffffff; --nav-bg: #ffffff; }
+        [data-theme="cyberpunk"] { --primary: #00E5FF; --primary-dark: #00B8D4; --bg: #09090b; --surface: #17171c; --text: #00E5FF; --text-muted: #b2ebf2; --border: #006064; --msg-sent: #006064; --msg-recv: #17171c; --nav-bg: #17171c; }
+        [data-theme="coffee"] { --primary: #795548; --primary-dark: #5D4037; --bg: #efebe9; --surface: #ffffff; --text: #3e2723; --text-muted: #8d6e63; --border: #d7ccc8; --msg-sent: #d7ccc8; --msg-recv: #ffffff; --nav-bg: #ffffff; }
+        [data-theme="mint"] { --primary: #00BFA5; --primary-dark: #00897B; --bg: #e0f2f1; --surface: #ffffff; --text: #004d40; --text-muted: #26a69a; --border: #b2dfdb; --msg-sent: #e0f2f1; --msg-recv: #ffffff; --nav-bg: #ffffff; }
+        [data-theme="gold"] { --primary: #FFB300; --primary-dark: #FF8F00; --bg: #fff8e1; --surface: #ffffff; --text: #3e2723; --text-muted: #a1887f; --border: #ffecb3; --msg-sent: #ffecb3; --msg-recv: #ffffff; --nav-bg: #ffffff; }
+        [data-theme="orchid"] { --primary: #9C27B0; --primary-dark: #7B1FA2; --bg: #f3e5f5; --surface: #ffffff; --text: #4a148c; --text-muted: #ba68c8; --border: #e1bee7; --msg-sent: #f3e5f5; --msg-recv: #ffffff; --nav-bg: #ffffff; }
+        [data-theme="amoled"] { --primary: #ffffff; --primary-dark: #cccccc; --bg: #000000; --surface: #0a0a0a; --text: #ffffff; --text-muted: #666666; --border: #222222; --msg-sent: #1a1a1a; --msg-recv: #0a0a0a; --nav-bg: #050505; }
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        /* कीबोर्ड लेआउट फिक्स */
         body, html { height: 100%; height: 100dvh; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; transition: background-color 0.3s, color 0.3s;}
         
         #authScreen { height: 100%; height: 100dvh; }
@@ -76,7 +74,7 @@
         .nav-item.active { color: var(--primary); }
         .nav-item.active i { transform: translateY(-2px); }
 
-        /* Chat Window (कीबोर्ड फिक्स के साथ) */
+        /* Chat Window */
         .chat-window { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg); z-index: 200; flex-direction: column; animation: slideIn 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;}
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
         .chat-header { flex-shrink: 0; background: var(--surface); padding: 10px 15px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid var(--border); box-shadow: 0 2px 10px rgba(0,0,0,0.05);}
@@ -91,12 +89,16 @@
         .btn-send { width: 50px; height: 50px; background: var(--primary); color: var(--surface); border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: 0.2s; flex-shrink: 0;}
         .btn-send:active { transform: scale(0.9); }
 
+        /* Preview Area */
+        #selectedFileBar { display: none; padding: 8px 15px; background: var(--surface); border-top: 1px solid var(--border); font-size: 13px; color: var(--primary); align-items: center; justify-content: space-between; }
+
         /* Bubbles */
-        .bubble { max-width: 75%; padding: 12px 16px; border-radius: 18px; font-size: 15px; line-height: 1.5; position: relative; word-wrap: break-word; box-shadow: 0 2px 5px rgba(0,0,0,0.05);}
+        .bubble { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 15px; line-height: 1.5; position: relative; word-wrap: break-word; box-shadow: 0 2px 5px rgba(0,0,0,0.05);}
         .bubble.sent { align-self: flex-end; background: var(--msg-sent); color: var(--text); border-bottom-right-radius: 4px;}
         .bubble.received { align-self: flex-start; background: var(--msg-recv); color: var(--text); border-bottom-left-radius: 4px; border: 1px solid var(--border);}
         .bubble-time { font-size: 11px; color: var(--text-muted); text-align: right; margin-top: 5px; display: block; opacity: 0.8;}
         .sender-name { font-size: 11px; font-weight: bold; color: var(--primary); margin-bottom: 4px; display: block;}
+        .chat-img-thumb { max-width: 100%; max-height: 250px; border-radius: 10px; margin-top: 5px; cursor: pointer; }
 
         /* Auth Screen */
         .auth-container { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; background: linear-gradient(135deg, var(--bg) 0%, var(--surface) 100%); }
@@ -157,13 +159,11 @@
         <div class="app-bar">
             <div class="app-title">ISB Messenger</div>
             <div class="app-bar-icons">
-                <!-- बाहरी सर्च बटन -->
                 <i class="material-icons" onclick="toggleMainSearch()">search</i>
                 <i class="material-icons" onclick="syncDrive()" id="syncIcon" title="Sync Securely">sync</i>
             </div>
         </div>
         
-        <!-- बाहरी सर्च बॉक्स -->
         <div id="mainSearchBar" class="search-container">
             <input type="text" id="mainSearchInput" class="search-input" onkeyup="filterMainChats()" placeholder="Search chats & groups...">
         </div>
@@ -230,17 +230,20 @@
                 <div style="font-size:17px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="chatTitle">User</div>
                 <div style="font-size:12px; color:var(--primary); font-weight:600;" id="chatSubtitle">ISB-24 Encrypted</div>
             </div>
-            <!-- चैट के अंदर का सर्च बटन -->
             <i class="material-icons" onclick="toggleChatSearch()">search</i>
         </div>
         
-        <!-- चैट के अंदर का सर्च बॉक्स -->
         <div id="chatSearchBar" class="search-container">
             <input type="text" id="chatSearchInput" class="search-input" onkeyup="filterChatMessages()" placeholder="Search in this chat...">
         </div>
 
         <div class="chat-messages" id="chatMessagesBox"></div>
         
+        <div id="selectedFileBar">
+            <span id="selectedFileNameDisplay">File selected</span>
+            <i class="material-icons" style="cursor:pointer;" onclick="cancelSelectedFile()">close</i>
+        </div>
+
         <div class="chat-input-area">
             <div class="attach-btn" onclick="document.getElementById('fileAttachment').click()">
                 <i class="material-icons">add</i>
@@ -316,10 +319,8 @@
     </div>
 
 <script>
-    // --- आपकी असली मास्टर चाबी (Client ID) ---
     const ISB_CLIENT_ID = "1091629496669-5881hgv7d4t01eepcq60u8mmdkguc1cn.apps.googleusercontent.com";
 
-    // --- FIREBASE कॉन्फ़िगरेशन (आपका नया सर्वर) ---
     const firebaseConfig = {
         apiKey: "AIzaSyA-d_mtHg1Age9ZggTWF3ABhUd_xn2PDKM",
         authDomain: "isb-messenger-75093.firebaseapp.com",
@@ -347,7 +348,6 @@
     let statusFileData = null;
     let isListeningToFirebase = false;
 
-    // लोकल स्टोरेज फंक्शन्स
     function getDB(name) { try { return JSON.parse(localStorage.getItem(name) || "[]"); } catch(e) { return []; } }
     function saveDB(name, data) { try { localStorage.setItem(name, JSON.stringify(data)); } catch(e) {} }
 
@@ -374,7 +374,6 @@
             }
         }
         
-        // कीबोर्ड फिक्स: जब भी टाइप करने लगें, चैट नीचे स्क्रॉल हो जाए
         let chatInput = document.getElementById("chatInputMsg");
         chatInput.addEventListener("keypress", function(e) { if (e.key === "Enter") sendChatMessage(); });
         chatInput.addEventListener("focus", function() {
@@ -419,7 +418,6 @@
         startFirebaseSync();
     }
 
-    // --- SEARCH FUNCTIONS (नया फीचर) ---
     function toggleMainSearch() {
         let b = document.getElementById('mainSearchBar');
         b.style.display = b.style.display === 'none' ? 'block' : 'none';
@@ -448,7 +446,6 @@
         });
     }
 
-    // --- Firebase Sync System ---
     function startFirebaseSync() {
         if(isListeningToFirebase) return;
         isListeningToFirebase = true;
@@ -525,34 +522,65 @@
         renderThemeGrid();
     }
 
-    // --- ISB-24 BLACKBOX WORKERS (ENCRYPTION ENGINE FIX - 100% BUG FREE) ---
+    // --- ISB-24 BLACKBOX WORKERS (RELIABLE FAST CHUNKING) ---
     const keyWorkerCode = `self.onmessage=function(e){let pwd=e.data.password;let salt=new Uint8Array(e.data.salt);let bigKey=new Uint8Array(128);for(let i=0;i<128;i++){bigKey[i]=pwd.charCodeAt(i%pwd.length)^salt[i%salt.length]^(i%256);}self.postMessage({bigKey:bigKey.buffer},[bigKey.buffer]);};`;
     const mathWorkerCode = `self.onmessage=function(e){let buffer=new Uint8Array(e.data.buffer);let isEncrypt=e.data.action==='encrypt';let bigKey=new Uint8Array(e.data.bigKey);let chunkIdx=e.data.chunkIdx;let G1=0x12345678,G2=0x87654321,G3=0xDEADBEEF,G4=0xCAFEBABE;for(let i=0;i<128;i++){let c=bigKey[i];G1=(G1>>>1)^(c<<24);G2=(G2<<3)^c;G3^=(G1>>>5);G4=(G4<<1)^(G2>>>2);}G1^=chunkIdx;G2^=(Math.imul(chunkIdx,13)>>>0);G3^=(Math.imul(chunkIdx,17)>>>0);G4^=(Math.imul(chunkIdx,19)>>>0);let dv=new DataView(buffer.buffer,buffer.byteOffset,buffer.byteLength);let words=Math.floor(buffer.length/4);let baseWordIndex=chunkIdx*1048576;for(let i=0;i<words;i++){let sizeNum=baseWordIndex+i+1;let x=sizeNum;let x2=Math.imul(x,x)>>>0;let x3=Math.imul(x2,x)>>>0;let x4=Math.imul(x3,x)>>>0;let x5=Math.imul(x4,x)>>>0;let x6=Math.imul(x5,x)>>>0;let x7=Math.imul(x6,x)>>>0;let x8=Math.imul(x7,x)>>>0;let pMode=bigKey[sizeNum%128]%6;let powerVal=(x3&((pMode===0)?0xFFFFFFFF:0))|(x4&((pMode===1)?0xFFFFFFFF:0))|(x5&((pMode===2)?0xFFFFFFFF:0))|(x6&((pMode===3)?0xFFFFFFFF:0))|(x7&((pMode===4)?0xFFFFFFFF:0))|(x8&((pMode===5)?0xFFFFFFFF:0));let pVal=bigKey[(sizeNum+15)%128];let rotInner=(Math.imul(pVal,Math.imul(pVal,pVal))>>>0)%31+1;let rotOuter=(Math.imul(powerVal%1000,powerVal%1000)+rotInner)%31+1;G1=(G1+powerVal)>>>0;G2=(G2^G1)>>>0;G2=((G2<<rotInner)|(G2>>>(32-rotInner)))>>>0;G3=(G3+G2)>>>0;G4=(G4^G3)>>>0;G4=((G4<<rotOuter)|(G4>>>(32-rotOuter)))>>>0;let g32=(G1+G2+G3+G4)>>>0;let y=(g32%10000)+1;let y2=Math.imul(y,y)>>>0;let y3=Math.imul(y2,y)>>>0;let y4=Math.imul(y3,y)>>>0;let y5=Math.imul(y4,y)>>>0;let y6=Math.imul(y5,y)>>>0;let y7=Math.imul(y6,y)>>>0;let y8=Math.imul(y7,y)>>>0;let dpMode=bigKey[(sizeNum+64)%128]%6;let dPowerVal=(y3&((dpMode===0)?0xFFFFFFFF:0))|(y4&((dpMode===1)?0xFFFFFFFF:0))|(y5&((dpMode===2)?0xFFFFFFFF:0))|(y6&((dpMode===3)?0xFFFFFFFF:0))|(y7&((dpMode===4)?0xFFFFFFFF:0))|(y8&((dpMode===5)?0xFFFFFFFF:0));let dpVal=bigKey[(sizeNum+42)%128];let dRotInner=(Math.imul(dpVal,Math.imul(dpVal,dpVal))>>>0)%31+1;let dRotOuter=(Math.imul(dPowerVal%1000,dPowerVal%1000)+dRotInner)%31+1;g32=(g32+dPowerVal)>>>0;g32=(g32^(g32>>>15))>>>0;g32=((g32<<dRotInner)|(g32>>>(32-dRotInner)))>>>0;g32=((g32<<dRotOuter)|(g32>>>(32-dRotOuter)))>>>0;let pwdGarbage=(bigKey[(sizeNum*7)%128])|(bigKey[(sizeNum*11)%128]<<8)|(bigKey[(sizeNum*13)%128]<<16)|(bigKey[(sizeNum*17)%128]<<24);g32=(g32+pwdGarbage)>>>0;g32=(g32^(pwdGarbage>>>7))>>>0;let opMode=bigKey[(sizeNum+32)%128]%3;if(isEncrypt){let d32=dv.getUint32(i*4,true);let opA=(d32+g32)>>>0;let opS=(d32-g32)>>>0;let opX=(d32^g32)>>>0;d32=(opA&((opMode===0)?0xFFFFFFFF:0))|(opS&((opMode===1)?0xFFFFFFFF:0))|(opX&((opMode===2)?0xFFFFFFFF:0));dv.setUint32(i*4,d32,true);G3=(G3^d32)>>>0;}else{let c32=dv.getUint32(i*4,true);let opA=(c32-g32)>>>0;let opS=(c32+g32)>>>0;let opX=(c32^g32)>>>0;let p32=(opA&((opMode===0)?0xFFFFFFFF:0))|(opS&((opMode===1)?0xFFFFFFFF:0))|(opX&((opMode===2)?0xFFFFFFFF:0));dv.setUint32(i*4,p32,true);G3=(G3^c32)>>>0;}}let rem=buffer.length%4;if(rem>0){let off=buffer.length-rem;for(let i=0;i<rem;i++){let sizeNum=baseWordIndex+words+i+1;let x=sizeNum;let x2=Math.imul(x,x)>>>0;let x3=Math.imul(x2,x)>>>0;let x4=Math.imul(x3,x)>>>0;let x5=Math.imul(x4,x)>>>0;let x6=Math.imul(x5,x)>>>0;let x7=Math.imul(x6,x)>>>0;let x8=Math.imul(x7,x)>>>0;let pMode=bigKey[sizeNum%128]%6;let tVal=(pMode===0)?x3:(pMode===1)?x4:(pMode===2)?x5:(pMode===3)?x6:(pMode===4)?x7:x8;let pVal=bigKey[(sizeNum+5)%128];let rIn=(Math.imul(pVal,Math.imul(pVal,pVal))>>>0)%7+1;let rOut=(Math.imul(tVal%100,tVal%100)+rIn)%7+1;G1=(G1+tVal)>>>0;let gCombined=(G1^G2^G3^G4)>>>0;gCombined=((gCombined<<rIn)|(gCombined>>>(32-rIn)))>>>0;gCombined=((gCombined<<rOut)|(gCombined>>>(32-rOut)))>>>0;let pwdGarbageByte=bigKey[(sizeNum*7)%128];let gByte=((gCombined+pwdGarbageByte+(Math.imul(sizeNum%100,sizeNum%100)>>>0))&0xFF)^(pwdGarbageByte>>2);let opMode=bigKey[(sizeNum+32)%128]%3;if(isEncrypt){let dB=buffer[off+i];let oA=(dB+gByte)&0xFF;let oS=(dB-gByte+256)&0xFF;let oX=(dB^gByte)&0xFF;dB=(opMode===0)?oA:((opMode===1)?oS:oX);buffer[off+i]=dB;G3=(G3^dB)>>>0;}else{let cB=buffer[off+i];let oA=(cB-gByte+256)&0xFF;let oS=(cB+gByte)&0xFF;let oX=(cB^gByte)&0xFF;let pB=(opMode===0)?oA:((opMode===1)?oS:oX);buffer[off+i]=pB;G3=(G3^cB)>>>0;}}}self.postMessage({type:'chunk_done',buffer:buffer.buffer,chunkIdx:chunkIdx},[buffer.buffer]);};`;
+
+    function uint8ToBase64(bytes) {
+        let binary = '';
+        let len = bytes.byteLength;
+        let chunkSize = 0x8000; // 32KB chunks prevent call stack limit
+        for (let i = 0; i < len; i += chunkSize) {
+            let sub = bytes.subarray(i, Math.min(i + chunkSize, len));
+            binary += String.fromCharCode.apply(null, sub);
+        }
+        return btoa(binary);
+    }
+
+    function base64ToUint8(base64) {
+        let binary = atob(base64.replace(/\s+/g, ''));
+        let len = binary.length;
+        let bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+            bytes[i] = binary.charCodeAt(i);
+        }
+        return bytes;
+    }
 
     async function runISBText(text, password, isEncrypt) {
         return new Promise((resolve, reject) => {
             let buffer;
-            if (isEncrypt) { buffer = new TextEncoder().encode(text); } 
-            else { try { let b64 = atob(text.replace(/\s+/g, '')); buffer = new Uint8Array(b64.length); for(let i=0; i<b64.length; i++) buffer[i] = b64.charCodeAt(i); } catch(e) { reject("Invalid Code"); return; } }
+            if (isEncrypt) { 
+                buffer = new TextEncoder().encode(text); 
+            } else { 
+                try { 
+                    buffer = base64ToUint8(text);
+                } catch(e) { reject("Invalid Code"); return; } 
+            }
+            
             let salt;
-            if (isEncrypt) { salt = crypto.getRandomValues(new Uint8Array(32)); } else { salt = buffer.slice(0, 32); buffer = buffer.slice(32); }
+            if (isEncrypt) { 
+                salt = crypto.getRandomValues(new Uint8Array(32)); 
+            } else { 
+                salt = buffer.slice(0, 32); 
+                buffer = buffer.slice(32); 
+            }
+
             let kw = new Worker(URL.createObjectURL(new Blob([keyWorkerCode], {type:'application/javascript'})));
             kw.onmessage = function(e) {
                 let bigKey = e.data.bigKey; kw.terminate();
                 let mw = new Worker(URL.createObjectURL(new Blob([mathWorkerCode], {type:'application/javascript'})));
                 mw.onmessage = function(e2) {
-                    mw.terminate(); let outBuf = new Uint8Array(e2.data.buffer);
+                    mw.terminate(); 
+                    let outBuf = new Uint8Array(e2.data.buffer);
                     if (isEncrypt) { 
                         let finalArr = new Uint8Array(32 + outBuf.length); 
                         finalArr.set(salt, 0); 
                         finalArr.set(outBuf, 32); 
-                        
-                        // FILE BUG FIX: सुरक्षित तरीके से बाइनरी को बेस64 में बदलना
-                        let binaryStr = '';
-                        for(let i=0; i<finalArr.byteLength; i++){ binaryStr += String.fromCharCode(finalArr[i]); }
-                        resolve(btoa(binaryStr)); 
-                    } 
-                    else { resolve(new TextDecoder().decode(outBuf)); }
+                        resolve(uint8ToBase64(finalArr)); 
+                    } else { 
+                        resolve(new TextDecoder().decode(outBuf)); 
+                    }
                 };
                 mw.postMessage({buffer: buffer.buffer, action: isEncrypt ? 'encrypt' : 'bigKey', bigKey: bigKey, chunkIdx: 0}, [buffer.buffer, bigKey]);
             };
@@ -565,15 +593,23 @@
         let file = event.target.files[0];
         if(!file) return;
         if(file.size > 5 * 1024 * 1024) { alert("⚠️ Max File Size 5MB."); return; }
+        
         let reader = new FileReader();
         reader.onload = function(e) {
             selectedFileData = e.target.result; 
             selectedFileName = file.name;
-            let inputMsg = document.getElementById('chatInputMsg');
-            inputMsg.value = `[File: ${file.name}]`;
-            inputMsg.disabled = true; 
+            
+            document.getElementById('selectedFileNameDisplay').innerText = `📎 ${file.name} (${(file.size/1024).toFixed(1)} KB)`;
+            document.getElementById('selectedFileBar').style.display = 'flex';
         };
         reader.readAsDataURL(file);
+    }
+
+    function cancelSelectedFile() {
+        selectedFileData = null;
+        selectedFileName = null;
+        document.getElementById('fileAttachment').value = "";
+        document.getElementById('selectedFileBar').style.display = 'none';
     }
 
     function openNewChatModal() { document.getElementById('newChatModal').style.display = 'flex'; }
@@ -611,7 +647,7 @@
         msgs.forEach(m => {
             if(!m.isGroup && (m.from === currentUserEmail || m.to === currentUserEmail)) {
                 let other = (m.from === currentUserEmail) ? m.to : m.from;
-                let preview = m.payload.length > 500 ? "📁 Secure File" : "🔒 Encrypted Message";
+                let preview = m.payload.length > 500 ? "📁 Secure File / Media" : "🔒 Encrypted Message";
                 if(!contacts[other]) contacts[other] = { email: other, name: other, lastMsg: preview, time: m.time, isGroup: false };
                 else { contacts[other].time = m.time; contacts[other].lastMsg = preview; }
             }
@@ -637,7 +673,7 @@
         }
         if(html === "") html = `<div class="empty-state"><i class="material-icons">chat_bubble_outline</i><h3>No Messages Yet</h3><p>Tap the button below to start a secure chat.</p></div>`;
         document.getElementById("chatsList").innerHTML = html;
-        filterMainChats(); // सर्च अप्लाई रखें
+        filterMainChats();
     }
 
     function openChat(id, isGroup, chatName = null) {
@@ -647,19 +683,24 @@
         document.getElementById('chatSubtitle').innerText = isGroup ? "ISB-24 Secure Group" : "ISB-24 Encrypted";
         document.getElementById('chatAvatar').innerText = isGroup ? "G" : id.charAt(0).toUpperCase();
         
-        document.getElementById('chatSearchBar').style.display = 'none'; // नया चैट खोलने पर सर्च बंद कर दें
+        document.getElementById('chatSearchBar').style.display = 'none';
         document.getElementById('chatSearchInput').value = "";
         
         document.getElementById('chatWindow').style.display = 'flex';
         
-        selectedFileData = null; selectedFileName = null;
+        cancelSelectedFile();
         document.getElementById('chatInputMsg').value = "";
-        document.getElementById('chatInputMsg').disabled = false;
         
         renderChatMessages();
     }
     
-    function closeChat() { document.getElementById('chatWindow').style.display = 'none'; currentChatContact = null; isGroupChat = false; loadChatsList(); }
+    function closeChat() { 
+        document.getElementById('chatWindow').style.display = 'none'; 
+        currentChatContact = null; 
+        isGroupChat = false; 
+        cancelSelectedFile();
+        loadChatsList(); 
+    }
 
     function renderChatMessages() {
         let box = document.getElementById('chatMessagesBox');
@@ -710,7 +751,13 @@
                     let parts = decrypted.split("|||");
                     let fName = parts[1];
                     let fData = parts[2];
-                    b.innerHTML = `${senderHtml}<div style="display:flex; gap:10px; align-items:center; cursor:pointer; background:rgba(0,0,0,0.03); padding:10px; border-radius:8px;" onclick="downloadAttachedFile('${fData}', '${fName}')"><i class="material-icons" style="font-size:30px; color:var(--primary);">insert_drive_file</i><div><div style="font-weight:bold; font-size:14px; max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${fName}</div><div style="font-size:11px; color:var(--text-muted);">Tap to download</div></div></div><span class="bubble-time">${timeStr}</span>`;
+                    let isImg = fData.startsWith("data:image/");
+                    
+                    let content = isImg 
+                        ? `<img src="${fData}" class="chat-img-thumb" onclick="downloadAttachedFile('${fData}', '${fName}')"><div style="font-size:11px; color:var(--text-muted); margin-top:4px;">${fName}</div>`
+                        : `<div style="display:flex; gap:10px; align-items:center; cursor:pointer; background:rgba(0,0,0,0.03); padding:10px; border-radius:8px;" onclick="downloadAttachedFile('${fData}', '${fName}')"><i class="material-icons" style="font-size:30px; color:var(--primary);">insert_drive_file</i><div><div style="font-weight:bold; font-size:14px; max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${fName}</div><div style="font-size:11px; color:var(--text-muted);">Tap to download</div></div></div>`;
+                        
+                    b.innerHTML = `${senderHtml}${content}<span class="bubble-time">${timeStr}</span>`;
                 } else {
                     b.innerHTML = `${senderHtml}${decrypted} <span class="bubble-time">${timeStr}</span>`;
                 }
@@ -719,7 +766,7 @@
             let b = document.getElementById(`msg_${m.id}`);
             if(b) b.innerHTML = `${senderHtml}<span style="color:#E91E63; font-size:13px;"><i class="material-icons" style="font-size:14px; vertical-align:middle;">error</i> Corrupted</span>`;
         }
-        filterChatMessages(); // सर्च अप्लाई रखें
+        filterChatMessages();
         box.scrollTop = box.scrollHeight;
     }
 
@@ -728,10 +775,15 @@
         let msg = input.value.trim();
         let payloadToEncrypt = "";
 
-        if(selectedFileData) { payloadToEncrypt = `ISB_FILE|||${selectedFileName}|||${selectedFileData}`; input.value = "Encrypting File..."; } 
-        else { if(!msg) return; payloadToEncrypt = msg; input.value = "Encrypting..."; }
+        if(selectedFileData) { 
+            payloadToEncrypt = `ISB_FILE|||${selectedFileName}|||${selectedFileData}`; 
+        } else { 
+            if(!msg) return; 
+            payloadToEncrypt = msg; 
+        }
         
-        input.disabled = true;
+        let sendBtn = document.querySelector('.btn-send');
+        sendBtn.disabled = true;
 
         try {
             let encryptionPwd = isGroupChat ? currentChatContact : currentUserEmail; 
@@ -746,18 +798,20 @@
                 isGroup: isGroupChat
             };
             
-            database.ref('messages').push(msgObj);
+            await database.ref('messages').push(msgObj);
             
-            input.value = ""; input.disabled = false;
-            selectedFileData = null; selectedFileName = null;
-            document.getElementById('fileAttachment').value = ""; 
+            input.value = "";
+            cancelSelectedFile();
+            sendBtn.disabled = false;
             
-            // मैसेज भेजने के बाद सर्च क्लियर करें और नीचे जाएं
             document.getElementById('chatSearchInput').value = "";
             filterChatMessages();
             setTimeout(() => { document.getElementById('chatMessagesBox').scrollTop = document.getElementById('chatMessagesBox').scrollHeight; }, 100);
 
-        } catch(e) { alert("Encryption Error"); input.value = msg; input.disabled = false; }
+        } catch(e) { 
+            alert("Encryption / Send Error"); 
+            sendBtn.disabled = false; 
+        }
     }
 
     function downloadAttachedFile(base64Data, filename) {
@@ -766,7 +820,7 @@
         document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
 
-    // --- STATUS SYSTEM (अब फोटो/स्टेटस क्रैश नहीं होगा) ---
+    // --- STATUS SYSTEM ---
     function openAddStatusModal() {
         document.getElementById('addStatusModal').style.display = 'flex';
         statusFileData = null;
@@ -780,7 +834,10 @@
         if(!file) return;
         if(file.size > 5 * 1024 * 1024) return alert("⚠️ Max File Size 5MB.");
         let reader = new FileReader();
-        reader.onload = function(e) { statusFileData = e.target.result; document.getElementById('statusFileName').innerText = file.name; };
+        reader.onload = function(e) { 
+            statusFileData = e.target.result; 
+            document.getElementById('statusFileName').innerText = `Selected: ${file.name}`; 
+        };
         reader.readAsDataURL(file);
     }
 
@@ -794,7 +851,7 @@
         try {
             let encrypted = await runISBText(payloadToEncrypt, currentUserEmail, true);
             let statusObj = { id: 'sts_' + Date.now(), from: currentUserEmail, payload: encrypted, timestamp: Date.now(), timeStr: new Date().toLocaleTimeString() };
-            database.ref('statuses').push(statusObj);
+            await database.ref('statuses').push(statusObj);
             alert("Status Posted Securely!");
         } catch(e) { alert("Failed to post status"); }
     }
@@ -841,7 +898,7 @@
         document.getElementById('statusViewer').style.display = 'flex';
         document.getElementById('statusViewerSender').innerText = st.from;
         let contentBox = document.getElementById('statusViewerContent');
-        contentBox.innerHTML = `<i class="material-icons animate-spin">sync</i> Decrypting...`;
+        contentBox.innerHTML = `<i class="material-icons">sync</i> Decrypting...`;
 
         try {
             let decrypted = await runISBText(st.payload, st.from, false);
