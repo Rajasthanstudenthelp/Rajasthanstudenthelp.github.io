@@ -4,18 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, interactive-widget=resizes-content">
     <title>ISB-24 Premium Web3</title>
-    
-    <!-- Google Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    
-    <!-- PDF.js Engine -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-    
-    <!-- Google Login API -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     
     <style>
@@ -32,7 +24,7 @@
         [data-theme="gold"] { --primary: #FFB300; --primary-dark: #FF8F00; --bg: #fff8e1; --surface: #ffffff; --text: #3e2723; --text-muted: #a1887f; --border: #ffecb3; --msg-sent: #ffecb3; --msg-recv: #ffffff; --nav-bg: #ffffff; }
         [data-theme="orchid"] { --primary: #9C27B0; --primary-dark: #7B1FA2; --bg: #f3e5f5; --surface: #ffffff; --text: #4a148c; --text-muted: #ba68c8; --border: #e1bee7; --msg-sent: #f3e5f5; --msg-recv: #ffffff; --nav-bg: #ffffff; }
         [data-theme="amoled"] { --primary: #ffffff; --primary-dark: #cccccc; --bg: #000000; --surface: #0a0a0a; --text: #ffffff; --text-muted: #666666; --border: #222222; --msg-sent: #1a1a1a; --msg-recv: #0a0a0a; --nav-bg: #050505; }
-        
+
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body, html { height: 100%; height: 100dvh; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0;}
         
@@ -61,7 +53,7 @@
         .list-subtitle { font-size: 14px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 5px;}
         .list-time { font-size: 12px; color: var(--text-muted); font-weight: 500; }
 
-        .fab { position: fixed; bottom: 85px; right: 20px; width: 60px; height: 60px; background: var(--primary); color: var(--surface); border-radius: 20px; display: flex; justify-content: center; align-items: center; box-shadow: 0 10px 20px rgba(0,0,0,0.15); cursor: pointer; z-index: 90;}
+        .fab { position: fixed; bottom: 85px; right: 20px; width: 60px; height: 60px; background: #25D366; color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 10px 20px rgba(0,0,0,0.15); cursor: pointer; z-index: 90;}
         .fab-secondary { bottom: 160px; background: var(--surface); color: var(--primary); border: 1px solid var(--border); }
         .fab-pencil { position: fixed; bottom: 160px; right: 28px; width: 45px; height: 45px; background: var(--surface); color: var(--text-muted); border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.15); cursor: pointer; z-index: 90; border: 1px solid var(--border);}
 
@@ -141,7 +133,7 @@
             <div class="app-title">ISB Messenger</div>
             <div class="app-bar-icons">
                 <i class="material-icons" onclick="toggleMainSearch()">search</i>
-                <i class="material-icons" onclick="syncDrive()">sync</i>
+                <i class="material-icons" onclick="syncDrive()" id="syncIcon">sync</i>
             </div>
         </div>
         
@@ -204,7 +196,7 @@
         </div>
     </div>
 
-    <!-- UNIVERSAL PURE JS MEDIA VIEWER ENGINE -->
+    <!-- UNIVERSAL MEDIA VIEWER ENGINE -->
     <div id="waStatusViewer" class="wa-status-viewer">
         <div class="wa-progress-container" id="waProgressBarContainer"></div>
         <div class="wa-header">
@@ -241,6 +233,7 @@
 
     let APP_STATE = { msgs: [], groups: [], statuses: [] };
     
+    // Media & Status JS Engine Vars
     window.statusPlaylist = []; 
     let waActiveUser = null;
     let waUserStatusGroup = [];
@@ -331,14 +324,16 @@
         });
     }
 
-    function getMediaBlobUrl(dataURI) {
+    // --- C++ LEVEL FETCH NATIVE BLOB MAKER FOR VIDEO FIX ---
+    async function getMediaBlobUrl(dataURI) {
         try {
-            let arr = dataURI.split(','), mime = arr[0].match(/:(.*?);/)[1], bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
-            while(n--){ u8arr[n] = bstr.charCodeAt(n); }
-            return URL.createObjectURL(new Blob([u8arr], {type:mime}));
+            let res = await fetch(dataURI);
+            let blob = await res.blob();
+            return URL.createObjectURL(blob);
         } catch(e) { return dataURI; }
     }
 
+    // --- CHAT SYSTEM ---
     function handleFileSelect(event) {
         let file = event.target.files[0]; if(!file) return;
         if(file.size > 5 * 1024 * 1024) return alert("⚠️ Max File Size 5MB.");
@@ -418,13 +413,10 @@
                 let isVid = m.decryptedData.startsWith("data:video/");
                 let content = "";
                 
-                if(isImg || isVid) {
-                    let bUrl = getMediaBlobUrl(m.decryptedData);
-                    if(isImg) {
-                        content = `<img src="${bUrl}" style="max-width:100%; max-height:250px; border-radius:8px; cursor:pointer; display:block; object-fit:contain;" onclick="openMediaViewer('${m.id}', 'msg')">`;
-                    } else {
-                        content = `<div style="position:relative; cursor:pointer;" onclick="openMediaViewer('${m.id}', 'msg')"><div style="width:200px; height:150px; background:#000; border-radius:8px; display:flex; align-items:center; justify-content:center;"><i class="material-icons" style="font-size:50px; color:white;">play_circle_outline</i></div><div style="font-size:11px; margin-top:5px; color:var(--text-muted);">${m.decryptedName}</div></div>`;
-                    }
+                if(isImg) {
+                    content = `<img src="${m.decryptedData}" style="max-width:100%; max-height:250px; border-radius:8px; cursor:pointer; display:block; object-fit:contain;" onclick="openMediaViewer('${m.id}', 'msg')">`;
+                } else if (isVid) {
+                    content = `<div style="position:relative; cursor:pointer;" onclick="openMediaViewer('${m.id}', 'msg')"><div style="width:200px; height:150px; background:#000; border-radius:8px; display:flex; align-items:center; justify-content:center;"><i class="material-icons" style="font-size:50px; color:white;">play_circle_outline</i></div><div style="font-size:11px; margin-top:5px; color:var(--text-muted);">${m.decryptedName}</div></div>`;
                 } else {
                     let iconType = m.decryptedData.startsWith("data:application/pdf") ? "picture_as_pdf" : "insert_drive_file";
                     content = `<div style="display:flex; gap:10px; align-items:center; cursor:pointer; background:rgba(0,0,0,0.03); padding:10px; border-radius:8px;" onclick="openMediaViewer('${m.id}', 'msg')">
@@ -451,8 +443,13 @@
             setTimeout(() => { document.getElementById('chatMessagesBox').scrollTop = document.getElementById('chatMessagesBox').scrollHeight; }, 100);
         } catch(e) { alert("Encryption Error"); sendBtn.disabled = false; input.disabled = false; }
     }
-    function downloadAttachedFile(base64Data, filename) { const a = document.createElement("a"); a.href = getMediaBlobUrl(base64Data); a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
+    
+    async function downloadAttachedFile(base64Data, filename) { 
+        let bUrl = await getMediaBlobUrl(base64Data);
+        const a = document.createElement("a"); a.href = bUrl; a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); 
+    }
 
+    // --- STATUS SYSTEM ---
     function openTextStatusModal() { document.getElementById('textStatusModal').style.display = 'flex'; document.getElementById('statusTextOnly').value = ""; }
     function openImageStatusModal() { document.getElementById('imageStatusModal').style.display = 'flex'; statusFileData = null; document.getElementById('statusFileName').innerText = ""; document.getElementById('statusCaption').value = ""; document.getElementById('statusFile').value = "";}
     
@@ -525,16 +522,16 @@
             let st = userGroups[user][userGroups[user].length - 1]; 
             listHtml += `<div class="list-item" onclick="viewUserStatus('${user}')"><div class="avatar status-ring">${user.charAt(0).toUpperCase()}</div><div class="list-info"><div class="list-title">${user}</div><div class="list-subtitle">${st.timeStr}</div></div></div>`;
         }
-        document.getElementById('statusList').innerHTML = listHtml || `<div class="empty-state"><i class="material-icons">chat_bubble_outline</i><h3>No recent updates</h3></div>`;
+        document.getElementById('statusList').innerHTML = listHtml || `<div class="empty-state"><i class="material-icons">chat_bubble_outline</i><h3>No Messages Yet</h3></div>`;
     }
 
-    // --- PURE JS MEDIA ENGINE (Video Player Fix) ---
+    // --- UNIVERSAL PURE JS MEDIA VIEWER ENGINE ---
+    let currentPdf = null; let currentPdfPage = 1;
+
     async function openMediaViewer(msgId, source) {
         waIsChatMedia = (source === 'msg');
-        let viewer = document.getElementById('waStatusViewer');
-        viewer.style.display = 'flex';
-        let barContainer = document.getElementById('waProgressBarContainer');
-        barContainer.innerHTML = ''; 
+        document.getElementById('waStatusViewer').style.display = 'flex';
+        document.getElementById('waProgressBarContainer').innerHTML = ''; 
         
         let m = (source === 'msg') ? APP_STATE.msgs.find(x => x.id === msgId) : window.statusPlaylist.find(x => x.id === msgId);
         let fData = m.decryptedData, fName = m.decryptedName;
@@ -563,9 +560,9 @@
             return;
         }
 
-        let bUrl = getMediaBlobUrl(fData);
+        let bUrl = await getMediaBlobUrl(fData); // USE ASYNC FETCH FIX
 
-        // 1. Video Player (Pure DOM)
+        // 1. Video Player (Pure DOM Fix)
         if(fData.startsWith("data:video/")) {
             let video = document.createElement('video');
             video.src = bUrl;
@@ -647,7 +644,6 @@
         }
     }
 
-    let currentPdf = null; let currentPdfPage = 1;
     async function renderPdfPage(num) {
         if(!currentPdf) return;
         let canvas = document.getElementById('pdfCanvas'); let ctx = canvas.getContext('2d');
@@ -700,4 +696,4 @@
     
 </script>
 </body>
-                                                                                                                                                  </html>
+                                                     </html>
