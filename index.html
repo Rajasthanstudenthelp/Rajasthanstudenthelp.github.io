@@ -16,12 +16,6 @@
 
         :root { --primary: #3F51B5; --primary-dark: #303F9F; --bg: #f0f2f5; --surface: #ffffff; --text: #1c1e21; --text-muted: #65676B; --border: #e4e6eb; --msg-sent: #E8EAF6; --msg-recv: #ffffff; --nav-bg: #ffffff; }
         [data-theme="dark"] { --primary: #5C6BC0; --primary-dark: #3F51B5; --bg: #121212; --surface: #1e1e1e; --text: #e4e6eb; --text-muted: #b0b3b8; --border: #333333; --msg-sent: #2c387e; --msg-recv: #242526; --nav-bg: #1e1e1e; }
-        [data-theme="telegram"] { --primary: #2AABEE; --bg: #f4f4f4; --surface: #ffffff; --text: #222222; --border: #e0e0e0; }
-        [data-theme="sunset"] { --primary: #FF5722; --bg: #fdf8f5; --surface: #ffffff; --text: #3e2723; --border: #fbe9e7; }
-        [data-theme="forest"] { --primary: #2E7D32; --bg: #f1f8e9; --surface: #ffffff; --text: #1b5e20; --border: #c8e6c9; }
-        [data-theme="ruby"] { --primary: #E91E63; --bg: #fce4ec; --surface: #ffffff; --text: #4a148c; --border: #f8bbd0; }
-        [data-theme="cyberpunk"] { --primary: #00E5FF; --bg: #09090b; --surface: #17171c; --text: #00E5FF; --border: #006064; }
-        [data-theme="amoled"] { --primary: #ffffff; --bg: #000000; --surface: #0a0a0a; --text: #ffffff; --border: #222222; }
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body, html { height: 100%; height: 100dvh; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0;}
@@ -218,7 +212,6 @@
             </div>
         </div>
 
-        <!-- 🔥 NAVIGATION BAR UPDATED WITH CALLS 🔥 -->
         <div class="bottom-nav">
             <div class="nav-item active" onclick="switchNav('chatsTab', this)"><i class="material-icons">chat_bubble</i><span>Chats</span></div>
             <div class="nav-item" onclick="switchNav('statusTab', this)"><i class="material-icons">donut_large</i><span>Status</span></div>
@@ -264,7 +257,7 @@
         </div>
     </div>
 
-    <!-- CALL OVERLAY (UPDATED WITH MUTE & VIDEO SWITCH CONTROLS) -->
+    <!-- 🔥 SINGLE FIX: NO AUDIO TAG, JUST VIDEO TAG FOR BOTH 🔥 -->
     <div id="callOverlay">
         <div class="call-avatar-glow" id="callAvatarPreview">U</div>
         <h2 id="callStatusText" style="color:white; margin:0 0 5px 0; font-size:24px;">Calling...</h2>
@@ -273,13 +266,9 @@
         <video id="remoteVideo" autoplay playsinline style="width:100%; height:100%; position:absolute; top:0; left:0; object-fit:cover; z-index:-1; display:none; background:#111;"></video>
         <video id="localVideo" autoplay playsinline muted style="width:110px; height:150px; position:absolute; bottom:130px; right:20px; border-radius:12px; border:2px solid white; object-fit:cover; box-shadow:0 10px 20px rgba(0,0,0,0.5); display:none; background:#333; z-index: 10;"></video>
         
-        <!-- Hidden Audio tag for WebView Force Play -->
-        <audio id="remoteAudio" autoplay playsinline style="visibility:hidden; width:0px; height:0px;"></audio>
-        
         <div style="position:absolute; bottom:40px; display:flex; gap:20px; align-items:center; z-index: 20;">
             <button id="btnAcceptCall" onclick="acceptCall()" style="display:none; background:#25D366; border:none; border-radius:50%; width:65px; height:65px; color:white; box-shadow:0 10px 20px rgba(37,211,102,0.4); cursor:pointer;"><i class="material-icons" style="font-size:30px;">call</i></button>
             
-            <!-- 🔥 NEW: MUTE & VIDEO CONTROLS (Initially hidden until connected) 🔥 -->
             <div id="callControls" style="display:none; gap:15px;">
                 <button id="btnMute" onclick="toggleMute()" style="background:rgba(255,255,255,0.2); border:none; border-radius:50%; width:55px; height:55px; color:white; cursor:pointer; backdrop-filter:blur(5px);"><i class="material-icons" id="muteIcon">mic</i></button>
                 <button id="btnVideoToggle" onclick="toggleVideo()" style="background:rgba(255,255,255,0.2); border:none; border-radius:50%; width:55px; height:55px; color:white; cursor:pointer; backdrop-filter:blur(5px);"><i class="material-icons" id="videoToggleIcon">videocam_off</i></button>
@@ -316,7 +305,7 @@
     let selectedFileData = null, selectedFileName = null, statusFileData = null, tempSetupAvatarData = null;
     let isListeningToFirebase = false;
 
-    let APP_STATE = { msgs: [], groups: [], statuses: [], users: {}, callLogs: [] };
+    let APP_STATE = { msgs: [], groups: [], statuses: [], users: [], callLogs: [] };
     window.statusPlaylist = []; 
     let waActiveUser = null, waUserStatusGroup = [], waActiveIndex = 0, waTimer = null, waIsChatMedia = false; 
     let activeActionMsg = null;
@@ -568,13 +557,11 @@
     function renderWaStatus() { clearTimeout(waTimer); let st = waUserStatusGroup[waActiveIndex]; let barContainer = document.getElementById('waProgressBarContainer'); barContainer.innerHTML = ''; for(let i=0; i<waUserStatusGroup.length; i++) { let fillWidth = (i < waActiveIndex) ? '100%' : '0%'; barContainer.innerHTML += `<div class="wa-progress-segment"><div class="wa-progress-fill" id="waFill_${i}" style="width:${fillWidth}"></div></div>`; } openMediaViewer(st.id, 'status'); if(st.decryptedData !== "txt" && !st.decryptedData.startsWith("data:video/") && !st.decryptedData.startsWith("data:application/pdf")) { let fillBar = document.getElementById(`waFill_${waActiveIndex}`); if(fillBar) { void fillBar.offsetWidth; fillBar.style.transition = "width 10s linear"; fillBar.classList.add('filling'); } waTimer = setTimeout(() => { nextWaStatus(); }, 10000); } else if (st.decryptedData === "txt" || st.decryptedData.startsWith("data:application/pdf")) { let fillBar = document.getElementById(`waFill_${waActiveIndex}`); if(fillBar) { void fillBar.offsetWidth; fillBar.style.transition = "width 5s linear"; fillBar.classList.add('filling'); } waTimer = setTimeout(() => { nextWaStatus(); }, 5000); } }
     function nextWaStatus() { if(waActiveIndex < waUserStatusGroup.length - 1) { waActiveIndex++; renderWaStatus(); } else closeWaStatus(); } function prevWaStatus() { if(waActiveIndex > 0) { waActiveIndex--; renderWaStatus(); } else renderWaStatus(); } function closeWaStatus() { clearTimeout(waTimer); document.getElementById('waStatusViewer').style.display = 'none'; document.getElementById('waStatusContent').innerHTML = ""; currentPdf = null; }
 
-    // 🔥 P2P WEBRTC CALLING ENGINE WITH DISCONNECT SYNC, AUDIO FIX, AND IN-CALL CONTROLS 🔥
     function initCallListener() {
         if(!currentUsername) return;
         database.ref('calls/' + currentUsername).on('value', async snapshot => {
             const data = snapshot.val();
             
-            // 🔥 Disconnect Sync Fix: Check if remote sent 'end' signal
             if(data && data.type === 'end') {
                 endCall(false); 
             } 
@@ -590,19 +577,17 @@
                 document.getElementById('callAvatarPreview').innerHTML = (uInfo && uInfo.avatar) ? `<img src="${uInfo.avatar}">` : data.from.charAt(0).toUpperCase();
                 
                 document.getElementById('btnAcceptCall').style.display = 'block';
-                document.getElementById('callControls').style.display = 'none'; // Hide controls until accepted
+                document.getElementById('callControls').style.display = 'none'; 
                 document.getElementById('callOverlay').style.display = 'flex';
                 document.getElementById('remoteVideo').style.display = 'none';
                 document.getElementById('localVideo').style.display = 'none';
                 window.currentCallData = data;
             } else if (!data && isCallActive) {
-                // Fallback disconnect
                 endCall(false); 
             }
         });
     }
 
-    // 🔥 Call Control Functions 🔥
     function toggleMute() {
         if(localStream) {
             isMuted = !isMuted;
@@ -636,7 +621,6 @@
         currentCallType = callType;
         window.currentCallTarget = targetUname;
 
-        // Reset UI Controls
         isMuted = false;
         document.getElementById('muteIcon').innerText = "mic";
         document.getElementById('btnMute').style.background = "rgba(255,255,255,0.2)";
@@ -654,11 +638,9 @@
         isCallActive = true;
 
         try {
-            // Always try to get video so user can switch later
             try {
                 localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
             } catch(e) {
-                // Fallback to audio only if camera fails
                 localStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
             }
 
@@ -668,11 +650,11 @@
                 document.getElementById('videoToggleIcon').innerText = isVideoEnabled ? "videocam" : "videocam_off";
                 document.getElementById('btnVideoToggle').style.background = isVideoEnabled ? "rgba(37,211,102,0.8)" : "rgba(255,255,255,0.2)";
             } else {
-                document.getElementById('btnVideoToggle').style.display = 'none'; // Hide switch if no camera
+                document.getElementById('btnVideoToggle').style.display = 'none'; 
             }
             if(isVideoEnabled) { document.getElementById('localVideo').style.display = 'block'; document.getElementById('localVideo').srcObject = localStream; }
             
-            document.getElementById('callControls').style.display = 'flex'; // Show controls
+            document.getElementById('callControls').style.display = 'flex'; 
             
             peerConnection = new RTCPeerConnection(rtcConfig); remoteStream = new MediaStream(); 
             
@@ -680,16 +662,16 @@
             
             peerConnection.ontrack = event => { 
                 event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track)); 
-                document.getElementById('remoteVideo').srcObject = remoteStream;
-                document.getElementById('remoteAudio').srcObject = remoteStream;
                 
-                // 🔥 WebView Audio Fix: Force Play 🔥
-                let playPromise = document.getElementById('remoteAudio').play();
-                if (playPromise !== undefined) { playPromise.catch(error => console.log("Audio autoplay blocked")); }
+                // 🔥 THE MAGIC FIX: Play stream ONLY in video tag 🔥
+                let remoteVid = document.getElementById('remoteVideo');
+                remoteVid.srcObject = remoteStream;
+                let playPromise = remoteVid.play();
+                if (playPromise !== undefined) { playPromise.catch(error => console.log("Video autoplay blocked")); }
 
-                if(callType === 'video') { document.getElementById('remoteVideo').style.display = 'block'; }
+                if(callType === 'video') { remoteVid.style.display = 'block'; }
                 document.getElementById('callStatusText').innerText = "Connected";
-                callStartTime = Date.now(); // Start Duration Timer
+                callStartTime = Date.now(); 
             };
 
             peerConnection.onicecandidate = event => { if(event.candidate) database.ref('calls/' + targetUname + '/callerCandidates').push(event.candidate.toJSON()); };
@@ -712,7 +694,6 @@
         document.getElementById('btnAcceptCall').style.display = 'none'; document.getElementById('callStatusText').innerText = "Connecting...";
         const data = window.currentCallData; isCallActive = true;
 
-        // Reset UI Controls
         isMuted = false;
         document.getElementById('muteIcon').innerText = "mic";
         document.getElementById('btnMute').style.background = "rgba(255,255,255,0.2)";
@@ -735,7 +716,7 @@
             }
             if(isVideoEnabled) { document.getElementById('localVideo').style.display = 'block'; document.getElementById('localVideo').srcObject = localStream; }
             
-            document.getElementById('callControls').style.display = 'flex'; // Show controls
+            document.getElementById('callControls').style.display = 'flex'; 
 
             peerConnection = new RTCPeerConnection(rtcConfig); remoteStream = new MediaStream(); 
             
@@ -743,16 +724,16 @@
             
             peerConnection.ontrack = event => { 
                 event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track)); 
-                document.getElementById('remoteVideo').srcObject = remoteStream;
-                document.getElementById('remoteAudio').srcObject = remoteStream;
                 
-                // 🔥 WebView Audio Fix: Force Play 🔥
-                let playPromise = document.getElementById('remoteAudio').play();
-                if (playPromise !== undefined) { playPromise.catch(error => console.log("Audio autoplay blocked")); }
+                // 🔥 THE MAGIC FIX: Play stream ONLY in video tag 🔥
+                let remoteVid = document.getElementById('remoteVideo');
+                remoteVid.srcObject = remoteStream;
+                let playPromise = remoteVid.play();
+                if (playPromise !== undefined) { playPromise.catch(error => console.log("Video autoplay blocked")); }
 
-                if(data.callType === 'video') document.getElementById('remoteVideo').style.display = 'block';
+                if(data.callType === 'video') remoteVid.style.display = 'block';
                 document.getElementById('callStatusText').innerText = "Connected";
-                callStartTime = Date.now(); // Start Duration Timer
+                callStartTime = Date.now(); 
             };
 
             peerConnection.onicecandidate = event => { if(event.candidate) database.ref('calls/' + currentUsername + '/receiverCandidates').push(event.candidate.toJSON()); };
@@ -772,7 +753,6 @@
     function endCall(notifyRemote = true) {
         isCallActive = false; document.getElementById('callOverlay').style.display = 'none';
         
-        // Calculate Duration and Save History
         if (window.currentCallTarget && currentCallDirection) {
             let durationStr = "Missed";
             if (callStartTime > 0) {
@@ -791,7 +771,6 @@
             });
         }
         
-        // 🔥 Send Disconnect Signal 🔥
         if(notifyRemote) {
             let targetUname = window.currentCallTarget || (window.currentCallData ? window.currentCallData.from : null);
             if(targetUname) {
@@ -808,11 +787,9 @@
         
         document.getElementById('localVideo').srcObject = null; 
         document.getElementById('remoteVideo').srcObject = null;
-        document.getElementById('remoteAudio').srcObject = null;
         window.currentCallData = null;
     }
 
-    // LOAD & RENDER CALL HISTORY
     function loadCallsList() {
         let html = "";
         APP_STATE.callLogs.forEach(log => {
