@@ -182,7 +182,7 @@
                 <div class="fab" onclick="openImageStatusModal()"><i class="material-icons">camera_alt</i></div>
             </div>
 
-            <!-- 🔥 NEW CALLS TAB 🔥 -->
+            <!-- CALLS TAB -->
             <div id="callsTab" class="tab-content">
                 <div style="display:flex; justify-content:space-between; align-items:center; padding:15px 20px; border-bottom:1px solid var(--border);">
                     <h3 style="margin:0; font-size:18px; color:var(--text);">Recent Calls</h3>
@@ -288,7 +288,20 @@
     <div id="waStatusViewer" class="wa-status-viewer"><div class="wa-progress-container" id="waProgressBarContainer"></div><div class="wa-header"><div style="display:flex; align-items:center; gap:12px; cursor:pointer; z-index:4005;" onclick="closeWaStatus()"><i class="material-icons">arrow_back</i><div class="avatar" id="waStatusAvatar" style="width:40px; height:40px;">U</div><div style="display:flex; flex-direction:column;"><span id="waStatusName" style="font-weight:700;">Name</span><span id="waStatusTime" style="font-size:12px; opacity:0.8;">Time</span></div></div><div style="display:flex; align-items:center; gap:15px; z-index:4005;"><a id="waStatusDownloadBtn" style="color:white; display:none;"><i class="material-icons">download</i></a><i class="material-icons" id="waStatusDeleteBtn" style="color:#E91E63; display:none; cursor:pointer;" onclick="deleteActiveStatus()">delete</i></div></div><div class="wa-content" id="waStatusContent"></div><div class="wa-tap-left" id="waTapLeft" onclick="prevWaStatus()" style="display:none;"></div><div class="wa-tap-right" id="waTapRight" onclick="nextWaStatus()" style="display:none;"></div></div>
     
     <!-- MODALS -->
-    <div id="setupProfileModal" class="modal-overlay"><div class="modal-content" style="text-align:center;"><h3 style="margin-top:0; color:var(--text);">Create Your Profile</h3><p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">Choose a unique username and photo</p><div class="profile-pic-upload" onclick="document.getElementById('setupAvatarFile').click()"><img id="setupAvatarPreview" style="display:none;"><i class="material-icons" id="setupAvatarIcon" style="font-size:40px; color:var(--primary);">camera_alt</i></div><input type="file" id="setupAvatarFile" accept="image/*" style="display:none;" onchange="handleImageSelection(event, 'setup')"><div class="input-wrapper"><input type="text" id="setupUsernameInput" placeholder="@username" oninput="validateUsernameInput()"><i class="material-icons input-icon-right" id="usernameStatusIcon" style="color:var(--text-muted);">info</i></div><button id="saveProfileBtn" disabled style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:bold; font-size:16px; box-shadow:0 4px 10px rgba(0,0,0,0.15); cursor:pointer; opacity:0.5; transition:0.3s;" onclick="saveProfileSetup()">SAVE PROFILE</button><button id="cancelSetupBtn" style="width:100%; padding:15px; background:transparent; color:var(--text-muted); border:none; margin-top:10px; cursor:pointer; display:none;" onclick="document.getElementById('setupProfileModal').style.display='none'">CANCEL</button></div></div>
+    <div id="setupProfileModal" class="modal-overlay">
+        <div class="modal-content" style="text-align:center;">
+            <h3 style="margin-top:0; color:var(--text);">Create Your Profile</h3>
+            <p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">Choose a unique username and photo</p>
+            <div class="profile-pic-upload" onclick="document.getElementById('setupAvatarFile').click()"><img id="setupAvatarPreview" style="display:none;"><i class="material-icons" id="setupAvatarIcon" style="font-size:40px; color:var(--primary);">camera_alt</i></div>
+            <input type="file" id="setupAvatarFile" accept="image/*" style="display:none;" onchange="handleImageSelection(event, 'setup')">
+            <div class="input-wrapper"><input type="text" id="setupUsernameInput" placeholder="@username" oninput="validateUsernameInput()"><i class="material-icons input-icon-right" id="usernameStatusIcon" style="color:var(--text-muted);">info</i></div>
+            <button id="saveProfileBtn" disabled style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:bold; font-size:16px; box-shadow:0 4px 10px rgba(0,0,0,0.15); cursor:pointer; opacity:0.5; transition:0.3s;" onclick="saveProfileSetup()">SAVE PROFILE</button>
+            
+            <!-- 🔥 FIX: यह बटन हमेशा ब्राउज़र में अटके लोगों को बचाएगा 🔥 -->
+            <button id="cancelSetupBtn" style="width:100%; padding:15px; background:transparent; color:#E91E63; border:none; margin-top:10px; cursor:pointer; display:none; font-weight:bold;" onclick="logoutUser()">LOGOUT & GO BACK</button>
+        </div>
+    </div>
+    
     <div id="cropperModal" class="modal-overlay" style="z-index: 3000;"><div class="modal-content" style="text-align:center;"><h3 style="margin-top:0; color:var(--text);">Crop Photo</h3><p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;">Drag to adjust and use slider to zoom</p><div class="crop-container" id="cropBox"><canvas id="cropCanvas" width="250" height="250"></canvas></div><input type="range" id="cropZoomSlider" min="1" max="3" step="0.05" value="1" style="width:100%; margin-bottom:20px; accent-color:var(--primary);" oninput="drawCrop()"><div style="display:flex; gap:10px;"><button style="flex:1; padding:12px; background:transparent; border:2px solid var(--border); border-radius:12px; color:var(--text); font-weight:bold; cursor:pointer;" onclick="document.getElementById('cropperModal').style.display='none'">CANCEL</button><button style="flex:1; padding:12px; background:var(--primary); border:none; border-radius:12px; color:white; font-weight:bold; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.15);" onclick="applyCrop()">CROP & SAVE</button></div></div></div>
     <div id="blockedUsersModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h3>Blocked Contacts</h3><button class="close-btn" onclick="document.getElementById('blockedUsersModal').style.display='none'"><i class="material-icons">cancel</i></button></div><div id="blockedUsersList" style="max-height:300px; overflow-y:auto;"></div></div></div>
     <div id="newChatModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h3>New Chat</h3><button class="close-btn" onclick="document.getElementById('newChatModal').style.display='none'"><i class="material-icons">cancel</i></button></div><input type="text" id="newChatInput" placeholder="Enter Gmail OR Username..." style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:15px; font-weight:bold;"><button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px;" onclick="startNewChat()">START CHAT</button></div></div>
@@ -337,7 +350,10 @@
                     try { 
                         google.accounts.id.initialize({ client_id: ISB_CLIENT_ID, callback: handleCredentialResponse }); 
                         google.accounts.id.renderButton(document.getElementById("googleButtonContainer"), { theme: "filled_blue", size: "large", text: "continue_with" }); 
-                    } catch(e) {} 
+                        google.accounts.id.prompt(); // 🔥 यह कंप्यूटर ब्राउज़र में डायरेक्ट लॉगिन पॉपअप दिखाएगा
+                    } catch(e) {
+                        document.getElementById("googleButtonContainer").innerHTML = "<p style='color:red;'>Please turn off Adblocker to Sign in.</p>";
+                    } 
                 }
             }, 500);
         }
@@ -372,7 +388,7 @@
                 startFirebaseSync(); loadChatsList(); loadStatusList(); initPresence(); initCallListener();
             } else {
                 document.getElementById('mainApp').style.display = 'none';
-                document.getElementById('cancelSetupBtn').style.display = 'none';
+                document.getElementById('cancelSetupBtn').style.display = 'block'; // 🔥 यह लॉगआउट बटन दिखाएगा
                 document.getElementById('setupProfileModal').style.display = 'flex';
             }
         });
@@ -429,7 +445,6 @@
         database.ref('statuses').on('child_added', function(snapshot) { let s = snapshot.val(); s.fbKey = snapshot.key; if(s) { if(!APP_STATE.statuses.some(st => st.id === s.id)) { APP_STATE.statuses.push(s); loadStatusList(); } } });
         database.ref('statuses').on('child_removed', function(snapshot) { let removedSts = snapshot.val(); APP_STATE.statuses = APP_STATE.statuses.filter(s => s.id !== removedSts.id); loadStatusList(); });
         
-        // 🔥 LOAD CALL HISTORY 🔥
         database.ref('callHistory/' + currentUsername).on('value', function(snapshot) {
             APP_STATE.callLogs = [];
             snapshot.forEach(child => {
@@ -495,6 +510,7 @@
             html += `<div class="list-item" onclick="openChat('${info.email}', ${info.isGroup}, '${dName}')"><div class="avatar">${avatarHtml}</div><div class="list-info"><div class="list-title">${dName}</div><div class="list-subtitle"><i class="material-icons" style="font-size:14px; color:var(--primary);">lock</i> ${info.lastMsg}</div></div><div class="list-time">${info.time.split(',')[1] || info.time}</div></div>`;
         }
         
+        // 🔥 LOADING FIX: "No Messages Yet" को रोकेगा और पहले लोडिंग स्पिनर दिखाएगा 🔥
         if (!isChatsLoaded && html === "") {
             document.getElementById("chatsList").innerHTML = `<div style="text-align:center; padding:50px 20px; color:var(--text-muted);"><i class="material-icons animate-spin" style="font-size:40px; color:var(--primary);">sync</i><div style="margin-top:10px; font-weight:bold; font-size:15px;">Syncing Chats...</div></div>`;
         } else {
@@ -746,7 +762,53 @@
 
                 if(data.callType === 'video') remoteVid.style.display = 'block';
                 document.getElementById('callStatusText').innerText = "Connected";
-                callStartTime = 0; currentCallDirection = ''; currentCallType = ''; window.currentCallTarget = null;
+                callStartTime = Date.now(); 
+            };
+
+            peerConnection.onicecandidate = event => { if(event.candidate) database.ref('calls/' + currentUsername + '/receiverCandidates').push(event.candidate.toJSON()); };
+
+            const offerDesc = new RTCSessionDescription({ type: 'offer', sdp: data.sdp }); await peerConnection.setRemoteDescription(offerDesc);
+
+            const answer = await peerConnection.createAnswer(); await peerConnection.setLocalDescription(answer);
+
+            await database.ref('calls/' + currentUsername + '/answer').set({ type: 'answer', sdp: answer.sdp });
+
+            database.ref('calls/' + currentUsername + '/callerCandidates').on('child_added', snapshot => {
+                if(peerConnection) peerConnection.addIceCandidate(new RTCIceCandidate(snapshot.val()));
+            });
+        } catch(e) { alert("Camera/Mic Permission Denied!"); endCall(); }
+    }
+
+    function endCall(notifyRemote = true) {
+        isCallActive = false; document.getElementById('callOverlay').style.display = 'none';
+        
+        if (window.currentCallTarget && currentCallDirection) {
+            let durationStr = "Missed";
+            if (callStartTime > 0) {
+                let diffSec = Math.floor((Date.now() - callStartTime) / 1000);
+                let m = Math.floor(diffSec / 60);
+                let s = diffSec % 60;
+                durationStr = (m > 0 ? m + "m " : "") + s + "s";
+            }
+            database.ref('callHistory/' + currentUsername).push({
+                peer: window.currentCallTarget,
+                type: currentCallType,
+                direction: currentCallDirection,
+                duration: durationStr,
+                timestamp: Date.now(),
+                timeStr: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            });
+        }
+        
+        if(notifyRemote) {
+            let targetUname = window.currentCallTarget || (window.currentCallData ? window.currentCallData.from : null);
+            if(targetUname) {
+                database.ref('calls/' + targetUname).set({ type: 'end' });
+            }
+        }
+        database.ref('calls/' + currentUsername).remove();
+
+        callStartTime = 0; currentCallDirection = ''; currentCallType = ''; window.currentCallTarget = null;
         
         if(localStream) { localStream.getTracks().forEach(track => track.stop()); }
         if(remoteStream) { remoteStream.getTracks().forEach(track => track.stop()); }
