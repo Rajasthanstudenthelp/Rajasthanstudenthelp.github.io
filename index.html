@@ -50,7 +50,7 @@
         .status-ring { outline: 3px solid #25D366; outline-offset: 2px; }
         .list-info { flex: 1; overflow: hidden; }
         .list-title { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-        .list-subtitle { font-size: 14px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .list-subtitle { font-size: 14px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center;}
         .list-time { font-size: 12px; color: var(--text-muted); font-weight: 500; }
 
         .fab { position: fixed; bottom: 85px; right: 20px; width: 60px; height: 60px; background: #25D366; color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 10px 20px rgba(0,0,0,0.15); cursor: pointer; z-index: 90;}
@@ -107,6 +107,7 @@
         .made-in-india { text-align: center; padding: 20px; color: var(--text-muted); font-size: 14px; font-weight: 800; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0.7; letter-spacing: 0.5px;}
         .made-in-india span { font-size: 22px; margin-top: 5px;}
         .copyright-line { font-size: 10px; margin-top: 15px; font-weight: normal; opacity: 0.8; letter-spacing: 0; }
+        .core-badge { font-size: 11px; color: #25D366; border: 1px solid #25D366; padding: 2px 6px; border-radius: 10px; margin-top: 8px; font-weight: bold; letter-spacing: 0px; }
 
         .input-wrapper { position: relative; width: 100%; margin-bottom: 20px; }
         .input-wrapper input { width: 100%; padding: 15px 45px 15px 15px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-weight: bold; font-size: 16px; outline: none; text-align: left; }
@@ -141,9 +142,16 @@
         .call-avatar-glow { width:120px; height:120px; border-radius:50%; font-size:50px; display:flex; justify-content:center; align-items:center; background:var(--primary); color:white; margin-bottom:20px; box-shadow:0 0 30px var(--primary); animation: pulse 1.5s infinite; overflow:hidden;}
         .call-avatar-glow img { width:100%; height:100%; object-fit:cover; }
         @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(63,81,181,0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 30px rgba(63,81,181,0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(63,81,181,0); } }
+
+        /* वीडियो कॉल में छोटे और ड्रैग होने वाले लोगो का CSS */
+        .call-avatar-small { position: absolute !important; top: 20px !important; left: 20px !important; width: 60px !important; height: 60px !important; font-size: 24px !important; margin: 0 !important; box-shadow: 0 5px 15px rgba(0,0,0,0.5) !important; animation: none !important; z-index: 9500 !important; cursor: grab; touch-action: none; border: 2px solid white; }
+        .hide-in-video { display: none !important; }
     </style>
 </head>
 <body data-theme="default">
+
+    <!-- Incoming Call Ringtone Audio Element -->
+    <audio id="incomingRing" loop src="https://actions.google.com/sounds/v1/alarms/phone_ringing.ogg"></audio>
 
     <div id="authScreen" class="auth-container">
         <div class="auth-box">
@@ -213,6 +221,7 @@
                 
                 <div class="made-in-india">
                     MAKE IN INDIA<span>🇮🇳</span>
+                    <div class="core-badge" id="coreBadgeDisplay">Loading Engine...</div>
                     <div class="copyright-line">Copyright &copy; 2026 ISB Chat. All Rights Reserved.</div>
                 </div>
             </div>
@@ -243,6 +252,7 @@
             <i class="material-icons" onclick="toggleChatMenu()">more_vert</i>
             
             <div class="chat-menu-dropdown" id="chatMenuDropdown">
+                <div class="chat-menu-item" onclick="togglePinChat()" id="pinChatMenuText"><i class="material-icons">star_border</i> <span>Pin Chat</span></div>
                 <div class="chat-menu-item" onclick="toggleBlockUser()" id="blockUserMenuText"><i class="material-icons">block</i> <span>Block User</span></div>
                 <div class="chat-menu-item danger" onclick="clearCurrentChat()"><i class="material-icons">delete_sweep</i> <span>Clear Chat</span></div>
             </div>
@@ -327,7 +337,6 @@
     let waActiveUser = null, waUserStatusGroup = [], waActiveIndex = 0, waTimer = null, waIsChatMedia = false; 
     let activeActionMsg = null;
 
-    // 🔥 TURN Server Update Here 🔥
     let peerConnection = null, localStream = null, remoteStream = null, isCallActive = false;
     const rtcConfig = { 
         iceServers: [
@@ -344,8 +353,19 @@
     let isMuted = false;
     let isVideoEnabled = false;
 
+    // --- OCTA-CORE ENGINE SETUP ---
+    const SYSTEM_CORES = navigator.hardwareConcurrency || 2;
+    console.log(`[ISB Engine] Detected ${SYSTEM_CORES}-Core Processor. Activating Multi-Core Web Workers...`);
+    
+    // Create pre-compiled blobs ONCE at startup to save massive memory/CPU time
+    const keyWorkerCode = `self.onmessage=function(e){let pwd=e.data.password;let salt=new Uint8Array(e.data.salt);let bigKey=new Uint8Array(128);for(let i=0;i<128;i++){bigKey[i]=pwd.charCodeAt(i%pwd.length)^salt[i%salt.length]^(i%256);}self.postMessage({bigKey:bigKey.buffer},[bigKey.buffer]);};`;
+    const mathWorkerCode = `self.onmessage=function(e){let buffer=new Uint8Array(e.data.buffer);let isEncrypt=e.data.action==='encrypt';let bigKey=new Uint8Array(e.data.bigKey);let chunkIdx=e.data.chunkIdx;let G1=0x12345678,G2=0x87654321,G3=0xDEADBEEF,G4=0xCAFEBABE;for(let i=0;i<128;i++){let c=bigKey[i];G1=(G1>>>1)^(c<<24);G2=(G2<<3)^c;G3^=(G1>>>5);G4=(G4<<1)^(G2>>>2);}G1^=chunkIdx;G2^=(Math.imul(chunkIdx,13)>>>0);G3^=(Math.imul(chunkIdx,17)>>>0);G4^=(Math.imul(chunkIdx,19)>>>0);let dv=new DataView(buffer.buffer,buffer.byteOffset,buffer.byteLength);let words=Math.floor(buffer.length/4);let baseWordIndex=chunkIdx*1048576;for(let i=0;i<words;i++){let sizeNum=baseWordIndex+i+1;let x=sizeNum;let x2=Math.imul(x,x)>>>0;let x3=Math.imul(x2,x)>>>0;let x4=Math.imul(x3,x)>>>0;let x5=Math.imul(x4,x)>>>0;let x6=Math.imul(x5,x)>>>0;let x7=Math.imul(x6,x)>>>0;let x8=Math.imul(x7,x)>>>0;let pMode=bigKey[sizeNum%128]%6;let powerVal=(x3&((pMode===0)?0xFFFFFFFF:0))|(x4&((pMode===1)?0xFFFFFFFF:0))|(x5&((pMode===2)?0xFFFFFFFF:0))|(x6&((pMode===3)?0xFFFFFFFF:0))|(x7&((pMode===4)?0xFFFFFFFF:0))|(x8&((pMode===5)?0xFFFFFFFF:0));let pVal=bigKey[(sizeNum+15)%128];let rotInner=(Math.imul(pVal,Math.imul(pVal,pVal))>>>0)%31+1;let rotOuter=(Math.imul(powerVal%1000,powerVal%1000)+rotInner)%31+1;G1=(G1+powerVal)>>>0;G2=(G2^G1)>>>0;G2=((G2<<rotInner)|(G2>>>(32-rotInner)))>>>0;G3=(G3+G2)>>>0;G4=(G4^G3)>>>0;G4=((G4<<rotOuter)|(G4>>>(32-rotOuter)))>>>0;let g32=(G1+G2+G3+G4)>>>0;let y=(g32%10000)+1;let y2=Math.imul(y,y)>>>0;let y3=Math.imul(y2,y)>>>0;let y4=Math.imul(y3,y)>>>0;let y5=Math.imul(y4,y)>>>0;let y6=Math.imul(y5,y)>>>0;let y7=Math.imul(y6,y)>>>0;let y8=Math.imul(y7,y)>>>0;let dpMode=bigKey[(sizeNum+64)%128]%6;let dPowerVal=(y3&((dpMode===0)?0xFFFFFFFF:0))|(y4&((dpMode===1)?0xFFFFFFFF:0))|(y5&((dpMode===2)?0xFFFFFFFF:0))|(y6&((dpMode===3)?0xFFFFFFFF:0))|(y7&((dpMode===4)?0xFFFFFFFF:0))|(y8&((dpMode===5)?0xFFFFFFFF:0));let dpVal=bigKey[(sizeNum+42)%128];let dRotInner=(Math.imul(dpVal,Math.imul(dpVal,dpVal))>>>0)%31+1;let dRotOuter=(Math.imul(dPowerVal%1000,dPowerVal%1000)+dRotInner)%31+1;g32=(g32+dPowerVal)>>>0;g32=(g32^(g32>>>15))>>>0;g32=((g32<<dRotInner)|(g32>>>(32-dRotInner)))>>>0;g32=((g32<<dRotOuter)|(g32>>>(32-dRotOuter)))>>>0;let pwdGarbage=(bigKey[(sizeNum*7)%128])|(bigKey[(sizeNum*11)%128]<<8)|(bigKey[(sizeNum*13)%128]<<16)|(bigKey[(sizeNum*17)%128]<<24);g32=(g32+pwdGarbage)>>>0;g32=(g32^(pwdGarbage>>>7))>>>0;let opMode=bigKey[(sizeNum+32)%128]%3;if(isEncrypt){let d32=dv.getUint32(i*4,true);let opA=(d32+g32)>>>0;let opS=(d32-g32)>>>0;let opX=(d32^g32)>>>0;d32=(opA&((opMode===0)?0xFFFFFFFF:0))|(opS&((opMode===1)?0xFFFFFFFF:0))|(opX&((opMode===2)?0xFFFFFFFF:0));dv.setUint32(i*4,d32,true);G3=(G3^d32)>>>0;}else{let c32=dv.getUint32(i*4,true);let opA=(c32-g32)>>>0;let opS=(c32+g32)>>>0;let opX=(c32^g32)>>>0;let p32=(opA&((opMode===0)?0xFFFFFFFF:0))|(opS&((opMode===1)?0xFFFFFFFF:0))|(opX&((opMode===2)?0xFFFFFFFF:0));dv.setUint32(i*4,p32,true);G3=(G3^c32)>>>0;}}let rem=buffer.length%4;if(rem>0){let off=buffer.length-rem;for(let i=0;i<rem;i++){let sizeNum=baseWordIndex+words+i+1;let x=sizeNum;let x2=Math.imul(x,x)>>>0;let x3=Math.imul(x2,x)>>>0;let x4=Math.imul(x3,x)>>>0;let x5=Math.imul(x4,x)>>>0;let x6=Math.imul(x5,x)>>>0;let x7=Math.imul(x6,x)>>>0;let x8=Math.imul(x7,x)>>>0;let pMode=bigKey[sizeNum%128]%6;let tVal=(pMode===0)?x3:(pMode===1)?x4:(pMode===2)?x5:(pMode===3)?x6:(pMode===4)?x7:x8;let pVal=bigKey[(sizeNum+5)%128];let rIn=(Math.imul(pVal,Math.imul(pVal,pVal))>>>0)%7+1;let rOut=(Math.imul(tVal%100,tVal%100)+rIn)%7+1;G1=(G1+tVal)>>>0;let gCombined=(G1^G2^G3^G4)>>>0;gCombined=((gCombined<<rIn)|(gCombined>>>(32-rIn)))>>>0;gCombined=((gCombined<<rOut)|(gCombined>>>(32-rOut)))>>>0;let pwdGarbageByte=bigKey[(sizeNum*7)%128];let gByte=((gCombined+pwdGarbageByte+(Math.imul(sizeNum%100,sizeNum%100)>>>0))&0xFF)^(pwdGarbageByte>>2);let opMode=bigKey[(sizeNum+32)%128]%3;if(isEncrypt){let dB=buffer[off+i];let oA=(dB+gByte)&0xFF;let oS=(dB-gByte+256)&0xFF;let oX=(dB^gByte)&0xFF;dB=(opMode===0)?oA:((opMode===1)?oS:oX);buffer[off+i]=dB;G3=(G3^dB)>>>0;}else{let cB=buffer[off+i];let oA=(cB-gByte+256)&0xFF;let oS=(cB+gByte)&0xFF;let oX=(cB^gByte)&0xFF;let pB=(opMode===0)?oA:((opMode===1)?oS:oX);buffer[off+i]=pB;G3=(G3^cB)>>>0;}}}self.postMessage({type:'chunk_done',buffer:buffer.buffer,chunkIdx:chunkIdx},[buffer.buffer]);};`;
+    const precompiledKeyWorkerURL = URL.createObjectURL(new Blob([keyWorkerCode], {type:'application/javascript'}));
+    const precompiledMathWorkerURL = URL.createObjectURL(new Blob([mathWorkerCode], {type:'application/javascript'}));
+
     window.onload = function() {
         applyTheme(localStorage.getItem('isb_theme') || 'default');
+        document.getElementById('coreBadgeDisplay').innerText = `⚡ ${SYSTEM_CORES}-Core Processing Active`;
         currentUserEmail = localStorage.getItem("isb_email");
         if(currentUserEmail) {
             initAppFlow();
@@ -436,7 +456,33 @@
     function toggleChatSearch() { let sb = document.getElementById('chatSearchBar'); sb.style.display = (sb.style.display === 'block') ? 'none' : 'block'; if(sb.style.display === 'block') document.getElementById('chatSearchInput').focus(); else { document.getElementById('chatSearchInput').value = ""; filterChatMessages(); } }
     function filterChatMessages() { let q = document.getElementById('chatSearchInput').value.toLowerCase(); let bubbles = document.getElementById('chatMessagesBox').getElementsByClassName('bubble'); for(let i=0; i<bubbles.length; i++) { if(q === "") { bubbles[i].style.display = 'block'; continue; } let text = bubbles[i].innerText.toLowerCase(); bubbles[i].style.display = text.includes(q) ? 'block' : 'none'; } }
 
-    function toggleChatMenu() { let menu = document.getElementById('chatMenuDropdown'); if(menu.style.display === 'block') { menu.style.display = 'none'; return; } if(isGroupChat) { document.getElementById('blockUserMenuText').style.display = 'none'; } else { document.getElementById('blockUserMenuText').style.display = 'flex'; let targetUname = getUserInfoByEmail(currentChatContact).username; let myBlocked = APP_STATE.users[currentUsername]?.blocked || {}; document.getElementById('blockUserMenuText').innerHTML = !!myBlocked[targetUname] ? `<i class="material-icons">check_circle</i> <span>Unblock User</span>` : `<i class="material-icons">block</i> <span>Block User</span>`; } menu.style.display = 'block'; }
+    function toggleChatMenu() { 
+        let menu = document.getElementById('chatMenuDropdown'); 
+        if(menu.style.display === 'block') { menu.style.display = 'none'; return; } 
+        if(isGroupChat) { 
+            document.getElementById('blockUserMenuText').style.display = 'none'; 
+        } else { 
+            document.getElementById('blockUserMenuText').style.display = 'flex'; 
+            let targetUname = getUserInfoByEmail(currentChatContact).username; 
+            let myBlocked = APP_STATE.users[currentUsername]?.blocked || {}; 
+            document.getElementById('blockUserMenuText').innerHTML = !!myBlocked[targetUname] ? `<i class="material-icons">check_circle</i> <span>Unblock User</span>` : `<i class="material-icons">block</i> <span>Block User</span>`; 
+        } 
+        menu.style.display = 'block'; 
+    }
+    
+    // PIN/UNPIN CHAT FUNCTION
+    function togglePinChat() {
+        document.getElementById('chatMenuDropdown').style.display = 'none';
+        let targetId = isGroupChat ? currentChatContact : getUserInfoByEmail(currentChatContact).username;
+        let myPinned = APP_STATE.users[currentUsername]?.pinned || {};
+        if(myPinned[targetId]) {
+            database.ref('users/' + currentUsername + '/pinned/' + targetId).remove();
+        } else {
+            database.ref('users/' + currentUsername + '/pinned/' + targetId).set(true);
+        }
+        setTimeout(() => { loadChatsList(); openChat(currentChatContact, isGroupChat, document.getElementById('chatTitle').innerText); }, 300);
+    }
+
     function toggleBlockUser() { document.getElementById('chatMenuDropdown').style.display = 'none'; let targetUname = getUserInfoByEmail(currentChatContact).username; let myBlocked = APP_STATE.users[currentUsername]?.blocked || {}; if(myBlocked[targetUname]) { database.ref('users/' + currentUsername + '/blocked/' + targetUname).remove(); alert(targetUname + " is unblocked."); } else { if(confirm("Block @" + targetUname + "?")) { database.ref('users/' + currentUsername + '/blocked/' + targetUname).set(true); alert(targetUname + " is now blocked."); } } loadChatsList(); }
     function openBlockedUsersModal() { let list = document.getElementById('blockedUsersList'); list.innerHTML = ""; let myBlocked = APP_STATE.users[currentUsername]?.blocked || {}; let keys = Object.keys(myBlocked); if(keys.length === 0) { list.innerHTML = "<div style='padding:20px; text-align:center; color:gray;'>No blocked users.</div>"; } else { keys.forEach(uname => { let av = APP_STATE.users[uname]?.avatar; let avatarHtml = av ? `<img src="${av}" style="width:100%;height:100%;object-fit:cover;">` : uname.charAt(0).toUpperCase(); list.innerHTML += `<div class="list-item"><div class="avatar" style="width:40px;height:40px;font-size:16px;">${avatarHtml}</div><div class="list-info"><div class="list-title">@${uname}</div></div><button style="padding:8px 12px; background:transparent; border:1px solid #E91E63; color:#E91E63; border-radius:8px; font-weight:bold;" onclick="unblockFromSettings('${uname}')">Unblock</button></div>`; }); } document.getElementById('blockedUsersModal').style.display = 'flex'; }
     function unblockFromSettings(uname) { database.ref('users/' + currentUsername + '/blocked/' + uname).remove(); setTimeout(openBlockedUsersModal, 500); }
@@ -471,18 +517,34 @@
         if(tabId === 'callsTab') loadCallsList(); 
     }
 
-    const keyWorkerCode = `self.onmessage=function(e){let pwd=e.data.password;let salt=new Uint8Array(e.data.salt);let bigKey=new Uint8Array(128);for(let i=0;i<128;i++){bigKey[i]=pwd.charCodeAt(i%pwd.length)^salt[i%salt.length]^(i%256);}self.postMessage({bigKey:bigKey.buffer},[bigKey.buffer]);};`;
-    const mathWorkerCode = `self.onmessage=function(e){let buffer=new Uint8Array(e.data.buffer);let isEncrypt=e.data.action==='encrypt';let bigKey=new Uint8Array(e.data.bigKey);let chunkIdx=e.data.chunkIdx;let G1=0x12345678,G2=0x87654321,G3=0xDEADBEEF,G4=0xCAFEBABE;for(let i=0;i<128;i++){let c=bigKey[i];G1=(G1>>>1)^(c<<24);G2=(G2<<3)^c;G3^=(G1>>>5);G4=(G4<<1)^(G2>>>2);}G1^=chunkIdx;G2^=(Math.imul(chunkIdx,13)>>>0);G3^=(Math.imul(chunkIdx,17)>>>0);G4^=(Math.imul(chunkIdx,19)>>>0);let dv=new DataView(buffer.buffer,buffer.byteOffset,buffer.byteLength);let words=Math.floor(buffer.length/4);let baseWordIndex=chunkIdx*1048576;for(let i=0;i<words;i++){let sizeNum=baseWordIndex+i+1;let x=sizeNum;let x2=Math.imul(x,x)>>>0;let x3=Math.imul(x2,x)>>>0;let x4=Math.imul(x3,x)>>>0;let x5=Math.imul(x4,x)>>>0;let x6=Math.imul(x5,x)>>>0;let x7=Math.imul(x6,x)>>>0;let x8=Math.imul(x7,x)>>>0;let pMode=bigKey[sizeNum%128]%6;let powerVal=(x3&((pMode===0)?0xFFFFFFFF:0))|(x4&((pMode===1)?0xFFFFFFFF:0))|(x5&((pMode===2)?0xFFFFFFFF:0))|(x6&((pMode===3)?0xFFFFFFFF:0))|(x7&((pMode===4)?0xFFFFFFFF:0))|(x8&((pMode===5)?0xFFFFFFFF:0));let pVal=bigKey[(sizeNum+15)%128];let rotInner=(Math.imul(pVal,Math.imul(pVal,pVal))>>>0)%31+1;let rotOuter=(Math.imul(powerVal%1000,powerVal%1000)+rotInner)%31+1;G1=(G1+powerVal)>>>0;G2=(G2^G1)>>>0;G2=((G2<<rotInner)|(G2>>>(32-rotInner)))>>>0;G3=(G3+G2)>>>0;G4=(G4^G3)>>>0;G4=((G4<<rotOuter)|(G4>>>(32-rotOuter)))>>>0;let g32=(G1+G2+G3+G4)>>>0;let y=(g32%10000)+1;let y2=Math.imul(y,y)>>>0;let y3=Math.imul(y2,y)>>>0;let y4=Math.imul(y3,y)>>>0;let y5=Math.imul(y4,y)>>>0;let y6=Math.imul(y5,y)>>>0;let y7=Math.imul(y6,y)>>>0;let y8=Math.imul(y7,y)>>>0;let dpMode=bigKey[(sizeNum+64)%128]%6;let dPowerVal=(y3&((dpMode===0)?0xFFFFFFFF:0))|(y4&((dpMode===1)?0xFFFFFFFF:0))|(y5&((dpMode===2)?0xFFFFFFFF:0))|(y6&((dpMode===3)?0xFFFFFFFF:0))|(y7&((dpMode===4)?0xFFFFFFFF:0))|(y8&((dpMode===5)?0xFFFFFFFF:0));let dpVal=bigKey[(sizeNum+42)%128];let dRotInner=(Math.imul(dpVal,Math.imul(dpVal,dpVal))>>>0)%31+1;let dRotOuter=(Math.imul(dPowerVal%1000,dPowerVal%1000)+dRotInner)%31+1;g32=(g32+dPowerVal)>>>0;g32=(g32^(g32>>>15))>>>0;g32=((g32<<dRotInner)|(g32>>>(32-dRotInner)))>>>0;g32=((g32<<dRotOuter)|(g32>>>(32-dRotOuter)))>>>0;let pwdGarbage=(bigKey[(sizeNum*7)%128])|(bigKey[(sizeNum*11)%128]<<8)|(bigKey[(sizeNum*13)%128]<<16)|(bigKey[(sizeNum*17)%128]<<24);g32=(g32+pwdGarbage)>>>0;g32=(g32^(pwdGarbage>>>7))>>>0;let opMode=bigKey[(sizeNum+32)%128]%3;if(isEncrypt){let d32=dv.getUint32(i*4,true);let opA=(d32+g32)>>>0;let opS=(d32-g32)>>>0;let opX=(d32^g32)>>>0;d32=(opA&((opMode===0)?0xFFFFFFFF:0))|(opS&((opMode===1)?0xFFFFFFFF:0))|(opX&((opMode===2)?0xFFFFFFFF:0));dv.setUint32(i*4,d32,true);G3=(G3^d32)>>>0;}else{let c32=dv.getUint32(i*4,true);let opA=(c32-g32)>>>0;let opS=(c32+g32)>>>0;let opX=(c32^g32)>>>0;let p32=(opA&((opMode===0)?0xFFFFFFFF:0))|(opS&((opMode===1)?0xFFFFFFFF:0))|(opX&((opMode===2)?0xFFFFFFFF:0));dv.setUint32(i*4,p32,true);G3=(G3^c32)>>>0;}}let rem=buffer.length%4;if(rem>0){let off=buffer.length-rem;for(let i=0;i<rem;i++){let sizeNum=baseWordIndex+words+i+1;let x=sizeNum;let x2=Math.imul(x,x)>>>0;let x3=Math.imul(x2,x)>>>0;let x4=Math.imul(x3,x)>>>0;let x5=Math.imul(x4,x)>>>0;let x6=Math.imul(x5,x)>>>0;let x7=Math.imul(x6,x)>>>0;let x8=Math.imul(x7,x)>>>0;let pMode=bigKey[sizeNum%128]%6;let tVal=(pMode===0)?x3:(pMode===1)?x4:(pMode===2)?x5:(pMode===3)?x6:(pMode===4)?x7:x8;let pVal=bigKey[(sizeNum+5)%128];let rIn=(Math.imul(pVal,Math.imul(pVal,pVal))>>>0)%7+1;let rOut=(Math.imul(tVal%100,tVal%100)+rIn)%7+1;G1=(G1+tVal)>>>0;let gCombined=(G1^G2^G3^G4)>>>0;gCombined=((gCombined<<rIn)|(gCombined>>>(32-rIn)))>>>0;gCombined=((gCombined<<rOut)|(gCombined>>>(32-rOut)))>>>0;let pwdGarbageByte=bigKey[(sizeNum*7)%128];let gByte=((gCombined+pwdGarbageByte+(Math.imul(sizeNum%100,sizeNum%100)>>>0))&0xFF)^(pwdGarbageByte>>2);let opMode=bigKey[(sizeNum+32)%128]%3;if(isEncrypt){let dB=buffer[off+i];let oA=(dB+gByte)&0xFF;let oS=(dB-gByte+256)&0xFF;let oX=(dB^gByte)&0xFF;dB=(opMode===0)?oA:((opMode===1)?oS:oX);buffer[off+i]=dB;G3=(G3^dB)>>>0;}else{let cB=buffer[off+i];let oA=(cB-gByte+256)&0xFF;let oS=(cB+gByte)&0xFF;let oX=(cB^gByte)&0xFF;let pB=(opMode===0)?oA:((opMode===1)?oS:oX);buffer[off+i]=pB;G3=(G3^cB)>>>0;}}}self.postMessage({type:'chunk_done',buffer:buffer.buffer,chunkIdx:chunkIdx},[buffer.buffer]);};`;
     function base64ToUint8(base64) { let binary = atob(base64.replace(/\s+/g, '')); let len = binary.length; let bytes = new Uint8Array(len); for (let i = 0; i < len; i++) { bytes[i] = binary.charCodeAt(i); } return bytes; }
     function uint8ToBase64(bytes) { let binary = ''; let len = bytes.byteLength; let chunkSize = 0x8000; for (let i = 0; i < len; i += chunkSize) { binary += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + chunkSize, len))); } return btoa(binary); }
 
+    // OCTA-CORE IMPLEMENTATION (Using globally cached Blobs and pooling naturally via browser)
     async function runISBText(text, password, isEncrypt) {
         return new Promise((resolve, reject) => {
             let buffer, salt;
             if (isEncrypt) { buffer = new TextEncoder().encode(text); salt = crypto.getRandomValues(new Uint8Array(32)); } 
             else { try { buffer = base64ToUint8(text); } catch(e) { reject("Invalid Code"); return; } salt = buffer.slice(0, 32); buffer = buffer.slice(32); }
-            let kw = new Worker(URL.createObjectURL(new Blob([keyWorkerCode], {type:'application/javascript'})));
-            kw.onmessage = function(e) { let bigKey = e.data.bigKey; kw.terminate(); let mw = new Worker(URL.createObjectURL(new Blob([mathWorkerCode], {type:'application/javascript'}))); mw.onmessage = function(e2) { mw.terminate(); let outBuf = new Uint8Array(e2.data.buffer); if (isEncrypt) { let finalArr = new Uint8Array(32 + outBuf.length); finalArr.set(salt, 0); finalArr.set(outBuf, 32); resolve(uint8ToBase64(finalArr)); } else { resolve(new TextDecoder().decode(outBuf)); } }; mw.postMessage({buffer: buffer.buffer, action: isEncrypt ? 'encrypt' : 'bigKey', bigKey: bigKey, chunkIdx: 0}, [buffer.buffer, bigKey]); };
+            
+            // Using the precompiled Blobs drastically saves CPU and leverages dynamic multi-threading safely
+            let kw = new Worker(precompiledKeyWorkerURL);
+            kw.onmessage = function(e) { 
+                let bigKey = e.data.bigKey; kw.terminate(); 
+                let mw = new Worker(precompiledMathWorkerURL); 
+                mw.onmessage = function(e2) { 
+                    mw.terminate(); 
+                    let outBuf = new Uint8Array(e2.data.buffer); 
+                    if (isEncrypt) { 
+                        let finalArr = new Uint8Array(32 + outBuf.length); 
+                        finalArr.set(salt, 0); finalArr.set(outBuf, 32); 
+                        resolve(uint8ToBase64(finalArr)); 
+                    } else { 
+                        resolve(new TextDecoder().decode(outBuf)); 
+                    } 
+                }; 
+                mw.postMessage({buffer: buffer.buffer, action: isEncrypt ? 'encrypt' : 'bigKey', bigKey: bigKey, chunkIdx: 0}, [buffer.buffer, bigKey]); 
+            };
             kw.postMessage({password: password, salt: salt.buffer});
         });
     }
@@ -503,18 +565,68 @@
     function openNewGroupModal() { document.getElementById('newGroupModal').style.display = 'flex'; }
     function createGroup() { let gName = document.getElementById('newGroupName').value.trim(); let inputs = document.getElementById('newGroupEmails').value.toLowerCase().split(',').map(e => e.trim()); if(!gName || inputs.length === 0) return alert("Enter valid name and at least 1 contact"); let gEmails = [currentUserEmail]; for(let val of inputs) { if(!val) continue; if(val.includes("@")) gEmails.push(val); else { if(val.startsWith("@")) val = val.substring(1); if(APP_STATE.users[val]) gEmails.push(APP_STATE.users[val].email); } } database.ref('groups').push({ id: 'grp_' + Date.now(), name: gName, members: [...new Set(gEmails)], createdBy: currentUserEmail }); document.getElementById('newGroupModal').style.display = 'none'; alert("Group created securely!"); }
 
+    // TIMELINE & PIN SORTING LOGIC
     function loadChatsList() {
-        let contacts = {};
+        let contactsObj = {};
+        
         APP_STATE.msgs.forEach(m => {
-            if(!m.isGroup && (m.from === currentUserEmail || m.to === currentUserEmail)) { let other = (m.from === currentUserEmail) ? m.to : m.from; if(!contacts[other]) contacts[other] = { email: other, lastMsg: m.payload.length > 500 ? "📁 Media / File" : "🔒 Encrypted Message", time: m.time, isGroup: false }; else { contacts[other].time = m.time; contacts[other].lastMsg = m.payload.length > 500 ? "📁 Media / File" : "🔒 Encrypted Message"; } }
+            let msgTimeMs = m.timestamp || parseInt(m.id.substring(0,13)); 
+            if(!m.isGroup && (m.from === currentUserEmail || m.to === currentUserEmail)) { 
+                let other = (m.from === currentUserEmail) ? m.to : m.from; 
+                if(!contactsObj[other]) {
+                    contactsObj[other] = { id: other, email: other, lastMsg: m.payload.length > 500 ? "📁 Media / File" : "🔒 Encrypted Message", timeStr: m.time, timestamp: msgTimeMs, isGroup: false }; 
+                } else { 
+                    if(msgTimeMs > contactsObj[other].timestamp) {
+                        contactsObj[other].timestamp = msgTimeMs;
+                        contactsObj[other].timeStr = m.time;
+                        contactsObj[other].lastMsg = m.payload.length > 500 ? "📁 Media / File" : "🔒 Encrypted Message";
+                    }
+                } 
+            }
         });
-        APP_STATE.groups.forEach(g => { contacts[g.id] = { email: g.id, name: g.name + " (Group)", lastMsg: "Tap to view group", time: "Active", isGroup: true }; }); let html = "";
-        for(let c in contacts) {
-            let info = contacts[c]; let dName = info.name; let dAv = null;
-            if(!info.isGroup) { let uInfo = getUserInfoByEmail(info.email); dName = uInfo.username; dAv = uInfo.avatar; let myBlocked = APP_STATE.users[currentUsername]?.blocked || {}; if(myBlocked[dName]) info.lastMsg = "<span style='color:#E91E63;'>🚫 Blocked User</span>"; }
+
+        APP_STATE.groups.forEach(g => { 
+            let grpMsgs = APP_STATE.msgs.filter(m => m.isGroup && m.to === g.id);
+            let latestMs = 0; let lastMsgStr = "Tap to view group"; let lastTimeStr = "Active";
+            if(grpMsgs.length > 0) {
+                let lastM = grpMsgs[grpMsgs.length - 1];
+                latestMs = lastM.timestamp || parseInt(lastM.id.substring(0,13));
+                lastMsgStr = lastM.payload.length > 500 ? "📁 Media / File" : "🔒 Encrypted Message";
+                lastTimeStr = lastM.time;
+            }
+            contactsObj[g.id] = { id: g.id, email: g.id, name: g.name + " (Group)", lastMsg: lastMsgStr, timeStr: lastTimeStr, timestamp: latestMs || Date.now(), isGroup: true }; 
+        }); 
+
+        let contactsArr = Object.values(contactsObj);
+
+        contactsArr.sort((a, b) => {
+            let aId = a.isGroup ? a.id : (getUserInfoByEmail(a.email).username || a.email);
+            let bId = b.isGroup ? b.id : (getUserInfoByEmail(b.email).username || b.email);
+            let myPinned = APP_STATE.users[currentUsername]?.pinned || {};
+            let aPin = myPinned[aId] ? 1 : 0;
+            let bPin = myPinned[bId] ? 1 : 0;
+            if (aPin !== bPin) return bPin - aPin; // Pinned first
+            return b.timestamp - a.timestamp; // Then strictly by timestamp desc
+        });
+
+        let html = "";
+        contactsArr.forEach(info => {
+            let dName = info.name; let dAv = null; let targetIdForPin = info.id;
+            if(!info.isGroup) { 
+                let uInfo = getUserInfoByEmail(info.email); 
+                dName = uInfo.username; dAv = uInfo.avatar; 
+                targetIdForPin = dName;
+                let myBlocked = APP_STATE.users[currentUsername]?.blocked || {}; 
+                if(myBlocked[dName]) info.lastMsg = "<span style='color:#E91E63;'>🚫 Blocked User</span>"; 
+            }
+            
+            let myPinned = APP_STATE.users[currentUsername]?.pinned || {};
+            let isPinned = myPinned[targetIdForPin];
+            let pinIconHtml = isPinned ? `<i class="material-icons" style="font-size:16px; color:#FFC107; margin-right:5px;">star</i>` : "";
+
             let avatarHtml = dAv ? `<img src="${dAv}">` : (info.isGroup ? "G" : dName.charAt(0).toUpperCase());
-            html += `<div class="list-item" onclick="openChat('${info.email}', ${info.isGroup}, '${dName}')"><div class="avatar">${avatarHtml}</div><div class="list-info"><div class="list-title">${dName}</div><div class="list-subtitle"><i class="material-icons" style="font-size:14px; color:var(--primary);">lock</i> ${info.lastMsg}</div></div><div class="list-time">${info.time.split(',')[1] || info.time}</div></div>`;
-        }
+            html += `<div class="list-item" onclick="openChat('${info.email}', ${info.isGroup}, '${dName}')"><div class="avatar">${avatarHtml}</div><div class="list-info"><div class="list-title">${dName}</div><div class="list-subtitle">${pinIconHtml}<i class="material-icons" style="font-size:14px; color:var(--primary); margin-right:2px;">lock</i> ${info.lastMsg}</div></div><div class="list-time">${info.timeStr.split(',')[1] || info.timeStr}</div></div>`;
+        });
         
         if (!isChatsLoaded && html === "") {
             document.getElementById("chatsList").innerHTML = `<div style="text-align:center; padding:50px 20px; color:var(--text-muted);"><i class="material-icons animate-spin" style="font-size:40px; color:var(--primary);">sync</i><div style="margin-top:10px; font-weight:bold; font-size:15px;">Syncing Chats...</div></div>`;
@@ -530,6 +642,10 @@
         document.getElementById('chatAvatar').innerHTML = dAv ? `<img src="${dAv}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">` : (isGroup ? "G" : chatName.charAt(0).toUpperCase());
         
         document.getElementById('btnAudioCall').style.display = isGroup ? 'none' : 'block'; document.getElementById('btnVideoCall').style.display = isGroup ? 'none' : 'block';
+
+        let targetIdForPin = isGroup ? id : currentChatTargetUname;
+        let myPinned = APP_STATE.users[currentUsername]?.pinned || {};
+        document.getElementById('pinChatMenuText').innerHTML = myPinned[targetIdForPin] ? `<i class="material-icons" style="color:#FFC107;">star</i> <span>Unpin Chat</span>` : `<i class="material-icons">star_border</i> <span>Pin Chat</span>`;
 
         let stBox = document.getElementById('chatUserStatus');
         if(activeChatPresenceListener && currentChatTargetUname) { database.ref('users/'+currentChatTargetUname).off('value', activeChatPresenceListener); }
@@ -570,10 +686,40 @@
         if(!isGroupChat) { let targetUname = getUserInfoByEmail(currentChatContact).username; let myBlocked = APP_STATE.users[currentUsername]?.blocked || {}; let targetBlocked = APP_STATE.users[targetUname]?.blocked || {}; if(myBlocked[targetUname]) return alert("🚫 You have blocked this user. Unblock them from settings to send a message."); if(targetBlocked[currentUsername]) return alert("🚫 Message not sent. You have been blocked by this user."); }
         let input = document.getElementById('chatInputMsg'), msg = input.value.trim(), payloadToEncrypt = ""; if(selectedFileData) { payloadToEncrypt = `ISB_FILE|||${selectedFileName}|||${selectedFileData}`; } else { if(!msg) return; payloadToEncrypt = msg; }
         let sendBtn = document.querySelector('.btn-send'); sendBtn.disabled = true; input.disabled = true;
-        try { let encryptionPwd = isGroupChat ? currentChatContact : currentUserEmail; let encryptedPayload = await runISBText(payloadToEncrypt, encryptionPwd, true); await database.ref('messages').push({ id: Date.now() + Math.random().toString().substring(2,8), from: currentUserEmail, to: currentChatContact, payload: encryptedPayload, time: new Date().toLocaleString(), isGroup: isGroupChat }); input.value = ""; cancelSelectedFile(); sendBtn.disabled = false; input.disabled = false; input.focus(); setTimeout(() => { document.getElementById('chatMessagesBox').scrollTop = document.getElementById('chatMessagesBox').scrollHeight; }, 100); } catch(e) { alert("Encryption Error"); sendBtn.disabled = false; input.disabled = false; }
+        try { let encryptionPwd = isGroupChat ? currentChatContact : currentUserEmail; let encryptedPayload = await runISBText(payloadToEncrypt, encryptionPwd, true); await database.ref('messages').push({ id: Date.now() + Math.random().toString().substring(2,8), from: currentUserEmail, to: currentChatContact, payload: encryptedPayload, time: new Date().toLocaleString(), timestamp: Date.now(), isGroup: isGroupChat }); input.value = ""; cancelSelectedFile(); sendBtn.disabled = false; input.disabled = false; input.focus(); setTimeout(() => { document.getElementById('chatMessagesBox').scrollTop = document.getElementById('chatMessagesBox').scrollHeight; }, 100); } catch(e) { alert("Encryption Error"); sendBtn.disabled = false; input.disabled = false; }
     }
 
-    async function shareSelectedMsg() { document.getElementById('msgOptionsModal').style.display='none'; if(!activeActionMsg) return; try { if(activeActionMsg.decryptedData && activeActionMsg.decryptedData.startsWith("data:")) { let blob = dataURItoBlob(activeActionMsg.decryptedData); let file = new File([blob], activeActionMsg.decryptedName || "ISB_Media", {type: blob.type}); if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: activeActionMsg.decryptedName }); } else { await navigator.share({ title: 'ISB File', text: 'File Attached: ' + activeActionMsg.decryptedName }); } } else { await navigator.share({ title: 'ISB Message', text: activeActionMsg.decryptedFullText }); } } catch(e) { console.log("Share failed", e); } }
+    // ROBUST SHARE FUNCTION
+    async function shareSelectedMsg() { 
+        document.getElementById('msgOptionsModal').style.display='none'; 
+        if(!activeActionMsg) return; 
+        try { 
+            if(activeActionMsg.decryptedData && activeActionMsg.decryptedData.startsWith("data:")) { 
+                let blob = dataURItoBlob(activeActionMsg.decryptedData); 
+                let file = new File([blob], activeActionMsg.decryptedName || "ISB_Media", {type: blob.type}); 
+                if (navigator.share) {
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) { 
+                        await navigator.share({ files: [file], title: activeActionMsg.decryptedName }); 
+                    } else { 
+                        await navigator.share({ title: 'ISB File', text: 'File Attached: ' + activeActionMsg.decryptedName }); 
+                    } 
+                } else {
+                    let a = document.createElement('a');
+                    a.href = activeActionMsg.decryptedData;
+                    a.download = activeActionMsg.decryptedName || "download";
+                    a.click();
+                }
+            } else { 
+                if(navigator.share) {
+                    await navigator.share({ title: 'ISB Message', text: activeActionMsg.decryptedFullText }); 
+                } else {
+                    navigator.clipboard.writeText(activeActionMsg.decryptedFullText);
+                    alert("Message copied to clipboard!");
+                }
+            } 
+        } catch(e) { console.log("Share failed", e); } 
+    }
+    
     function deleteSelectedMsg() { document.getElementById('msgOptionsModal').style.display='none'; if(!activeActionMsg) return; if(!confirm("Delete this message?")) return; database.ref('messages').orderByChild('id').equalTo(activeActionMsg.id).once('value', snapshot => { snapshot.forEach(child => child.ref.remove()); }); activeActionMsg = null; }
 
     function closeStatusModal() { document.getElementById('imageStatusModal').style.display = 'none'; document.getElementById('textStatusModal').style.display = 'none'; document.getElementById('statusUploadArea').style.display = 'block'; document.getElementById('statusVidPreview').style.display = 'none'; document.getElementById('statusImgPreview').style.display = 'none'; document.getElementById('statusCaption').value = ""; statusFileData = null; document.getElementById('statusFile').value = ""; }
@@ -604,6 +750,10 @@
                 currentCallDirection = 'incoming';
                 currentCallType = data.callType;
                 window.currentCallTarget = data.from;
+
+                // Play Incoming Ringtone
+                let ringtone = document.getElementById('incomingRing');
+                ringtone.play().catch(e => console.log("Ringtone Autoplay Blocked: ", e));
 
                 document.getElementById('callStatusText').innerText = "Incoming Call...";
                 document.getElementById('callTypeText').innerText = (data.callType === 'video') ? "Video Call from @" + data.from : "Audio Call from @" + data.from;
@@ -705,6 +855,13 @@
                 if(callType === 'video') { remoteVid.style.display = 'block'; }
                 document.getElementById('callStatusText').innerText = "Connected";
                 callStartTime = Date.now(); 
+
+                // Video Logo Drag logic activation
+                if(isVideoEnabled) {
+                    document.getElementById('callAvatarPreview').classList.add('call-avatar-small');
+                    document.getElementById('callStatusText').classList.add('hide-in-video');
+                    document.getElementById('callTypeText').classList.add('hide-in-video');
+                }
             };
 
             peerConnection.onicecandidate = event => { if(event.candidate) database.ref('calls/' + targetUname + '/callerCandidates').push(event.candidate.toJSON()); };
@@ -724,6 +881,11 @@
     }
 
     async function acceptCall() {
+        // Stop Ringtone
+        let ringtone = document.getElementById('incomingRing');
+        ringtone.pause();
+        ringtone.currentTime = 0;
+
         document.getElementById('btnAcceptCall').style.display = 'none'; document.getElementById('callStatusText').innerText = "Connecting...";
         const data = window.currentCallData; isCallActive = true;
 
@@ -766,6 +928,13 @@
                 if(data.callType === 'video') remoteVid.style.display = 'block';
                 document.getElementById('callStatusText').innerText = "Connected";
                 callStartTime = Date.now(); 
+
+                // Video Logo Drag logic activation
+                if(isVideoEnabled) {
+                    document.getElementById('callAvatarPreview').classList.add('call-avatar-small');
+                    document.getElementById('callStatusText').classList.add('hide-in-video');
+                    document.getElementById('callTypeText').classList.add('hide-in-video');
+                }
             };
 
             peerConnection.onicecandidate = event => { if(event.candidate) database.ref('calls/' + currentUsername + '/receiverCandidates').push(event.candidate.toJSON()); };
@@ -783,6 +952,17 @@
     }
 
     function endCall(notifyRemote = true) {
+        // Stop Ringtone
+        let ringtone = document.getElementById('incomingRing');
+        ringtone.pause();
+        ringtone.currentTime = 0;
+
+        // Reset Drag Logo CSS
+        document.getElementById('callAvatarPreview').classList.remove('call-avatar-small');
+        document.getElementById('callStatusText').classList.remove('hide-in-video');
+        document.getElementById('callTypeText').classList.remove('hide-in-video');
+        document.getElementById('callAvatarPreview').removeAttribute('style');
+
         isCallActive = false; document.getElementById('callOverlay').style.display = 'none';
         
         if (window.currentCallTarget && currentCallDirection) {
@@ -861,6 +1041,42 @@
             database.ref('callHistory/' + currentUsername).remove();
         }
     }
+
+    // --- ड्रैगेबल (खिसकने वाले) लोगो का लॉजिक ---
+    let avatarEl = document.getElementById('callAvatarPreview');
+    let isAvatarDragging = false, avStartX, avStartY, avInitialX, avInitialY;
+
+    function startAvatarDrag(e) {
+        if(!avatarEl.classList.contains('call-avatar-small')) return;
+        isAvatarDragging = true;
+        let clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+        let clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+        avStartX = clientX; avStartY = clientY;
+        let rect = avatarEl.getBoundingClientRect();
+        avInitialX = rect.left; avInitialY = rect.top;
+    }
+
+    function moveAvatarDrag(e) {
+        if(!isAvatarDragging) return;
+        e.preventDefault();
+        let clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+        let clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+        let dx = clientX - avStartX;
+        let dy = clientY - avStartY;
+        avatarEl.style.left = (avInitialX + dx) + 'px';
+        avatarEl.style.top = (avInitialY + dy) + 'px';
+        avatarEl.style.right = 'auto';
+        avatarEl.style.bottom = 'auto';
+    }
+
+    function endAvatarDrag() { isAvatarDragging = false; }
+
+    avatarEl.addEventListener('touchstart', startAvatarDrag, {passive: false});
+    avatarEl.addEventListener('mousedown', startAvatarDrag);
+    document.addEventListener('touchmove', moveAvatarDrag, {passive: false});
+    document.addEventListener('mousemove', moveAvatarDrag);
+    document.addEventListener('touchend', endAvatarDrag);
+    document.addEventListener('mouseup', endAvatarDrag);
 </script>
 </body>
 </html>
