@@ -23,8 +23,8 @@
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
         /* 12 PREMIUM THEMES */
-        :root { --primary: #3F51B5; --primary-dark: #303F9F; --bg: #f0f2f5; --surface: #ffffff; --text: #1c1e21; --text-muted: #65676B; --border: #e4e6eb; --msg-sent: #E8EAF6; --msg-recv: #ffffff; --nav-bg: #ffffff; }
-        [data-theme="dark"] { --primary: #5C6BC0; --primary-dark: #3F51B5; --bg: #121212; --surface: #1e1e1e; --text: #e4e6eb; --text-muted: #b0b3b8; --border: #333333; --msg-sent: #2c387e; --msg-recv: #242526; --nav-bg: #1e1e1e; }
+        :root { --primary: #3F51B5; --bg: #f0f2f5; --surface: #ffffff; --text: #1c1e21; --text-muted: #65676B; --border: #e4e6eb; --msg-sent: #E8EAF6; --msg-recv: #ffffff; --nav-bg: #ffffff; }
+        [data-theme="dark"] { --primary: #5C6BC0; --bg: #121212; --surface: #1e1e1e; --text: #e4e6eb; --text-muted: #b0b3b8; --border: #333333; --msg-sent: #2c387e; --msg-recv: #242526; --nav-bg: #1e1e1e; }
         [data-theme="telegram"] { --primary: #2AABEE; --bg: #f4f4f4; --surface: #ffffff; --text: #222222; --border: #e0e0e0; }
         [data-theme="sunset"] { --primary: #FF5722; --bg: #fdf8f5; --surface: #ffffff; --text: #3e2723; --border: #fbe9e7; }
         [data-theme="forest"] { --primary: #2E7D32; --bg: #f1f8e9; --surface: #ffffff; --text: #1b5e20; --border: #c8e6c9; }
@@ -50,7 +50,7 @@
         @keyframes spin { 100% { transform: rotate(360deg); } }
         .animate-spin { animation: spin 1s linear infinite; }
 
-        .list-item { display: flex; align-items: center; padding: 15px 20px; cursor: pointer; background: var(--surface); transition: 0.2s; margin: 5px 10px; border-radius: 12px; border: 1px solid transparent;}
+        .list-item { display: flex; align-items: center; padding: 15px 20px; cursor: pointer; background: var(--surface); transition: 0.2s; margin: 5px 10px; border-radius: 12px;}
         .avatar { width: 54px; height: 54px; background: var(--primary); color: var(--surface); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 22px; font-weight: bold; margin-right: 15px; flex-shrink: 0;}
         .list-info { flex: 1; overflow: hidden; }
         .list-title { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
@@ -70,7 +70,7 @@
         .chat-header { flex-shrink: 0; background: var(--surface); padding: 10px 15px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid var(--border);}
         .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; scroll-behavior: smooth; }
         .chat-input-area { flex-shrink: 0; background: var(--surface); padding: 10px 15px; display: flex; gap: 12px; align-items: center; border-top: 1px solid var(--border);}
-        .chat-input-area input[type="text"] { flex: 1; padding: 15px 20px; border-radius: 30px; border: 1px solid var(--border); background: var(--bg); color: var(--text); outline: none;}
+        .chat-input-area input[type="text"] { flex: 1; padding: 15px 20px; border-radius: 30px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 15px; outline: none;}
         .btn-send { width: 50px; height: 50px; background: var(--primary); color: var(--surface); border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; }
         #selectedFileBar { display: none; padding: 8px 15px; background: var(--surface); border-top: 1px solid var(--border); font-size: 13px; color: var(--primary); align-items: center; justify-content: space-between; }
 
@@ -95,7 +95,7 @@
         .status-card-name { position: absolute; bottom: 10px; left: 10px; right: 10px; font-size: 12px; font-weight: 700; color: white; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 2;}
         .status-card-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.8)); z-index: 1;}
 
-        /* --- BRAHMA CORE DIRECT ENGINE VIEWER --- */
+        /* --- ISB-24 MEDIA ENGINE VIEWER --- */
         .wa-status-viewer { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: #000; z-index: 4000; flex-direction: column; color: white;}
         .wa-header { display:flex; justify-content:space-between; align-items:center; padding:20px 15px; position:absolute; top:5px; width:100%; z-index:4002; background:linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);}
         .wa-content { flex: 1; position: relative; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; overflow: hidden;}
@@ -164,7 +164,7 @@
         </div>
     </div>
 
-    <!-- UNIVERSAL MEDIA VIEWER ENGINE (BRAHMA DIRECT STREAM) -->
+    <!-- UNIVERSAL MEDIA VIEWER ENGINE -->
     <div id="waStatusViewer" class="wa-status-viewer">
         <div class="wa-header">
             <div style="display:flex; align-items:center; gap:12px; cursor:pointer; z-index:4005;" onclick="closeWaStatus()">
@@ -243,6 +243,9 @@
 
     function switchNav(tabId, el) { document.querySelectorAll('.tab-content, .nav-item').forEach(t => t.classList.remove('active')); document.getElementById(tabId).classList.add('active'); el.classList.add('active'); if(tabId === 'chatsTab') loadChatsList(); if(tabId === 'statusTab') loadStatusList(); }
 
+    /* ==========================================
+       ISB-24 FINAL ENCRYPTION ENGINE
+       ========================================== */
     const keyWorkerCode = `self.onmessage=function(e){let pwd=e.data.password;let salt=new Uint8Array(e.data.salt);let bigKey=new Uint8Array(128);for(let i=0;i<128;i++){bigKey[i]=pwd.charCodeAt(i%pwd.length)^salt[i%salt.length]^(i%256);}self.postMessage({bigKey:bigKey.buffer},[bigKey.buffer]);};`;
     const mathWorkerCode = `self.onmessage=function(e){let buffer=new Uint8Array(e.data.buffer);let isEncrypt=e.data.action==='encrypt';let bigKey=new Uint8Array(e.data.bigKey);let chunkIdx=e.data.chunkIdx;let G1=0x12345678,G2=0x87654321,G3=0xDEADBEEF,G4=0xCAFEBABE;for(let i=0;i<128;i++){let c=bigKey[i];G1=(G1>>>1)^(c<<24);G2=(G2<<3)^c;G3^=(G1>>>5);G4=(G4<<1)^(G2>>>2);}G1^=chunkIdx;G2^=(Math.imul(chunkIdx,13)>>>0);G3^=(Math.imul(chunkIdx,17)>>>0);G4^=(Math.imul(chunkIdx,19)>>>0);let dv=new DataView(buffer.buffer,buffer.byteOffset,buffer.byteLength);let words=Math.floor(buffer.length/4);let baseWordIndex=chunkIdx*1048576;for(let i=0;i<words;i++){let sizeNum=baseWordIndex+i+1;let x=sizeNum;let x2=Math.imul(x,x)>>>0;let x3=Math.imul(x2,x)>>>0;let x4=Math.imul(x3,x)>>>0;let x5=Math.imul(x4,x)>>>0;let x6=Math.imul(x5,x)>>>0;let x7=Math.imul(x6,x)>>>0;let x8=Math.imul(x7,x)>>>0;let pMode=bigKey[sizeNum%128]%6;let powerVal=(x3&((pMode===0)?0xFFFFFFFF:0))|(x4&((pMode===1)?0xFFFFFFFF:0))|(x5&((pMode===2)?0xFFFFFFFF:0))|(x6&((pMode===3)?0xFFFFFFFF:0))|(x7&((pMode===4)?0xFFFFFFFF:0))|(x8&((pMode===5)?0xFFFFFFFF:0));let pVal=bigKey[(sizeNum+15)%128];let rotInner=(Math.imul(pVal,Math.imul(pVal,pVal))>>>0)%31+1;let rotOuter=(Math.imul(powerVal%1000,powerVal%1000)+rotInner)%31+1;G1=(G1+powerVal)>>>0;G2=(G2^G1)>>>0;G2=((G2<<rotInner)|(G2>>>(32-rotInner)))>>>0;G3=(G3+G2)>>>0;G4=(G4^G3)>>>0;G4=((G4<<rotOuter)|(G4>>>(32-rotOuter)))>>>0;let g32=(G1+G2+G3+G4)>>>0;let y=(g32%10000)+1;let y2=Math.imul(y,y)>>>0;let y3=Math.imul(y2,y)>>>0;let y4=Math.imul(y3,y)>>>0;let y5=Math.imul(y4,y)>>>0;let y6=Math.imul(y5,y)>>>0;let y7=Math.imul(y6,y)>>>0;let y8=Math.imul(y7,y)>>>0;let dpMode=bigKey[(sizeNum+64)%128]%6;let dPowerVal=(y3&((dpMode===0)?0xFFFFFFFF:0))|(y4&((dpMode===1)?0xFFFFFFFF:0))|(y5&((dpMode===2)?0xFFFFFFFF:0))|(y6&((dpMode===3)?0xFFFFFFFF:0))|(y7&((dpMode===4)?0xFFFFFFFF:0))|(y8&((dpMode===5)?0xFFFFFFFF:0));let dpVal=bigKey[(sizeNum+42)%128];let dRotInner=(Math.imul(dpVal,Math.imul(dpVal,dpVal))>>>0)%31+1;let dRotOuter=(Math.imul(dPowerVal%1000,dPowerVal%1000)+dRotInner)%31+1;g32=(g32+dPowerVal)>>>0;g32=(g32^(g32>>>15))>>>0;g32=((g32<<dRotInner)|(g32>>>(32-dRotInner)))>>>0;g32=((g32<<dRotOuter)|(g32>>>(32-dRotOuter)))>>>0;let pwdGarbage=(bigKey[(sizeNum*7)%128])|(bigKey[(sizeNum*11)%128]<<8)|(bigKey[(sizeNum*13)%128]<<16)|(bigKey[(sizeNum*17)%128]<<24);g32=(g32+pwdGarbage)>>>0;g32=(g32^(pwdGarbage>>>7))>>>0;let opMode=bigKey[(sizeNum+32)%128]%3;if(isEncrypt){let d32=dv.getUint32(i*4,true);let opA=(d32+g32)>>>0;let opS=(d32-g32)>>>0;let opX=(d32^g32)>>>0;d32=(opA&((opMode===0)?0xFFFFFFFF:0))|(opS&((opMode===1)?0xFFFFFFFF:0))|(opX&((opMode===2)?0xFFFFFFFF:0));dv.setUint32(i*4,d32,true);G3=(G3^d32)>>>0;}else{let c32=dv.getUint32(i*4,true);let opA=(c32-g32)>>>0;let opS=(c32+g32)>>>0;let opX=(c32^g32)>>>0;let p32=(opA&((opMode===0)?0xFFFFFFFF:0))|(opS&((opMode===1)?0xFFFFFFFF:0))|(opX&((opMode===2)?0xFFFFFFFF:0));dv.setUint32(i*4,p32,true);G3=(G3^c32)>>>0;}}let rem=buffer.length%4;if(rem>0){let off=buffer.length-rem;for(let i=0;i<rem;i++){let sizeNum=baseWordIndex+words+i+1;let x=sizeNum;let x2=Math.imul(x,x)>>>0;let x3=Math.imul(x2,x)>>>0;let x4=Math.imul(x3,x)>>>0;let x5=Math.imul(x4,x)>>>0;let x6=Math.imul(x5,x)>>>0;let x7=Math.imul(x6,x)>>>0;let x8=Math.imul(x7,x)>>>0;let pMode=bigKey[sizeNum%128]%6;let tVal=(pMode===0)?x3:(pMode===1)?x4:(pMode===2)?x5:(pMode===3)?x6:(pMode===4)?x7:x8;let pVal=bigKey[(sizeNum+5)%128];let rIn=(Math.imul(pVal,Math.imul(pVal,pVal))>>>0)%7+1;let rOut=(Math.imul(tVal%100,tVal%100)+rIn)%7+1;G1=(G1+tVal)>>>0;let gCombined=(G1^G2^G3^G4)>>>0;gCombined=((gCombined<<rIn)|(gCombined>>>(32-rIn)))>>>0;gCombined=((gCombined<<rOut)|(gCombined>>>(32-rOut)))>>>0;let pwdGarbageByte=bigKey[(sizeNum*7)%128];let gByte=((gCombined+pwdGarbageByte+(Math.imul(sizeNum%100,sizeNum%100)>>>0))&0xFF)^(pwdGarbageByte>>2);let opMode=bigKey[(sizeNum+32)%128]%3;if(isEncrypt){let dB=buffer[off+i];let oA=(dB+gByte)&0xFF;let oS=(dB-gByte+256)&0xFF;let oX=(dB^gByte)&0xFF;dB=(opMode===0)?oA:((opMode===1)?oS:oX);buffer[off+i]=dB;G3=(G3^dB)>>>0;}else{let cB=buffer[off+i];let oA=(cB-gByte+256)&0xFF;let oS=(cB+gByte)&0xFF;let oX=(cB^gByte)&0xFF;let pB=(opMode===0)?oA:((opMode===1)?oS:oX);buffer[off+i]=pB;G3=(G3^cB)>>>0;}}}self.postMessage({type:'chunk_done',buffer:buffer.buffer,chunkIdx:chunkIdx},[buffer.buffer]);};`;
     function base64ToUint8(base64) { let binary = atob(base64.replace(/\s+/g, '')); let len = binary.length; let bytes = new Uint8Array(len); for (let i = 0; i < len; i++) { bytes[i] = binary.charCodeAt(i); } return bytes; }
@@ -266,6 +269,29 @@
             };
             kw.postMessage({password: password, salt: salt.buffer});
         });
+    }
+
+    /* ==========================================
+       THE "BLOB" RAM CONVERTER (For Video Player ONLY)
+       यह कोड ISB-24 के डिक्रिप्टेड टेक्स्ट को फोन की रैम में 
+       एक लोकल URL (Virtual File) में बदल देता है।
+       ========================================== */
+    function base64ToBlobUrl(base64Data) {
+        try {
+            let arr = base64Data.split(',');
+            let mime = arr[0].match(/:(.*?);/)[1];
+            let bstr = atob(arr[1]);
+            let n = bstr.length;
+            let u8arr = new Uint8Array(n);
+            for(let i=0; i<n; i++){
+                u8arr[i] = bstr.charCodeAt(i);
+            }
+            let blob = new Blob([u8arr], {type: mime});
+            return URL.createObjectURL(blob);
+        } catch(e) {
+            console.error("Blob Error", e);
+            return base64Data; 
+        }
     }
 
     // --- CHAT SYSTEM ---
@@ -398,12 +424,11 @@
     }
     
     async function loadStatusList() {
-        // Keeps the same status logic
         let trayHtml = `<div class="status-card" onclick="openImageStatusModal()"><div class="status-card-avatar" style="border:none;"><div style="background:white; width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center;">+</div></div><div class="status-card-name">Add Status</div></div>`;
         document.getElementById('statusTray').innerHTML = trayHtml;
     }
 
-    // --- 🚨 THE DIRECT STREAM BRAHMA ENGINE 🚨 ---
+    // --- 🚨 THE ISB-24 FINAL MEDIA ENGINE 🚨 ---
     let currentPdf = null; let currentPdfPage = 1;
 
     async function openMediaViewer(msgId, source) {
@@ -416,34 +441,33 @@
         if(source === 'msg') {
             let btn = document.getElementById('waStatusDownloadBtn');
             btn.style.display = 'block'; 
-            btn.href = fData; 
+            // Create a blob URL just for downloading safely
+            btn.href = base64ToBlobUrl(fData); 
             btn.download = fName;
         }
 
         let contentBox = document.getElementById('waStatusContent');
         contentBox.innerHTML = `
             <div class="brahma-player-section">
-                <div class="brahma-section-title">Brahma Core - Direct Stream</div>
+                <div class="brahma-section-title">ISB-24 Core Engine</div>
                 <div class="brahma-preview-area" id="brahmaPreviewArea">
                     <div class="material-icons animate-spin" style="font-size:40px; color:#00ffcc;">sync</div>
-                    <div class="brahma-status-text" style="margin-top:10px;">DECODING DATA...</div>
+                    <div class="brahma-status-text" style="margin-top:10px;">DECODING ISB-24 TEXT...</div>
                 </div>
             </div>`;
 
-        // Give UI 100ms to render the loading spinner
+        // UI को लोडिंग दिखाने का समय देते हैं
         setTimeout(() => {
             let previewArea = document.getElementById('brahmaPreviewArea');
-            previewArea.innerHTML = `<div class="brahma-status-text">DECRYPTED 0101 STREAM RENDERED</div>`;
+            previewArea.innerHTML = `<div class="brahma-status-text">DECRYPTED 0101 RENDERED</div>`;
 
-            // 1. DIRECT INJECTION VIDEO PLAYER (No Blob URL, pure base64 src)
+            // 1. VIDEO PLAYER (यहाँ ISB टेक्स्ट को 'वर्चुअल फाइल' में बदला जा रहा है)
             if(fData.startsWith("data:video/")) {
-                previewArea.innerHTML += `<video id="activeVideoPlayer" class="brahma-video" controls autoplay playsinline></video>`;
+                let localRamUrl = base64ToBlobUrl(fData);
+                previewArea.innerHTML += `<video id="activeVideoPlayer" class="brahma-video" src="${localRamUrl}" controls autoplay playsinline></video>`;
                 let video = document.getElementById('activeVideoPlayer');
-                // Direct injection bypasses Android's Media Player URL resolver block
-                video.src = fData;
                 
                 try {
-                    video.load();
                     let playPromise = video.play();
                     if (playPromise !== undefined) {
                         playPromise.catch(error => {
@@ -458,10 +482,10 @@
                 previewArea.innerHTML += `<img src="${fData}" style="max-width:100%; max-height:400px; border-radius:8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); object-fit:contain;">`;
                 if(fName && source !== 'msg') previewArea.innerHTML += `<div style="text-align:center; margin-top:15px; color:#00ffcc;">${fName}</div>`;
             } 
-        }, 100);
+        }, 300);
     }
 
     function closeWaStatus() { document.getElementById('waStatusViewer').style.display = 'none'; document.getElementById('waStatusContent').innerHTML = ""; currentPdf = null; }
 </script>
 </body>
-    </html>
+</html>
