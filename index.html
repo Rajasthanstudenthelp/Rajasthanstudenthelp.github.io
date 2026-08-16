@@ -296,8 +296,6 @@
             <input type="file" id="setupAvatarFile" accept="image/*" style="display:none;" onchange="handleImageSelection(event, 'setup')">
             <div class="input-wrapper"><input type="text" id="setupUsernameInput" placeholder="@username" oninput="validateUsernameInput()"><i class="material-icons input-icon-right" id="usernameStatusIcon" style="color:var(--text-muted);">info</i></div>
             <button id="saveProfileBtn" disabled style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:bold; font-size:16px; box-shadow:0 4px 10px rgba(0,0,0,0.15); cursor:pointer; opacity:0.5; transition:0.3s;" onclick="saveProfileSetup()">SAVE PROFILE</button>
-            
-            <!-- 🔥 FIX: यह बटन हमेशा ब्राउज़र में अटके लोगों को बचाएगा 🔥 -->
             <button id="cancelSetupBtn" style="width:100%; padding:15px; background:transparent; color:#E91E63; border:none; margin-top:10px; cursor:pointer; display:none; font-weight:bold;" onclick="logoutUser()">LOGOUT & GO BACK</button>
         </div>
     </div>
@@ -329,8 +327,16 @@
     let waActiveUser = null, waUserStatusGroup = [], waActiveIndex = 0, waTimer = null, waIsChatMedia = false; 
     let activeActionMsg = null;
 
+    // 🔥 TURN Server Update Here 🔥
     let peerConnection = null, localStream = null, remoteStream = null, isCallActive = false;
-    const rtcConfig = { iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }] };
+    const rtcConfig = { 
+        iceServers: [
+            { urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] },
+            { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
+            { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
+            { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' }
+        ] 
+    };
 
     let callStartTime = 0;
     let currentCallDirection = '';
@@ -350,7 +356,7 @@
                     try { 
                         google.accounts.id.initialize({ client_id: ISB_CLIENT_ID, callback: handleCredentialResponse }); 
                         google.accounts.id.renderButton(document.getElementById("googleButtonContainer"), { theme: "filled_blue", size: "large", text: "continue_with" }); 
-                        google.accounts.id.prompt(); // 🔥 यह कंप्यूटर ब्राउज़र में डायरेक्ट लॉगिन पॉपअप दिखाएगा
+                        google.accounts.id.prompt(); 
                     } catch(e) {
                         document.getElementById("googleButtonContainer").innerHTML = "<p style='color:red;'>Please turn off Adblocker to Sign in.</p>";
                     } 
@@ -388,7 +394,7 @@
                 startFirebaseSync(); loadChatsList(); loadStatusList(); initPresence(); initCallListener();
             } else {
                 document.getElementById('mainApp').style.display = 'none';
-                document.getElementById('cancelSetupBtn').style.display = 'block'; // 🔥 यह लॉगआउट बटन दिखाएगा
+                document.getElementById('cancelSetupBtn').style.display = 'block'; 
                 document.getElementById('setupProfileModal').style.display = 'flex';
             }
         });
@@ -510,7 +516,6 @@
             html += `<div class="list-item" onclick="openChat('${info.email}', ${info.isGroup}, '${dName}')"><div class="avatar">${avatarHtml}</div><div class="list-info"><div class="list-title">${dName}</div><div class="list-subtitle"><i class="material-icons" style="font-size:14px; color:var(--primary);">lock</i> ${info.lastMsg}</div></div><div class="list-time">${info.time.split(',')[1] || info.time}</div></div>`;
         }
         
-        // 🔥 LOADING FIX: "No Messages Yet" को रोकेगा और पहले लोडिंग स्पिनर दिखाएगा 🔥
         if (!isChatsLoaded && html === "") {
             document.getElementById("chatsList").innerHTML = `<div style="text-align:center; padding:50px 20px; color:var(--text-muted);"><i class="material-icons animate-spin" style="font-size:40px; color:var(--primary);">sync</i><div style="margin-top:10px; font-weight:bold; font-size:15px;">Syncing Chats...</div></div>`;
         } else {
@@ -692,7 +697,6 @@
             peerConnection.ontrack = event => { 
                 event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track)); 
                 
-                // 🔥 THE MAGIC FIX: Play stream ONLY in video tag 🔥
                 let remoteVid = document.getElementById('remoteVideo');
                 remoteVid.srcObject = remoteStream;
                 let playPromise = remoteVid.play();
@@ -754,7 +758,6 @@
             peerConnection.ontrack = event => { 
                 event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track)); 
                 
-                // 🔥 THE MAGIC FIX: Play stream ONLY in video tag 🔥
                 let remoteVid = document.getElementById('remoteVideo');
                 remoteVid.srcObject = remoteStream;
                 let playPromise = remoteVid.play();
