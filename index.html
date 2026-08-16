@@ -16,6 +16,12 @@
 
         :root { --primary: #3F51B5; --primary-dark: #303F9F; --bg: #f0f2f5; --surface: #ffffff; --text: #1c1e21; --text-muted: #65676B; --border: #e4e6eb; --msg-sent: #E8EAF6; --msg-recv: #ffffff; --nav-bg: #ffffff; }
         [data-theme="dark"] { --primary: #5C6BC0; --primary-dark: #3F51B5; --bg: #121212; --surface: #1e1e1e; --text: #e4e6eb; --text-muted: #b0b3b8; --border: #333333; --msg-sent: #2c387e; --msg-recv: #242526; --nav-bg: #1e1e1e; }
+        [data-theme="telegram"] { --primary: #2AABEE; --bg: #f4f4f4; --surface: #ffffff; --text: #222222; --border: #e0e0e0; }
+        [data-theme="sunset"] { --primary: #FF5722; --bg: #fdf8f5; --surface: #ffffff; --text: #3e2723; --border: #fbe9e7; }
+        [data-theme="forest"] { --primary: #2E7D32; --bg: #f1f8e9; --surface: #ffffff; --text: #1b5e20; --border: #c8e6c9; }
+        [data-theme="ruby"] { --primary: #E91E63; --bg: #fce4ec; --surface: #ffffff; --text: #4a148c; --border: #f8bbd0; }
+        [data-theme="cyberpunk"] { --primary: #00E5FF; --bg: #09090b; --surface: #17171c; --text: #00E5FF; --border: #006064; }
+        [data-theme="amoled"] { --primary: #ffffff; --bg: #000000; --surface: #0a0a0a; --text: #ffffff; --border: #222222; }
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body, html { height: 100%; height: 100dvh; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0;}
@@ -257,7 +263,7 @@
         </div>
     </div>
 
-    <!-- 🔥 SINGLE FIX: NO AUDIO TAG, JUST VIDEO TAG FOR BOTH 🔥 -->
+    <!-- CALL OVERLAY -->
     <div id="callOverlay">
         <div class="call-avatar-glow" id="callAvatarPreview">U</div>
         <h2 id="callStatusText" style="color:white; margin:0 0 5px 0; font-size:24px;">Calling...</h2>
@@ -303,7 +309,7 @@
     let currentUserEmail = null, currentUsername = null, currentAvatar = null, myHideStatus = false;
     let currentChatContact = null, isGroupChat = false, activeChatPresenceListener = null, currentChatTargetUname = null;
     let selectedFileData = null, selectedFileName = null, statusFileData = null, tempSetupAvatarData = null;
-    let isListeningToFirebase = false;
+    let isListeningToFirebase = false, isChatsLoaded = false;
 
     let APP_STATE = { msgs: [], groups: [], statuses: [], users: [], callLogs: [] };
     window.statusPlaylist = []; 
@@ -416,6 +422,7 @@
 
     function startFirebaseSync() {
         if(isListeningToFirebase) return; isListeningToFirebase = true;
+        database.ref('messages').once('value', function() { isChatsLoaded = true; loadChatsList(); });
         database.ref('messages').on('child_added', function(snapshot) { let m = snapshot.val(); if(!m) return; m.fbKey = snapshot.key; if (!APP_STATE.msgs.some(msg => msg.id === m.id)) { let isMyGroupMsg = m.isGroup && APP_STATE.groups.some(g => g.id === m.to); let isPersonalMsg = !m.isGroup && (m.from === currentUserEmail || m.to === currentUserEmail); if (isMyGroupMsg || isPersonalMsg) { APP_STATE.msgs.push(m); loadChatsList(); if(currentChatContact && ((!m.isGroup && ((m.from===currentUserEmail && m.to===currentChatContact) || (m.from===currentChatContact && m.to===currentUserEmail))) || (m.isGroup && m.to===currentChatContact))) appendSingleMessage(m); } } });
         database.ref('messages').on('child_removed', function(snapshot) { let removedMsg = snapshot.val(); APP_STATE.msgs = APP_STATE.msgs.filter(m => m.id !== removedMsg.id); let el = document.getElementById(`msg_${removedMsg.id}`); if(el) el.remove(); loadChatsList(); });
         database.ref('groups').on('child_added', function(snapshot) { let g = snapshot.val(); if(g && g.members.includes(currentUserEmail)) { if(!APP_STATE.groups.some(grp => grp.id === g.id)) { APP_STATE.groups.push(g); loadChatsList(); } } });
@@ -487,7 +494,13 @@
             let avatarHtml = dAv ? `<img src="${dAv}">` : (info.isGroup ? "G" : dName.charAt(0).toUpperCase());
             html += `<div class="list-item" onclick="openChat('${info.email}', ${info.isGroup}, '${dName}')"><div class="avatar">${avatarHtml}</div><div class="list-info"><div class="list-title">${dName}</div><div class="list-subtitle"><i class="material-icons" style="font-size:14px; color:var(--primary);">lock</i> ${info.lastMsg}</div></div><div class="list-time">${info.time.split(',')[1] || info.time}</div></div>`;
         }
-        document.getElementById("chatsList").innerHTML = html || `<div style="text-align:center; padding:20px; color:gray;">No Messages Yet</div>`; filterChats();
+        
+        if (!isChatsLoaded && html === "") {
+            document.getElementById("chatsList").innerHTML = `<div style="text-align:center; padding:50px 20px; color:var(--text-muted);"><i class="material-icons animate-spin" style="font-size:40px; color:var(--primary);">sync</i><div style="margin-top:10px; font-weight:bold; font-size:15px;">Syncing Chats...</div></div>`;
+        } else {
+            document.getElementById("chatsList").innerHTML = html || `<div style="text-align:center; padding:20px; color:gray;">No Messages Yet</div>`;
+        }
+        filterChats();
     }
 
     function openChat(id, isGroup, chatName = null) {
@@ -733,53 +746,7 @@
 
                 if(data.callType === 'video') remoteVid.style.display = 'block';
                 document.getElementById('callStatusText').innerText = "Connected";
-                callStartTime = Date.now(); 
-            };
-
-            peerConnection.onicecandidate = event => { if(event.candidate) database.ref('calls/' + currentUsername + '/receiverCandidates').push(event.candidate.toJSON()); };
-
-            const offerDesc = new RTCSessionDescription({ type: 'offer', sdp: data.sdp }); await peerConnection.setRemoteDescription(offerDesc);
-
-            const answer = await peerConnection.createAnswer(); await peerConnection.setLocalDescription(answer);
-
-            await database.ref('calls/' + currentUsername + '/answer').set({ type: 'answer', sdp: answer.sdp });
-
-            database.ref('calls/' + currentUsername + '/callerCandidates').on('child_added', snapshot => {
-                if(peerConnection) peerConnection.addIceCandidate(new RTCIceCandidate(snapshot.val()));
-            });
-        } catch(e) { alert("Camera/Mic Permission Denied!"); endCall(); }
-    }
-
-    function endCall(notifyRemote = true) {
-        isCallActive = false; document.getElementById('callOverlay').style.display = 'none';
-        
-        if (window.currentCallTarget && currentCallDirection) {
-            let durationStr = "Missed";
-            if (callStartTime > 0) {
-                let diffSec = Math.floor((Date.now() - callStartTime) / 1000);
-                let m = Math.floor(diffSec / 60);
-                let s = diffSec % 60;
-                durationStr = (m > 0 ? m + "m " : "") + s + "s";
-            }
-            database.ref('callHistory/' + currentUsername).push({
-                peer: window.currentCallTarget,
-                type: currentCallType,
-                direction: currentCallDirection,
-                duration: durationStr,
-                timestamp: Date.now(),
-                timeStr: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-            });
-        }
-        
-        if(notifyRemote) {
-            let targetUname = window.currentCallTarget || (window.currentCallData ? window.currentCallData.from : null);
-            if(targetUname) {
-                database.ref('calls/' + targetUname).set({ type: 'end' });
-            }
-        }
-        database.ref('calls/' + currentUsername).remove();
-
-        callStartTime = 0; currentCallDirection = ''; currentCallType = ''; window.currentCallTarget = null;
+                callStartTime = 0; currentCallDirection = ''; currentCallType = ''; window.currentCallTarget = null;
         
         if(localStream) { localStream.getTracks().forEach(track => track.stop()); }
         if(remoteStream) { remoteStream.getTracks().forEach(track => track.stop()); }
