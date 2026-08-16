@@ -51,7 +51,8 @@
         .animate-spin { animation: spin 1s linear infinite; }
 
         .list-item { display: flex; align-items: center; padding: 15px 20px; cursor: pointer; background: var(--surface); transition: 0.2s; margin: 5px 10px; border-radius: 12px; border: 1px solid transparent;}
-        .avatar { width: 54px; height: 54px; background: var(--primary); color: var(--surface); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 22px; font-weight: bold; margin-right: 15px; flex-shrink: 0;}
+        .avatar { width: 54px; height: 54px; background: var(--primary); color: var(--surface); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 22px; font-weight: bold; margin-right: 15px; flex-shrink: 0; overflow:hidden;}
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
         .status-ring { outline: 3px solid #25D366; outline-offset: 2px; }
         .list-info { flex: 1; overflow: hidden; }
         .list-title { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
@@ -85,32 +86,36 @@
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; right:0; bottom:0; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px);}
         .modal-content { background: var(--surface); width: 92%; max-width: 400px; border-radius: 24px; padding: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); position: relative;}
         
-        /* 🔥 PROFESSIONAL UPLOAD AREA 🔥 */
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .modal-header h3 { margin: 0; font-size: 20px; color: var(--text); font-weight: 800;}
         .close-btn { background: none; border: none; color: var(--text-muted); font-size: 28px; cursor: pointer; padding: 0; transition: 0.2s;}
-        .close-btn:hover { color: #E91E63; }
         
         .upload-area { border: 2px dashed var(--primary); border-radius: 16px; padding: 40px 20px; text-align: center; cursor: pointer; margin-bottom: 20px; background: rgba(63, 81, 181, 0.05); transition: 0.3s; position: relative;}
-        .upload-area:hover { background: rgba(63, 81, 181, 0.1); }
         .upload-icon { font-size: 48px; color: var(--primary); margin-bottom: 10px; }
         .upload-text { font-size: 16px; color: var(--text); font-weight: 700; margin-bottom: 5px;}
         .status-preview-box { display:none; width:100%; height:180px; border-radius:12px; margin-bottom:20px; object-fit:contain; background:#000; border: 1px solid var(--border); box-shadow: 0 5px 15px rgba(0,0,0,0.1);}
 
-        /* THEMES GRID RESTORED */
+        /* Setup Profile Profile */
+        .profile-pic-upload { width: 100px; height: 100px; border-radius: 50%; background: var(--bg); border: 2px dashed var(--primary); display: flex; justify-content: center; align-items: center; margin: 0 auto 20px auto; cursor: pointer; overflow: hidden; position: relative;}
+        .profile-pic-upload img { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* Settings Tab UI Elements */
+        .settings-box { background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:12px 15px; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center;}
+        .settings-box-label { font-size:11px; color:var(--text-muted); font-weight:bold; letter-spacing:0.5px; margin-bottom:3px;}
+        .settings-box-value { font-weight:bold; font-size:16px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+
         .theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 10px 20px; }
         .theme-circle { width: 50px; height: 50px; border-radius: 50%; cursor: pointer; border: 3px solid transparent;}
         .theme-circle.active { border-color: var(--text); transform: scale(1.1); }
 
-        /* WhatsApp Status Tray */
         .status-tray { display: flex; overflow-x: auto; gap: 12px; padding: 10px 20px; scroll-snap-type: x mandatory; }
         .status-tray::-webkit-scrollbar { display: none; }
         .status-card { width: 105px; height: 150px; border-radius: 16px; background: var(--surface); position: relative; flex-shrink: 0; border: 1px solid var(--border); overflow: hidden; background-size: cover; background-position: center; cursor: pointer;}
-        .status-card-avatar { position: absolute; top: 10px; left: 10px; width: 36px; height: 36px; border-radius: 50%; border: 2px solid #25D366; background: var(--surface); display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--text); z-index: 2;}
+        .status-card-avatar { position: absolute; top: 10px; left: 10px; width: 36px; height: 36px; border-radius: 50%; border: 2px solid #25D366; background: var(--surface); display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--text); z-index: 2; overflow:hidden;}
+        .status-card-avatar img { width: 100%; height: 100%; object-fit: cover;}
         .status-card-name { position: absolute; bottom: 10px; left: 10px; right: 10px; font-size: 12px; font-weight: 700; color: white; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 2;}
         .status-card-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.8)); z-index: 1;}
 
-        /* --- FULL SCREEN NATIVE MEDIA VIEWER --- */
         .wa-status-viewer { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: #000; z-index: 4000; flex-direction: column; color: white;}
         .wa-progress-container { display: flex; gap: 4px; padding: 10px 10px 0 10px; position: absolute; top: 0; width: 100%; z-index: 4002; }
         .wa-progress-segment { flex: 1; height: 3px; background: rgba(255,255,255,0.3); border-radius: 2px; overflow: hidden; }
@@ -119,7 +124,6 @@
         .wa-content { flex: 1; position: relative; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; overflow: hidden; background: #000;}
         .wa-status-caption { position: absolute; bottom: 40px; width: 100%; text-align: center; padding: 10px 20px; background: rgba(0,0,0,0.6); font-size: 15px; word-wrap: break-word; z-index:4002;}
         
-        /* 50-50 Split Screen For Status Nav */
         .wa-tap-left { position: absolute; top:0; left:0; width: 35%; height: 100%; z-index: 4001; cursor: pointer;}
         .wa-tap-right { position: absolute; top:0; right:0; width: 65%; height: 100%; z-index: 4001; cursor: pointer;}
     </style>
@@ -157,14 +161,35 @@
                 <div class="fab" onclick="openImageStatusModal()"><i class="material-icons">camera_alt</i></div>
             </div>
 
+            <!-- 🔥 UPDATED PREMIUM SETTINGS TAB 🔥 -->
             <div id="settingsTab" class="tab-content">
-                <div style="text-align:center; padding: 40px 20px 20px;">
-                    <div class="avatar" style="margin: 0 auto 15px auto; width:100px; height:100px; font-size:40px; border: 4px solid var(--surface);" id="profileAvatar">U</div>
-                    <div id="profileEmail" style="font-weight:800; font-size:20px;">unknown@gmail.com</div>
+                <div style="text-align:center; padding: 30px 20px 10px;">
+                    <div class="avatar" style="margin: 0 auto 20px auto; width:110px; height:110px; font-size:45px; border: 4px solid var(--primary); cursor:pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.1);" id="profileAvatar" onclick="document.getElementById('editProfileAvatarFile').click()">U</div>
+                    <input type="file" id="editProfileAvatarFile" accept="image/*" style="display:none;" onchange="updateProfileAvatar(event)">
+                    
+                    <!-- Username Box -->
+                    <div class="settings-box">
+                        <div style="text-align:left; flex:1; overflow:hidden;">
+                            <div class="settings-box-label">USERNAME</div>
+                            <div class="settings-box-value" id="profileUsernameDisplay">@username</div>
+                        </div>
+                        <i class="material-icons" style="color:var(--primary); cursor:pointer; font-size:20px; padding:5px;" onclick="editUsernameModal()">edit</i>
+                    </div>
+
+                    <!-- Gmail Box -->
+                    <div class="settings-box">
+                        <div style="text-align:left; flex:1; overflow:hidden;">
+                            <div class="settings-box-label">GMAIL ACCOUNT</div>
+                            <div class="settings-box-value" id="profileEmailDisplay" style="font-size:14px; opacity:0.9;">user@gmail.com</div>
+                        </div>
+                        <i class="material-icons" style="color:var(--text-muted); font-size:20px; padding:5px;">email</i>
+                    </div>
+
                 </div>
+                
                 <div style="padding: 10px 20px; font-weight: bold; color: var(--primary);">Premium Themes</div>
                 <div class="theme-grid" id="themeGrid"></div>
-                <div class="list-item" onclick="logoutUser()" style="margin-top:20px;"><i class="material-icons" style="margin-right:15px; color:#E91E63;">logout</i><div class="list-info"><div class="list-title" style="color:#E91E63;">Log Out</div></div></div>
+                <div class="list-item" onclick="logoutUser()" style="margin-top:20px; margin-bottom:30px;"><i class="material-icons" style="margin-right:15px; color:#E91E63;">logout</i><div class="list-info"><div class="list-title" style="color:#E91E63;">Log Out</div></div></div>
             </div>
         </div>
 
@@ -206,66 +231,62 @@
                 <i class="material-icons" id="waStatusDeleteBtn" style="color:#E91E63; display:none; cursor:pointer;" onclick="deleteActiveStatus()">delete</i>
             </div>
         </div>
-        
         <div class="wa-content" id="waStatusContent"></div>
-        
         <div class="wa-tap-left" id="waTapLeft" onclick="prevWaStatus()" style="display:none;"></div>
         <div class="wa-tap-right" id="waTapRight" onclick="nextWaStatus()" style="display:none;"></div>
     </div>
 
-    <!-- 🔥 PROFESSIONAL UPLOAD MODALS 🔥 -->
+    <!-- PROFILE SETUP MODAL -->
+    <div id="setupProfileModal" class="modal-overlay">
+        <div class="modal-content" style="text-align:center;">
+            <h3 style="margin-top:0; color:var(--text);">Create Your Profile</h3>
+            <p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">Choose a unique username and photo</p>
+            
+            <div class="profile-pic-upload" onclick="document.getElementById('setupAvatarFile').click()">
+                <img id="setupAvatarPreview" style="display:none;">
+                <i class="material-icons" id="setupAvatarIcon" style="font-size:40px; color:var(--primary);">camera_alt</i>
+            </div>
+            <input type="file" id="setupAvatarFile" accept="image/*" style="display:none;" onchange="previewSetupAvatar(event)">
+            
+            <input type="text" id="setupUsernameInput" placeholder="@username" style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:20px; font-weight:bold; font-size:16px; outline:none; text-align:center;">
+            
+            <button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:bold; font-size:16px; box-shadow:0 4px 10px rgba(0,0,0,0.15); cursor:pointer;" onclick="saveProfileSetup()">SAVE PROFILE</button>
+            <button id="cancelSetupBtn" style="width:100%; padding:15px; background:transparent; color:var(--text-muted); border:none; margin-top:10px; cursor:pointer; display:none;" onclick="document.getElementById('setupProfileModal').style.display='none'">CANCEL</button>
+        </div>
+    </div>
+
+    <!-- 🔥 UPDATED NEW CHAT MODAL (DUAL SEARCH) 🔥 -->
+    <div id="newChatModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header"><h3>New Chat</h3><button class="close-btn" onclick="document.getElementById('newChatModal').style.display='none'"><i class="material-icons">cancel</i></button></div>
+            <!-- DUAL INPUT BOX -->
+            <input type="text" id="newChatInput" placeholder="Enter Gmail OR Username..." style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:15px; font-weight:bold;">
+            <button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px;" onclick="startNewChat()">START CHAT</button>
+        </div>
+    </div>
     
-    <!-- IMAGE / VIDEO STATUS MODAL -->
+    <div id="newGroupModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h3>New Group</h3><button class="close-btn" onclick="document.getElementById('newGroupModal').style.display='none'"><i class="material-icons">cancel</i></button></div><input type="text" id="newGroupName" placeholder="Group Name" style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:15px;"><textarea id="newGroupEmails" placeholder="Usernames OR Gmails (comma separated)" style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:15px;"></textarea><button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px;" onclick="createGroup()">CREATE GROUP</button></div></div>
+    
+    <div id="textStatusModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h3>Type Status</h3><button class="close-btn" onclick="closeStatusModal()"><i class="material-icons">cancel</i></button></div><textarea id="statusTextOnly" rows="4" placeholder="What's on your mind?" style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:15px; font-weight:bold; font-size:18px; outline:none; resize:none;"></textarea><button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:bold; font-size:16px; box-shadow:0 4px 10px rgba(0,0,0,0.15); cursor:pointer;" onclick="postStatus('text')">POST STATUS</button></div></div>
+    
     <div id="imageStatusModal" class="modal-overlay">
         <div class="modal-content">
-            <div class="modal-header">
-                <h3>Upload Media</h3>
-                <button class="close-btn" onclick="closeStatusModal()"><i class="material-icons">cancel</i></button>
-            </div>
-            
+            <div class="modal-header"><h3>Upload Media</h3><button class="close-btn" onclick="closeStatusModal()"><i class="material-icons">cancel</i></button></div>
             <div class="upload-area" id="statusUploadArea" onclick="document.getElementById('statusFile').click()">
                 <i class="material-icons upload-icon">cloud_upload</i>
                 <div class="upload-text">Tap to select Image or Video</div>
                 <div style="font-size:12px; color:var(--text-muted); margin-top:5px;">Max size 5MB (MP4, JPG, PNG)</div>
             </div>
-            
-            <!-- Live Preview Elements -->
             <img id="statusImgPreview" class="status-preview-box" />
             <video id="statusVidPreview" class="status-preview-box" muted autoplay playsinline loop></video>
-
             <input type="file" id="statusFile" accept="image/*,video/mp4" style="display:none;" onchange="handleStatusFile(event)">
-            
             <input type="text" id="statusCaption" placeholder="Add a caption..." style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:15px; font-weight:bold; font-size:15px; outline:none;">
-            
             <button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:bold; font-size:16px; box-shadow:0 4px 10px rgba(0,0,0,0.15); cursor:pointer;" onclick="postStatus('image')">POST STATUS</button>
         </div>
     </div>
 
-    <!-- TEXT STATUS MODAL -->
-    <div id="textStatusModal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Type Status</h3>
-                <button class="close-btn" onclick="closeStatusModal()"><i class="material-icons">cancel</i></button>
-            </div>
-            <textarea id="statusTextOnly" rows="4" placeholder="What's on your mind?" style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:15px; font-weight:bold; font-size:18px; outline:none; resize:none;"></textarea>
-            <button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:bold; font-size:16px; box-shadow:0 4px 10px rgba(0,0,0,0.15); cursor:pointer;" onclick="postStatus('text')">POST STATUS</button>
-        </div>
-    </div>
-
-    <!-- OLD MODALS FOR NEW CHAT / GROUP -->
-    <div id="newChatModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h3>New Chat</h3><button class="close-btn" onclick="document.getElementById('newChatModal').style.display='none'"><i class="material-icons">cancel</i></button></div><input type="email" id="newChatEmail" placeholder="Enter Gmail..." style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:15px;"><button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px;" onclick="startNewChat()">START</button></div></div>
-    <div id="newGroupModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h3>New Group</h3><button class="close-btn" onclick="document.getElementById('newGroupModal').style.display='none'"><i class="material-icons">cancel</i></button></div><input type="text" id="newGroupName" placeholder="Group Name" style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:15px;"><textarea id="newGroupEmails" placeholder="Emails separated by comma" style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:15px;"></textarea><button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px;" onclick="createGroup()">CREATE</button></div></div>
-
-    <!-- MESSAGE OPTIONS MODAL (LONG PRESS MENU) -->
-    <div id="msgOptionsModal" class="modal-overlay">
-        <div class="modal-content" style="text-align:center;">
-            <h3 style="margin-top:0;">Message Options</h3>
-            <button onclick="shareSelectedMsg()" style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px; margin-bottom:10px; font-weight:bold;">SHARE FILE / MESSAGE</button>
-            <button onclick="deleteSelectedMsg()" style="width:100%; padding:15px; background:#E91E63; color:white; border:none; border-radius:12px; margin-bottom:10px; font-weight:bold;">DELETE FOR ALL</button>
-            <button onclick="document.getElementById('msgOptionsModal').style.display='none'" style="width:100%; padding:15px; background:transparent; border:2px solid var(--border); color:var(--text); border-radius:12px; font-weight:bold;">CANCEL</button>
-        </div>
-    </div>
+    <!-- MESSAGE OPTIONS MODAL -->
+    <div id="msgOptionsModal" class="modal-overlay"><div class="modal-content" style="text-align:center;"><h3 style="margin-top:0;">Message Options</h3><button onclick="shareSelectedMsg()" style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px; margin-bottom:10px; font-weight:bold;">SHARE FILE / MESSAGE</button><button onclick="deleteSelectedMsg()" style="width:100%; padding:15px; background:#E91E63; color:white; border:none; border-radius:12px; margin-bottom:10px; font-weight:bold;">DELETE FOR ALL</button><button onclick="document.getElementById('msgOptionsModal').style.display='none'" style="width:100%; padding:15px; background:transparent; border:2px solid var(--border); color:var(--text); border-radius:12px; font-weight:bold;">CANCEL</button></div></div>
 
 <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
@@ -276,23 +297,20 @@
 
     const themes = [ { id: "default", color: "#3F51B5" }, { id: "dark", color: "#121212" }, { id: "telegram", color: "#2AABEE" }, { id: "sunset", color: "#FF5722" }, { id: "forest", color: "#2E7D32" }, { id: "ruby", color: "#E91E63" }, { id: "cyberpunk", color: "#00E5FF" }, { id: "coffee", color: "#795548" }, { id: "mint", color: "#00BFA5" }, { id: "gold", color: "#FFB300" }, { id: "orchid", color: "#9C27B0" }, { id: "amoled", color: "#000000" } ];
 
-    let currentUserEmail = null, currentChatContact = null, isGroupChat = false;
-    let selectedFileData = null, selectedFileName = null, statusFileData = null;
+    let currentUserEmail = null, currentUsername = null, currentAvatar = null;
+    let currentChatContact = null, isGroupChat = false;
+    let selectedFileData = null, selectedFileName = null, statusFileData = null, tempSetupAvatarData = null;
     let isListeningToFirebase = false;
 
-    let APP_STATE = { msgs: [], groups: [], statuses: [] };
+    let APP_STATE = { msgs: [], groups: [], statuses: [], users: {} };
     window.statusPlaylist = []; 
-    let waActiveUser = null;
-    let waUserStatusGroup = [];
-    let waActiveIndex = 0;
-    let waTimer = null;
-    let waIsChatMedia = false; 
+    let waActiveUser = null, waUserStatusGroup = [], waActiveIndex = 0, waTimer = null, waIsChatMedia = false; 
     let activeActionMsg = null;
 
     window.onload = function() {
         applyTheme(localStorage.getItem('isb_theme') || 'default');
         currentUserEmail = localStorage.getItem("isb_email");
-        if(currentUserEmail) showMainApp();
+        if(currentUserEmail) initAppFlow();
         else {
             if(typeof google !== 'undefined') { try { google.accounts.id.initialize({ client_id: ISB_CLIENT_ID, callback: handleCredentialResponse }); google.accounts.id.renderButton(document.getElementById("googleButtonContainer"), { theme: "filled_blue", size: "large", text: "continue_with" }); } catch(e) {} }
         }
@@ -308,24 +326,114 @@
         try {
             let base64 = response.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
             let jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
-            currentUserEmail = JSON.parse(jsonPayload).email; localStorage.setItem("isb_email", currentUserEmail); showMainApp();
+            currentUserEmail = JSON.parse(jsonPayload).email; localStorage.setItem("isb_email", currentUserEmail); initAppFlow();
         } catch(e) { alert("Login Failed"); }
     }
     
     function logoutUser() { localStorage.removeItem("isb_email"); location.reload(); }
     
-    function showMainApp() {
-        document.getElementById('authScreen').style.display = 'none'; document.getElementById('mainApp').style.display = 'flex';
-        document.getElementById('profileEmail').innerText = currentUserEmail; document.getElementById('profileAvatar').innerText = currentUserEmail.charAt(0).toUpperCase();
-        startFirebaseSync();
+    function initAppFlow() {
+        document.getElementById('authScreen').style.display = 'none';
+        
+        database.ref('users').on('value', snapshot => {
+            APP_STATE.users = snapshot.val() || {};
+            let foundUname = Object.keys(APP_STATE.users).find(k => APP_STATE.users[k].email === currentUserEmail);
+            
+            if(foundUname) {
+                currentUsername = foundUname;
+                currentAvatar = APP_STATE.users[foundUname].avatar;
+                
+                // Set Settings UI text
+                document.getElementById('profileUsernameDisplay').innerText = "@" + currentUsername;
+                document.getElementById('profileEmailDisplay').innerText = currentUserEmail;
+                
+                document.getElementById('profileAvatar').innerHTML = currentAvatar ? `<img src="${currentAvatar}">` : currentUsername.charAt(0).toUpperCase();
+                
+                document.getElementById('mainApp').style.display = 'flex';
+                document.getElementById('setupProfileModal').style.display = 'none';
+                startFirebaseSync();
+                
+                loadChatsList(); loadStatusList();
+            } else {
+                document.getElementById('mainApp').style.display = 'none';
+                document.getElementById('cancelSetupBtn').style.display = 'none';
+                document.getElementById('setupProfileModal').style.display = 'flex';
+            }
+        });
+    }
+
+    function previewSetupAvatar(e) {
+        let file = e.target.files[0]; if(!file) return;
+        let reader = new FileReader();
+        reader.onload = function(evt) {
+            let img = new Image();
+            img.onload = function() {
+                let canvas = document.createElement('canvas');
+                let MAX_WIDTH = 200; let scaleSize = MAX_WIDTH / img.width;
+                canvas.width = MAX_WIDTH; canvas.height = img.height * scaleSize;
+                let ctx = canvas.getContext("2d"); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                tempSetupAvatarData = canvas.toDataURL("image/jpeg", 0.7);
+                document.getElementById('setupAvatarIcon').style.display = 'none';
+                let prev = document.getElementById('setupAvatarPreview'); prev.style.display = 'block'; prev.src = tempSetupAvatarData;
+            }
+            img.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    async function saveProfileSetup() {
+        let uNameInput = document.getElementById('setupUsernameInput').value.trim().toLowerCase();
+        if(uNameInput.length < 3) return alert("Username must be at least 3 characters.");
+        if(uNameInput.includes(" ")) return alert("Username cannot contain spaces.");
+        if(APP_STATE.users[uNameInput] && APP_STATE.users[uNameInput].email !== currentUserEmail) { return alert("Username already taken! Try another."); }
+
+        if(currentUsername && currentUsername !== uNameInput) { await database.ref('users/' + currentUsername).remove(); }
+
+        let finalAvatar = tempSetupAvatarData || currentAvatar || "";
+        await database.ref('users/' + uNameInput).set({ email: currentUserEmail, avatar: finalAvatar });
+        document.getElementById('setupProfileModal').style.display = 'none';
+    }
+
+    function editUsernameModal() {
+        tempSetupAvatarData = null; document.getElementById('setupUsernameInput').value = currentUsername;
+        if(currentAvatar) {
+            document.getElementById('setupAvatarIcon').style.display = 'none';
+            document.getElementById('setupAvatarPreview').style.display = 'block';
+            document.getElementById('setupAvatarPreview').src = currentAvatar;
+        }
+        document.getElementById('cancelSetupBtn').style.display = 'block';
+        document.getElementById('setupProfileModal').style.display = 'flex';
+    }
+
+    function updateProfileAvatar(e) {
+        let file = e.target.files[0]; if(!file) return;
+        let reader = new FileReader();
+        reader.onload = function(evt) {
+            let img = new Image();
+            img.onload = function() {
+                let canvas = document.createElement('canvas');
+                let MAX_WIDTH = 200; let scaleSize = MAX_WIDTH / img.width;
+                canvas.width = MAX_WIDTH; canvas.height = img.height * scaleSize;
+                let ctx = canvas.getContext("2d"); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                let newAv = canvas.toDataURL("image/jpeg", 0.7);
+                database.ref('users/' + currentUsername).update({ avatar: newAv });
+            }
+            img.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function getUserInfoByEmail(email) {
+        let found = Object.entries(APP_STATE.users).find(([k, v]) => v.email === email);
+        if(found) return { username: found[0], avatar: found[1].avatar };
+        return { username: email.split('@')[0], avatar: null };
     }
 
     function startFirebaseSync() {
         if(isListeningToFirebase) return; isListeningToFirebase = true;
         
         database.ref('messages').on('child_added', function(snapshot) {
-            let m = snapshot.val(); if(!m) return;
-            m.fbKey = snapshot.key;
+            let m = snapshot.val(); if(!m) return; m.fbKey = snapshot.key;
             if (!APP_STATE.msgs.some(msg => msg.id === m.id)) {
                 let isMyGroupMsg = m.isGroup && APP_STATE.groups.some(g => g.id === m.to);
                 let isPersonalMsg = !m.isGroup && (m.from === currentUserEmail || m.to === currentUserEmail);
@@ -337,28 +445,21 @@
         });
 
         database.ref('messages').on('child_removed', function(snapshot) {
-            let removedMsg = snapshot.val();
-            APP_STATE.msgs = APP_STATE.msgs.filter(m => m.id !== removedMsg.id);
-            let el = document.getElementById(`msg_${removedMsg.id}`);
-            if(el) el.remove();
-            loadChatsList();
+            let removedMsg = snapshot.val(); APP_STATE.msgs = APP_STATE.msgs.filter(m => m.id !== removedMsg.id);
+            let el = document.getElementById(`msg_${removedMsg.id}`); if(el) el.remove(); loadChatsList();
         });
 
         database.ref('groups').on('child_added', function(snapshot) {
-            let g = snapshot.val();
-            if(g && g.members.includes(currentUserEmail)) { if(!APP_STATE.groups.some(grp => grp.id === g.id)) { APP_STATE.groups.push(g); loadChatsList(); } }
+            let g = snapshot.val(); if(g && g.members.includes(currentUserEmail)) { if(!APP_STATE.groups.some(grp => grp.id === g.id)) { APP_STATE.groups.push(g); loadChatsList(); } }
         });
 
         database.ref('statuses').on('child_added', function(snapshot) {
-            let s = snapshot.val();
-            s.fbKey = snapshot.key;
+            let s = snapshot.val(); s.fbKey = snapshot.key;
             if(s) { if(!APP_STATE.statuses.some(st => st.id === s.id)) { APP_STATE.statuses.push(s); loadStatusList(); } }
         });
 
         database.ref('statuses').on('child_removed', function(snapshot) {
-            let removedSts = snapshot.val();
-            APP_STATE.statuses = APP_STATE.statuses.filter(s => s.id !== removedSts.id);
-            loadStatusList();
+            let removedSts = snapshot.val(); APP_STATE.statuses = APP_STATE.statuses.filter(s => s.id !== removedSts.id); loadStatusList();
         });
     }
 
@@ -418,40 +519,88 @@
     }
     function cancelSelectedFile() { selectedFileData = null; selectedFileName = null; document.getElementById('fileAttachment').value = ""; document.getElementById('selectedFileBar').style.display = 'none'; }
     function openNewChatModal() { document.getElementById('newChatModal').style.display = 'flex'; }
+    
+    // 🔥 DOUBLE ENGINE START CHAT (Gmail or Username) 🔥
     function startNewChat() {
-        let email = document.getElementById('newChatEmail').value.trim().toLowerCase();
-        if(!email || !email.includes("@")) return alert("Enter valid Gmail!");
-        document.getElementById('newChatModal').style.display = 'none'; openChat(email, false);
+        let inputVal = document.getElementById('newChatInput').value.trim().toLowerCase();
+        if(!inputVal) return alert("Enter Username or Gmail!");
+        
+        let targetEmail = ""; let targetUname = "";
+
+        if(inputVal.includes("@")) {
+            // It's a Gmail ID
+            targetEmail = inputVal;
+            let uInfo = getUserInfoByEmail(targetEmail);
+            targetUname = (uInfo.username !== targetEmail.split('@')[0]) ? uInfo.username : inputVal; 
+        } else {
+            // It's a Username
+            if(inputVal.startsWith("@")) inputVal = inputVal.substring(1);
+            let targetUser = APP_STATE.users[inputVal];
+            if(!targetUser) return alert("Username not found!");
+            targetEmail = targetUser.email; targetUname = inputVal;
+        }
+        
+        document.getElementById('newChatModal').style.display = 'none'; 
+        openChat(targetEmail, false, targetUname);
     }
+
     function openNewGroupModal() { document.getElementById('newGroupModal').style.display = 'flex'; }
+    
+    // 🔥 DOUBLE ENGINE CREATE GROUP (Gmails or Usernames) 🔥
     function createGroup() {
         let gName = document.getElementById('newGroupName').value.trim();
-        let gEmails = document.getElementById('newGroupEmails').value.toLowerCase().split(',').map(e => e.trim()).filter(e => e.includes('@'));
-        if(!gName || gEmails.length === 0) return alert("Enter valid name and at least 1 email");
-        gEmails.push(currentUserEmail); 
+        let inputs = document.getElementById('newGroupEmails').value.toLowerCase().split(',').map(e => e.trim());
+        if(!gName || inputs.length === 0) return alert("Enter valid name and at least 1 contact");
+        
+        let gEmails = [currentUserEmail];
+        for(let val of inputs) {
+            if(!val) continue;
+            if(val.includes("@")) {
+                gEmails.push(val);
+            } else {
+                if(val.startsWith("@")) val = val.substring(1);
+                if(APP_STATE.users[val]) gEmails.push(APP_STATE.users[val].email);
+            }
+        }
+        
         database.ref('groups').push({ id: 'grp_' + Date.now(), name: gName, members: [...new Set(gEmails)], createdBy: currentUserEmail });
         document.getElementById('newGroupModal').style.display = 'none'; alert("Group created securely!");
     }
+
     function loadChatsList() {
         let contacts = {};
         APP_STATE.msgs.forEach(m => {
             if(!m.isGroup && (m.from === currentUserEmail || m.to === currentUserEmail)) {
                 let other = (m.from === currentUserEmail) ? m.to : m.from;
-                if(!contacts[other]) contacts[other] = { email: other, name: other, lastMsg: m.payload.length > 500 ? "📁 Media / File" : "🔒 Encrypted Message", time: m.time, isGroup: false };
+                if(!contacts[other]) contacts[other] = { email: other, lastMsg: m.payload.length > 500 ? "📁 Media / File" : "🔒 Encrypted Message", time: m.time, isGroup: false };
                 else { contacts[other].time = m.time; contacts[other].lastMsg = m.payload.length > 500 ? "📁 Media / File" : "🔒 Encrypted Message"; }
             }
         });
         APP_STATE.groups.forEach(g => { contacts[g.id] = { email: g.id, name: g.name + " (Group)", lastMsg: "Tap to view group", time: "Active", isGroup: true }; });
         let html = "";
         for(let c in contacts) {
-            let info = contacts[c]; let avatarChar = info.isGroup ? "G" : info.email.charAt(0);
-            html += `<div class="list-item" onclick="openChat('${info.email}', ${info.isGroup}, '${info.name}')"><div class="avatar">${avatarChar}</div><div class="list-info"><div class="list-title">${info.name}</div><div class="list-subtitle"><i class="material-icons" style="font-size:14px; color:var(--primary);">lock</i> ${info.lastMsg}</div></div><div class="list-time">${info.time.split(',')[1] || info.time}</div></div>`;
+            let info = contacts[c]; 
+            let dName = info.name; let dAv = null;
+            if(!info.isGroup) {
+                let uInfo = getUserInfoByEmail(info.email);
+                dName = uInfo.username; dAv = uInfo.avatar;
+            }
+            
+            let avatarHtml = dAv ? `<img src="${dAv}">` : (info.isGroup ? "G" : dName.charAt(0).toUpperCase());
+            html += `<div class="list-item" onclick="openChat('${info.email}', ${info.isGroup}, '${dName}')"><div class="avatar">${avatarHtml}</div><div class="list-info"><div class="list-title">${dName}</div><div class="list-subtitle"><i class="material-icons" style="font-size:14px; color:var(--primary);">lock</i> ${info.lastMsg}</div></div><div class="list-time">${info.time.split(',')[1] || info.time}</div></div>`;
         }
         document.getElementById("chatsList").innerHTML = html || `<div style="text-align:center; padding:20px; color:gray;">No Messages Yet</div>`;
     }
+
     function openChat(id, isGroup, chatName = null) {
         currentChatContact = id; isGroupChat = isGroup;
-        document.getElementById('chatTitle').innerText = chatName ? chatName : id; document.getElementById('chatAvatar').innerText = isGroup ? "G" : id.charAt(0).toUpperCase();
+        document.getElementById('chatTitle').innerText = chatName ? chatName : id; 
+        
+        let dAv = null;
+        if(!isGroup) { let uInfo = getUserInfoByEmail(id); dAv = uInfo.avatar; }
+        
+        document.getElementById('chatAvatar').innerHTML = dAv ? `<img src="${dAv}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">` : (isGroup ? "G" : chatName.charAt(0).toUpperCase());
+        
         document.getElementById('chatWindow').style.display = 'flex';
         cancelSelectedFile(); document.getElementById('chatInputMsg').value = ""; document.getElementById('chatInputMsg').disabled = false; renderChatMessages();
     }
@@ -468,7 +617,10 @@
         let box = document.getElementById('chatMessagesBox'); if(document.getElementById(`msg_${m.id}`)) return;
         let isSentByMe = (m.from === currentUserEmail), cls = isSentByMe ? "sent" : "received", timeStr = m.time.split(',')[1] || m.time;
         let bubble = document.createElement('div'); bubble.className = `bubble ${cls}`; bubble.id = `msg_${m.id}`;
-        let senderHtml = (!isSentByMe && m.isGroup) ? `<span class="sender-name">${m.from}</span>` : "";
+        
+        let uInfo = getUserInfoByEmail(m.from);
+        let senderHtml = (!isSentByMe && m.isGroup) ? `<span style="font-size:11px; font-weight:bold; color:var(--primary); margin-bottom:4px; display:block;">${uInfo.username}</span>` : "";
+        
         bubble.innerHTML = `${senderHtml}<span style="font-size:12px;"><i class="material-icons animate-spin" style="font-size:12px; vertical-align:middle;">sync</i> Decrypting...</span> <span class="bubble-time">${timeStr}</span>`;
         box.appendChild(bubble); box.scrollTop = box.scrollHeight;
         
@@ -484,13 +636,13 @@
                 
                 if(isImg || isVid) {
                     if(isImg) {
-                        content = `<img src="${m.decryptedData}" style="max-width:100%; max-height:250px; border-radius:8px; cursor:pointer; display:block; object-fit:contain;" onclick="openMediaViewer('${m.id}', 'msg')">`;
+                        content = `<img src="${m.decryptedData}" style="max-width:100%; max-height:250px; border-radius:8px; display:block; object-fit:contain;">`;
                     } else {
-                        content = `<div style="position:relative; cursor:pointer;" onclick="openMediaViewer('${m.id}', 'msg')"><div style="width:200px; height:150px; background:#000; border-radius:8px; display:flex; align-items:center; justify-content:center;"><i class="material-icons" style="font-size:50px; color:white;">play_circle_outline</i></div><div style="font-size:11px; margin-top:5px; color:gray;">${m.decryptedName}</div></div>`;
+                        content = `<div style="position:relative;"><div style="width:200px; height:150px; background:#000; border-radius:8px; display:flex; align-items:center; justify-content:center;"><i class="material-icons" style="font-size:50px; color:white;">play_circle_outline</i></div><div style="font-size:11px; margin-top:5px; color:gray;">${m.decryptedName}</div></div>`;
                     }
                 } else {
                     let iconType = m.decryptedData.startsWith("data:application/pdf") ? "picture_as_pdf" : "insert_drive_file";
-                    content = `<div style="display:flex; gap:10px; align-items:center; cursor:pointer; background:rgba(0,0,0,0.03); padding:10px; border-radius:8px;" onclick="openMediaViewer('${m.id}', 'msg')">
+                    content = `<div style="display:flex; gap:10px; align-items:center; background:rgba(0,0,0,0.03); padding:10px; border-radius:8px;">
                         <i class="material-icons" style="font-size:30px; color:var(--primary);">${iconType}</i>
                         <div><div style="font-weight:bold; font-size:14px; max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${m.decryptedName}</div></div>
                     </div>`;
@@ -498,6 +650,8 @@
                 document.getElementById(`msg_${m.id}`).innerHTML = `${senderHtml}${content}<span class="bubble-time">${timeStr}</span>`;
             } else { document.getElementById(`msg_${m.id}`).innerHTML = `${senderHtml}${decrypted} <span class="bubble-time">${timeStr}</span>`; }
         } catch(e) { document.getElementById(`msg_${m.id}`).innerHTML = `${senderHtml}<span style="color:#E91E63; font-size:13px;">Corrupted</span>`; }
+
+        bubble.onclick = () => { if(m.decryptedData) openMediaViewer(m.id, 'msg'); };
 
         let pressTimer;
         let startPress = (e) => { pressTimer = setTimeout(() => { activeActionMsg = m; document.getElementById('msgOptionsModal').style.display='flex'; }, 600); };
@@ -518,10 +672,7 @@
             await database.ref('messages').push({ id: Date.now() + Math.random().toString().substring(2,8), from: currentUserEmail, to: currentChatContact, payload: encryptedPayload, time: new Date().toLocaleString(), isGroup: isGroupChat });
             input.value = ""; cancelSelectedFile(); sendBtn.disabled = false; input.disabled = false; input.focus();
             setTimeout(() => { document.getElementById('chatMessagesBox').scrollTop = document.getElementById('chatMessagesBox').scrollHeight; }, 100);
-        } catch(e) { 
-            alert("Database Error! Message Not Saved.\n\nYour Firebase Database Security Rules might have expired (30-day limit). Please go to Firebase Console -> Realtime Database -> Rules, and set '.read': 'true', '.write': 'true'."); 
-            sendBtn.disabled = false; input.disabled = false; 
-        }
+        } catch(e) { alert("Encryption Error"); sendBtn.disabled = false; input.disabled = false; }
     }
 
     async function shareSelectedMsg() {
@@ -547,7 +698,6 @@
         activeActionMsg = null;
     }
 
-    // 🔥 NEW STATUS MODAL LOGIC 🔥
     function closeStatusModal() {
         document.getElementById('imageStatusModal').style.display = 'none';
         document.getElementById('textStatusModal').style.display = 'none';
@@ -624,18 +774,23 @@
 
         let trayHtml = `
         <div class="status-card" onclick="openImageStatusModal()">
-            <div class="status-card-avatar" style="border:none;"><div style="background:var(--bg); width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative;">${currentUserEmail.charAt(0).toUpperCase()}<div class="status-card-add-icon">+</div></div></div>
+            <div class="status-card-avatar" style="border:none;"><div style="background:var(--bg); width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative;">${currentAvatar ? `<img src="${currentAvatar}">` : (currentUserEmail?currentUserEmail.charAt(0).toUpperCase():'U')}<div class="status-card-add-icon">+</div></div></div>
             <div style="background:var(--surface); display:flex; justify-content:center; align-items:center; height:100%;"></div>
             <div class="status-card-name" style="color:var(--text); text-shadow:none; text-align:center;">Add Status</div>
         </div>`;
 
         for(let user in userGroups) {
             let userSts = userGroups[user]; let lastSt = userSts[userSts.length - 1];
+            let uInfo = getUserInfoByEmail(user);
+            
             let bgStyle = `background-color: var(--primary);`;
             if (lastSt.decryptedData.startsWith("data:image/")) { bgStyle = `background-image: url('${lastSt.decryptedData}');`; } 
             else if (lastSt.decryptedData.startsWith("data:video/")) { bgStyle = `background-color: #000;`; }
-            let dName = (user === currentUserEmail) ? "My Status" : user.split('@')[0];
-            trayHtml += `<div class="status-card" style="${bgStyle}" onclick="viewUserStatus('${user}')"><div class="status-card-overlay"></div><div class="status-card-avatar">${user.charAt(0).toUpperCase()}</div><div class="status-card-name">${dName}</div></div>`;
+            
+            let dName = (user === currentUserEmail) ? "My Status" : uInfo.username;
+            let avatarHtml = uInfo.avatar ? `<img src="${uInfo.avatar}">` : user.charAt(0).toUpperCase();
+            
+            trayHtml += `<div class="status-card" style="${bgStyle}" onclick="viewUserStatus('${user}')"><div class="status-card-overlay"></div><div class="status-card-avatar">${avatarHtml}</div><div class="status-card-name">${dName}</div></div>`;
         }
         document.getElementById('statusTray').innerHTML = trayHtml;
 
@@ -643,12 +798,13 @@
         for(let user in userGroups) {
             if(user === currentUserEmail) continue; 
             let st = userGroups[user][userGroups[user].length - 1]; 
-            listHtml += `<div class="list-item" onclick="viewUserStatus('${user}')"><div class="avatar status-ring">${user.charAt(0).toUpperCase()}</div><div class="list-info"><div class="list-title">${user}</div><div class="list-subtitle">${st.timeStr}</div></div></div>`;
+            let uInfo = getUserInfoByEmail(user);
+            let avatarHtml = uInfo.avatar ? `<img src="${uInfo.avatar}">` : user.charAt(0).toUpperCase();
+            listHtml += `<div class="list-item" onclick="viewUserStatus('${user}')"><div class="avatar status-ring">${avatarHtml}</div><div class="list-info"><div class="list-title">${uInfo.username}</div><div class="list-subtitle">${st.timeStr}</div></div></div>`;
         }
-        document.getElementById('statusList').innerHTML = listHtml || `<div class="empty-state"><i class="material-icons">chat_bubble_outline</i><h3>No Updates Yet</h3></div>`;
+        document.getElementById('statusList').innerHTML = listHtml || `<div style="text-align:center; padding:20px; color:gray;">No Updates Yet</div>`;
     }
 
-    // --- 🔥 DEDICATED PDF VIEWER ENGINE 🔥 ---
     let currentPdf = null; let currentPdfPage = 1;
     async function renderPdfPage(num) {
         if(!currentPdf) return;
@@ -665,7 +821,6 @@
         if(newPage >= 1 && newPage <= currentPdf.numPages) { currentPdfPage = newPage; renderPdfPage(currentPdfPage); } 
     }
 
-    // --- FULL SCREEN NATIVE MEDIA VIEWER ---
     async function openMediaViewer(msgId, source) {
         waIsChatMedia = (source === 'msg');
         document.getElementById('waStatusViewer').style.display = 'flex';
@@ -674,8 +829,10 @@
         let m = waIsChatMedia ? APP_STATE.msgs.find(x => x.id === msgId) : window.statusPlaylist.find(x => x.id === msgId);
         let fData = m.decryptedData, fName = m.decryptedName;
         
-        document.getElementById('waStatusName').innerText = waIsChatMedia ? "Media" : m.from;
+        let uInfo = getUserInfoByEmail(m.from);
+        document.getElementById('waStatusName').innerText = waIsChatMedia ? "Media" : uInfo.username;
         document.getElementById('waStatusTime').innerText = waIsChatMedia ? m.time : m.timeStr;
+        document.getElementById('waStatusAvatar').innerHTML = uInfo.avatar ? `<img src="${uInfo.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : uInfo.username.charAt(0).toUpperCase();
         
         let dBtn = document.getElementById('waStatusDownloadBtn');
         let tapLeft = document.getElementById('waTapLeft');
@@ -699,10 +856,9 @@
         let contentBox = document.getElementById('waStatusContent');
         contentBox.innerHTML = `<i class="material-icons animate-spin" style="font-size:50px;">sync</i>`;
 
-        // 🔥 DEDICATED PDF VIEWER INTEGRATION 🔥
         if (fData.startsWith("data:application/pdf")) {
             contentBox.innerHTML = `
-                <div style="position:absolute; top:80px; background:var(--surface); width:90%; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.2); display:flex; justify-content:space-between; align-items:center; padding:10px 20px; z-index:4005; left:5%; border:1px solid var(--border);">
+                <div style="position:absolute; top:80px; background:var(--surface); width:90%; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.2); display:flex; justify-content:space-between; align-items:center; padding:10px 20px; z-index:4005; border:1px solid var(--border);">
                     <i class="material-icons" onclick="changePdfPage(-1)" style="color:var(--primary); font-size:30px; cursor:pointer;">navigate_before</i>
                     <span style="color:var(--text); font-weight:bold; font-size:16px;">Page <span id="pdfPageNum">1</span> / <span id="pdfPageCount">-</span></span>
                     <i class="material-icons" onclick="changePdfPage(1)" style="color:var(--primary); font-size:30px; cursor:pointer;">navigate_next</i>
@@ -725,17 +881,20 @@
             } catch (error) {
                 contentBox.innerHTML = `<div style="text-align:center; color:#E91E63; margin-top:50px;"><h2>⚠️ PDF Error</h2><p>File might be corrupted.</p></div>`;
             }
-            return; // PDF process ends here
+            return;
         }
 
         let bUrl = base64ToBlobUrl(fData);
 
-        // 1. FULL SCREEN VIDEO PLAYER
         if(fData.startsWith("data:video/")) {
             let controlsAttr = waIsChatMedia ? "controls" : ""; 
-            contentBox.innerHTML = `<video id="activeVideoPlayer" src="${bUrl}" ${controlsAttr} playsinline style="width:100%; height:100%; object-fit:contain; background:#000; outline:none;"></video>`;
+            
+            let vidHtml = `<video id="activeVideoPlayer" src="${bUrl}" ${controlsAttr} playsinline style="width:100%; height:100%; object-fit:contain; background:#000; outline:none;"></video>`;
+            if(fName && !waIsChatMedia) { vidHtml += `<div class="wa-status-caption">${fName}</div>`; }
+            
+            contentBox.innerHTML = vidHtml;
             let video = document.getElementById('activeVideoPlayer');
-            if(fName && !waIsChatMedia) { contentBox.innerHTML += `<div class="wa-status-caption">${fName}</div>`; }
+            
             try {
                 let playPromise = video.play();
                 if (playPromise !== undefined) {
@@ -756,12 +915,10 @@
                 };
             }
         } 
-        // 2. IMAGE VIEWER
         else if (fData.startsWith("data:image/")) {
             contentBox.innerHTML = `<img src="${bUrl}" style="width:100%; height:100%; object-fit:contain;">`;
             if(fName && !waIsChatMedia) contentBox.innerHTML += `<div class="wa-status-caption">${fName}</div>`;
         } 
-        // 3. TEXT
         else {
             if(fData === "txt") { contentBox.innerHTML = `<div style="width:100%; height:100%; display:flex; justify-content:center; align-items:center; background:var(--primary); padding:30px; font-size:28px; text-align:center; word-wrap:break-word;">${fName}</div>`; } 
             else { contentBox.innerHTML = `<div style="text-align:center;"><h2>📁 File</h2><p>${fName}</p></div>`; }
@@ -812,4 +969,4 @@
     function closeWaStatus() { clearTimeout(waTimer); document.getElementById('waStatusViewer').style.display = 'none'; document.getElementById('waStatusContent').innerHTML = ""; currentPdf = null; }
 </script>
 </body>
-                                                                                                                         </html>
+                                                                     </html>
