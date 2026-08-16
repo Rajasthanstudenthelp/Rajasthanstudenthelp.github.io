@@ -143,7 +143,6 @@
         .call-avatar-glow img { width:100%; height:100%; object-fit:cover; }
         @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(63,81,181,0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 30px rgba(63,81,181,0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(63,81,181,0); } }
 
-        /* वीडियो कॉल में छोटे और ड्रैग होने वाले लोगो का CSS */
         .call-avatar-small { position: absolute !important; top: 20px !important; left: 20px !important; width: 60px !important; height: 60px !important; font-size: 24px !important; margin: 0 !important; box-shadow: 0 5px 15px rgba(0,0,0,0.5) !important; animation: none !important; z-index: 9500 !important; cursor: grab; touch-action: none; border: 2px solid white; }
         .hide-in-video { display: none !important; }
     </style>
@@ -353,11 +352,10 @@
     let isMuted = false;
     let isVideoEnabled = false;
 
-    // --- OCTA-CORE ENGINE SETUP ---
+    // OCTA-CORE ENGINE SETUP
     const SYSTEM_CORES = navigator.hardwareConcurrency || 2;
     console.log(`[ISB Engine] Detected ${SYSTEM_CORES}-Core Processor. Activating Multi-Core Web Workers...`);
     
-    // Create pre-compiled blobs ONCE at startup to save massive memory/CPU time
     const keyWorkerCode = `self.onmessage=function(e){let pwd=e.data.password;let salt=new Uint8Array(e.data.salt);let bigKey=new Uint8Array(128);for(let i=0;i<128;i++){bigKey[i]=pwd.charCodeAt(i%pwd.length)^salt[i%salt.length]^(i%256);}self.postMessage({bigKey:bigKey.buffer},[bigKey.buffer]);};`;
     const mathWorkerCode = `self.onmessage=function(e){let buffer=new Uint8Array(e.data.buffer);let isEncrypt=e.data.action==='encrypt';let bigKey=new Uint8Array(e.data.bigKey);let chunkIdx=e.data.chunkIdx;let G1=0x12345678,G2=0x87654321,G3=0xDEADBEEF,G4=0xCAFEBABE;for(let i=0;i<128;i++){let c=bigKey[i];G1=(G1>>>1)^(c<<24);G2=(G2<<3)^c;G3^=(G1>>>5);G4=(G4<<1)^(G2>>>2);}G1^=chunkIdx;G2^=(Math.imul(chunkIdx,13)>>>0);G3^=(Math.imul(chunkIdx,17)>>>0);G4^=(Math.imul(chunkIdx,19)>>>0);let dv=new DataView(buffer.buffer,buffer.byteOffset,buffer.byteLength);let words=Math.floor(buffer.length/4);let baseWordIndex=chunkIdx*1048576;for(let i=0;i<words;i++){let sizeNum=baseWordIndex+i+1;let x=sizeNum;let x2=Math.imul(x,x)>>>0;let x3=Math.imul(x2,x)>>>0;let x4=Math.imul(x3,x)>>>0;let x5=Math.imul(x4,x)>>>0;let x6=Math.imul(x5,x)>>>0;let x7=Math.imul(x6,x)>>>0;let x8=Math.imul(x7,x)>>>0;let pMode=bigKey[sizeNum%128]%6;let powerVal=(x3&((pMode===0)?0xFFFFFFFF:0))|(x4&((pMode===1)?0xFFFFFFFF:0))|(x5&((pMode===2)?0xFFFFFFFF:0))|(x6&((pMode===3)?0xFFFFFFFF:0))|(x7&((pMode===4)?0xFFFFFFFF:0))|(x8&((pMode===5)?0xFFFFFFFF:0));let pVal=bigKey[(sizeNum+15)%128];let rotInner=(Math.imul(pVal,Math.imul(pVal,pVal))>>>0)%31+1;let rotOuter=(Math.imul(powerVal%1000,powerVal%1000)+rotInner)%31+1;G1=(G1+powerVal)>>>0;G2=(G2^G1)>>>0;G2=((G2<<rotInner)|(G2>>>(32-rotInner)))>>>0;G3=(G3+G2)>>>0;G4=(G4^G3)>>>0;G4=((G4<<rotOuter)|(G4>>>(32-rotOuter)))>>>0;let g32=(G1+G2+G3+G4)>>>0;let y=(g32%10000)+1;let y2=Math.imul(y,y)>>>0;let y3=Math.imul(y2,y)>>>0;let y4=Math.imul(y3,y)>>>0;let y5=Math.imul(y4,y)>>>0;let y6=Math.imul(y5,y)>>>0;let y7=Math.imul(y6,y)>>>0;let y8=Math.imul(y7,y)>>>0;let dpMode=bigKey[(sizeNum+64)%128]%6;let dPowerVal=(y3&((dpMode===0)?0xFFFFFFFF:0))|(y4&((dpMode===1)?0xFFFFFFFF:0))|(y5&((dpMode===2)?0xFFFFFFFF:0))|(y6&((dpMode===3)?0xFFFFFFFF:0))|(y7&((dpMode===4)?0xFFFFFFFF:0))|(y8&((dpMode===5)?0xFFFFFFFF:0));let dpVal=bigKey[(sizeNum+42)%128];let dRotInner=(Math.imul(dpVal,Math.imul(dpVal,dpVal))>>>0)%31+1;let dRotOuter=(Math.imul(dPowerVal%1000,dPowerVal%1000)+dRotInner)%31+1;g32=(g32+dPowerVal)>>>0;g32=(g32^(g32>>>15))>>>0;g32=((g32<<dRotInner)|(g32>>>(32-dRotInner)))>>>0;g32=((g32<<dRotOuter)|(g32>>>(32-dRotOuter)))>>>0;let pwdGarbage=(bigKey[(sizeNum*7)%128])|(bigKey[(sizeNum*11)%128]<<8)|(bigKey[(sizeNum*13)%128]<<16)|(bigKey[(sizeNum*17)%128]<<24);g32=(g32+pwdGarbage)>>>0;g32=(g32^(pwdGarbage>>>7))>>>0;let opMode=bigKey[(sizeNum+32)%128]%3;if(isEncrypt){let d32=dv.getUint32(i*4,true);let opA=(d32+g32)>>>0;let opS=(d32-g32)>>>0;let opX=(d32^g32)>>>0;d32=(opA&((opMode===0)?0xFFFFFFFF:0))|(opS&((opMode===1)?0xFFFFFFFF:0))|(opX&((opMode===2)?0xFFFFFFFF:0));dv.setUint32(i*4,d32,true);G3=(G3^d32)>>>0;}else{let c32=dv.getUint32(i*4,true);let opA=(c32-g32)>>>0;let opS=(c32+g32)>>>0;let opX=(c32^g32)>>>0;let p32=(opA&((opMode===0)?0xFFFFFFFF:0))|(opS&((opMode===1)?0xFFFFFFFF:0))|(opX&((opMode===2)?0xFFFFFFFF:0));dv.setUint32(i*4,p32,true);G3=(G3^c32)>>>0;}}let rem=buffer.length%4;if(rem>0){let off=buffer.length-rem;for(let i=0;i<rem;i++){let sizeNum=baseWordIndex+words+i+1;let x=sizeNum;let x2=Math.imul(x,x)>>>0;let x3=Math.imul(x2,x)>>>0;let x4=Math.imul(x3,x)>>>0;let x5=Math.imul(x4,x)>>>0;let x6=Math.imul(x5,x)>>>0;let x7=Math.imul(x6,x)>>>0;let x8=Math.imul(x7,x)>>>0;let pMode=bigKey[sizeNum%128]%6;let tVal=(pMode===0)?x3:(pMode===1)?x4:(pMode===2)?x5:(pMode===3)?x6:(pMode===4)?x7:x8;let pVal=bigKey[(sizeNum+5)%128];let rIn=(Math.imul(pVal,Math.imul(pVal,pVal))>>>0)%7+1;let rOut=(Math.imul(tVal%100,tVal%100)+rIn)%7+1;G1=(G1+tVal)>>>0;let gCombined=(G1^G2^G3^G4)>>>0;gCombined=((gCombined<<rIn)|(gCombined>>>(32-rIn)))>>>0;gCombined=((gCombined<<rOut)|(gCombined>>>(32-rOut)))>>>0;let pwdGarbageByte=bigKey[(sizeNum*7)%128];let gByte=((gCombined+pwdGarbageByte+(Math.imul(sizeNum%100,sizeNum%100)>>>0))&0xFF)^(pwdGarbageByte>>2);let opMode=bigKey[(sizeNum+32)%128]%3;if(isEncrypt){let dB=buffer[off+i];let oA=(dB+gByte)&0xFF;let oS=(dB-gByte+256)&0xFF;let oX=(dB^gByte)&0xFF;dB=(opMode===0)?oA:((opMode===1)?oS:oX);buffer[off+i]=dB;G3=(G3^dB)>>>0;}else{let cB=buffer[off+i];let oA=(cB-gByte+256)&0xFF;let oS=(cB+gByte)&0xFF;let oX=(cB^gByte)&0xFF;let pB=(opMode===0)?oA:((opMode===1)?oS:oX);buffer[off+i]=pB;G3=(G3^cB)>>>0;}}}self.postMessage({type:'chunk_done',buffer:buffer.buffer,chunkIdx:chunkIdx},[buffer.buffer]);};`;
     const precompiledKeyWorkerURL = URL.createObjectURL(new Blob([keyWorkerCode], {type:'application/javascript'}));
@@ -405,6 +403,9 @@
                 currentUsername = foundUname; currentAvatar = APP_STATE.users[foundUname].avatar;
                 myHideStatus = APP_STATE.users[foundUname].hideStatus || false; updatePrivacyUI();
                 
+                // NEW: Send Token to Android Bridge
+                if(typeof ISBAndroid !== 'undefined') { ISBAndroid.saveFCMToken(currentUsername); }
+
                 document.getElementById('profileUsernameDisplay').innerText = "@" + currentUsername;
                 document.getElementById('profileEmailDisplay').innerText = currentUserEmail;
                 document.getElementById('profileAvatar').innerHTML = currentAvatar ? `<img src="${currentAvatar}">` : currentUsername.charAt(0).toUpperCase();
@@ -470,7 +471,6 @@
         menu.style.display = 'block'; 
     }
     
-    // PIN/UNPIN CHAT FUNCTION
     function togglePinChat() {
         document.getElementById('chatMenuDropdown').style.display = 'none';
         let targetId = isGroupChat ? currentChatContact : getUserInfoByEmail(currentChatContact).username;
@@ -520,14 +520,12 @@
     function base64ToUint8(base64) { let binary = atob(base64.replace(/\s+/g, '')); let len = binary.length; let bytes = new Uint8Array(len); for (let i = 0; i < len; i++) { bytes[i] = binary.charCodeAt(i); } return bytes; }
     function uint8ToBase64(bytes) { let binary = ''; let len = bytes.byteLength; let chunkSize = 0x8000; for (let i = 0; i < len; i += chunkSize) { binary += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + chunkSize, len))); } return btoa(binary); }
 
-    // OCTA-CORE IMPLEMENTATION (Using globally cached Blobs and pooling naturally via browser)
     async function runISBText(text, password, isEncrypt) {
         return new Promise((resolve, reject) => {
             let buffer, salt;
             if (isEncrypt) { buffer = new TextEncoder().encode(text); salt = crypto.getRandomValues(new Uint8Array(32)); } 
             else { try { buffer = base64ToUint8(text); } catch(e) { reject("Invalid Code"); return; } salt = buffer.slice(0, 32); buffer = buffer.slice(32); }
             
-            // Using the precompiled Blobs drastically saves CPU and leverages dynamic multi-threading safely
             let kw = new Worker(precompiledKeyWorkerURL);
             kw.onmessage = function(e) { 
                 let bigKey = e.data.bigKey; kw.terminate(); 
@@ -565,7 +563,6 @@
     function openNewGroupModal() { document.getElementById('newGroupModal').style.display = 'flex'; }
     function createGroup() { let gName = document.getElementById('newGroupName').value.trim(); let inputs = document.getElementById('newGroupEmails').value.toLowerCase().split(',').map(e => e.trim()); if(!gName || inputs.length === 0) return alert("Enter valid name and at least 1 contact"); let gEmails = [currentUserEmail]; for(let val of inputs) { if(!val) continue; if(val.includes("@")) gEmails.push(val); else { if(val.startsWith("@")) val = val.substring(1); if(APP_STATE.users[val]) gEmails.push(APP_STATE.users[val].email); } } database.ref('groups').push({ id: 'grp_' + Date.now(), name: gName, members: [...new Set(gEmails)], createdBy: currentUserEmail }); document.getElementById('newGroupModal').style.display = 'none'; alert("Group created securely!"); }
 
-    // TIMELINE & PIN SORTING LOGIC
     function loadChatsList() {
         let contactsObj = {};
         
@@ -605,8 +602,8 @@
             let myPinned = APP_STATE.users[currentUsername]?.pinned || {};
             let aPin = myPinned[aId] ? 1 : 0;
             let bPin = myPinned[bId] ? 1 : 0;
-            if (aPin !== bPin) return bPin - aPin; // Pinned first
-            return b.timestamp - a.timestamp; // Then strictly by timestamp desc
+            if (aPin !== bPin) return bPin - aPin;
+            return b.timestamp - a.timestamp;
         });
 
         let html = "";
@@ -689,7 +686,6 @@
         try { let encryptionPwd = isGroupChat ? currentChatContact : currentUserEmail; let encryptedPayload = await runISBText(payloadToEncrypt, encryptionPwd, true); await database.ref('messages').push({ id: Date.now() + Math.random().toString().substring(2,8), from: currentUserEmail, to: currentChatContact, payload: encryptedPayload, time: new Date().toLocaleString(), timestamp: Date.now(), isGroup: isGroupChat }); input.value = ""; cancelSelectedFile(); sendBtn.disabled = false; input.disabled = false; input.focus(); setTimeout(() => { document.getElementById('chatMessagesBox').scrollTop = document.getElementById('chatMessagesBox').scrollHeight; }, 100); } catch(e) { alert("Encryption Error"); sendBtn.disabled = false; input.disabled = false; }
     }
 
-    // ROBUST SHARE FUNCTION
     async function shareSelectedMsg() { 
         document.getElementById('msgOptionsModal').style.display='none'; 
         if(!activeActionMsg) return; 
@@ -751,7 +747,6 @@
                 currentCallType = data.callType;
                 window.currentCallTarget = data.from;
 
-                // Play Incoming Ringtone
                 let ringtone = document.getElementById('incomingRing');
                 ringtone.play().catch(e => console.log("Ringtone Autoplay Blocked: ", e));
 
@@ -800,197 +795,6 @@
         let targetUname = getUserInfoByEmail(currentChatContact).username;
         await database.ref('calls/' + targetUname).remove();
         
-        callStartTime = 0;
-        currentCallDirection = 'outgoing';
-        currentCallType = callType;
-        window.currentCallTarget = targetUname;
-
-        isMuted = false;
-        document.getElementById('muteIcon').innerText = "mic";
-        document.getElementById('btnMute').style.background = "rgba(255,255,255,0.2)";
-        document.getElementById('callControls').style.display = 'none';
-
-        document.getElementById('callStatusText').innerText = `Calling @${targetUname}...`;
-        document.getElementById('callTypeText').innerText = (callType === 'video') ? "Video Call" : "Voice Call";
-        let uInfo = APP_STATE.users[targetUname];
-        document.getElementById('callAvatarPreview').innerHTML = (uInfo && uInfo.avatar) ? `<img src="${uInfo.avatar}">` : targetUname.charAt(0).toUpperCase();
-        
-        document.getElementById('btnAcceptCall').style.display = 'none';
-        document.getElementById('callOverlay').style.display = 'flex';
-        document.getElementById('remoteVideo').style.display = 'none';
-        document.getElementById('localVideo').style.display = 'none';
-        isCallActive = true;
-
-        try {
-            try {
-                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            } catch(e) {
-                localStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
-            }
-
-            isVideoEnabled = (callType === 'video');
-            if(localStream.getVideoTracks().length > 0) {
-                localStream.getVideoTracks().forEach(t => t.enabled = isVideoEnabled);
-                document.getElementById('videoToggleIcon').innerText = isVideoEnabled ? "videocam" : "videocam_off";
-                document.getElementById('btnVideoToggle').style.background = isVideoEnabled ? "rgba(37,211,102,0.8)" : "rgba(255,255,255,0.2)";
-            } else {
-                document.getElementById('btnVideoToggle').style.display = 'none'; 
-            }
-            if(isVideoEnabled) { document.getElementById('localVideo').style.display = 'block'; document.getElementById('localVideo').srcObject = localStream; }
-            
-            document.getElementById('callControls').style.display = 'flex'; 
-            
-            peerConnection = new RTCPeerConnection(rtcConfig); remoteStream = new MediaStream(); 
-            
-            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-            
-            peerConnection.ontrack = event => { 
-                event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track)); 
-                
-                let remoteVid = document.getElementById('remoteVideo');
-                remoteVid.srcObject = remoteStream;
-                let playPromise = remoteVid.play();
-                if (playPromise !== undefined) { playPromise.catch(error => console.log("Video autoplay blocked")); }
-
-                if(callType === 'video') { remoteVid.style.display = 'block'; }
-                document.getElementById('callStatusText').innerText = "Connected";
-                callStartTime = Date.now(); 
-
-                // Video Logo Drag logic activation
-                if(isVideoEnabled) {
-                    document.getElementById('callAvatarPreview').classList.add('call-avatar-small');
-                    document.getElementById('callStatusText').classList.add('hide-in-video');
-                    document.getElementById('callTypeText').classList.add('hide-in-video');
-                }
-            };
-
-            peerConnection.onicecandidate = event => { if(event.candidate) database.ref('calls/' + targetUname + '/callerCandidates').push(event.candidate.toJSON()); };
-
-            const offer = await peerConnection.createOffer(); await peerConnection.setLocalDescription(offer);
-            await database.ref('calls/' + targetUname).set({ type: 'offer', from: currentUsername, callType: callType, sdp: offer.sdp });
-
-            database.ref('calls/' + targetUname + '/answer').on('value', async snapshot => {
-                const answer = snapshot.val();
-                if(answer && peerConnection && !peerConnection.currentRemoteDescription) { const answerDesc = new RTCSessionDescription({ type: 'answer', sdp: answer.sdp }); await peerConnection.setRemoteDescription(answerDesc); }
-            });
-
-            database.ref('calls/' + targetUname + '/receiverCandidates').on('child_added', snapshot => {
-                if(peerConnection) peerConnection.addIceCandidate(new RTCIceCandidate(snapshot.val()));
-            });
-        } catch(e) { alert("Camera/Mic Permission Denied!"); endCall(); }
-    }
-
-    async function acceptCall() {
-        // Stop Ringtone
-        let ringtone = document.getElementById('incomingRing');
-        ringtone.pause();
-        ringtone.currentTime = 0;
-
-        document.getElementById('btnAcceptCall').style.display = 'none'; document.getElementById('callStatusText').innerText = "Connecting...";
-        const data = window.currentCallData; isCallActive = true;
-
-        isMuted = false;
-        document.getElementById('muteIcon').innerText = "mic";
-        document.getElementById('btnMute').style.background = "rgba(255,255,255,0.2)";
-        document.getElementById('btnVideoToggle').style.display = 'block';
-
-        try {
-            try {
-                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            } catch(e) {
-                localStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
-            }
-
-            isVideoEnabled = (data.callType === 'video');
-            if(localStream.getVideoTracks().length > 0) {
-                localStream.getVideoTracks().forEach(t => t.enabled = isVideoEnabled);
-                document.getElementById('videoToggleIcon').innerText = isVideoEnabled ? "videocam" : "videocam_off";
-                document.getElementById('btnVideoToggle').style.background = isVideoEnabled ? "rgba(37,211,102,0.8)" : "rgba(255,255,255,0.2)";
-            } else {
-                document.getElementById('btnVideoToggle').style.display = 'none';
-            }
-            if(isVideoEnabled) { document.getElementById('localVideo').style.display = 'block'; document.getElementById('localVideo').srcObject = localStream; }
-            
-            document.getElementById('callControls').style.display = 'flex'; 
-
-            peerConnection = new RTCPeerConnection(rtcConfig); remoteStream = new MediaStream(); 
-            
-            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-            
-            peerConnection.ontrack = event => { 
-                event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track)); 
-                
-                let remoteVid = document.getElementById('remoteVideo');
-                remoteVid.srcObject = remoteStream;
-                let playPromise = remoteVid.play();
-                if (playPromise !== undefined) { playPromise.catch(error => console.log("Video autoplay blocked")); }
-
-                if(data.callType === 'video') remoteVid.style.display = 'block';
-                document.getElementById('callStatusText').innerText = "Connected";
-                callStartTime = Date.now(); 
-
-                // Video Logo Drag logic activation
-                if(isVideoEnabled) {
-                    document.getElementById('callAvatarPreview').classList.add('call-avatar-small');
-                    document.getElementById('callStatusText').classList.add('hide-in-video');
-                    document.getElementById('callTypeText').classList.add('hide-in-video');
-                }
-            };
-
-            peerConnection.onicecandidate = event => { if(event.candidate) database.ref('calls/' + currentUsername + '/receiverCandidates').push(event.candidate.toJSON()); };
-
-            const offerDesc = new RTCSessionDescription({ type: 'offer', sdp: data.sdp }); await peerConnection.setRemoteDescription(offerDesc);
-
-            const answer = await peerConnection.createAnswer(); await peerConnection.setLocalDescription(answer);
-
-            await database.ref('calls/' + currentUsername + '/answer').set({ type: 'answer', sdp: answer.sdp });
-
-            database.ref('calls/' + currentUsername + '/callerCandidates').on('child_added', snapshot => {
-                if(peerConnection) peerConnection.addIceCandidate(new RTCIceCandidate(snapshot.val()));
-            });
-        } catch(e) { alert("Camera/Mic Permission Denied!"); endCall(); }
-    }
-
-    function endCall(notifyRemote = true) {
-        // Stop Ringtone
-        let ringtone = document.getElementById('incomingRing');
-        ringtone.pause();
-        ringtone.currentTime = 0;
-
-        // Reset Drag Logo CSS
-        document.getElementById('callAvatarPreview').classList.remove('call-avatar-small');
-        document.getElementById('callStatusText').classList.remove('hide-in-video');
-        document.getElementById('callTypeText').classList.remove('hide-in-video');
-        document.getElementById('callAvatarPreview').removeAttribute('style');
-
-        isCallActive = false; document.getElementById('callOverlay').style.display = 'none';
-        
-        if (window.currentCallTarget && currentCallDirection) {
-            let durationStr = "Missed";
-            if (callStartTime > 0) {
-                let diffSec = Math.floor((Date.now() - callStartTime) / 1000);
-                let m = Math.floor(diffSec / 60);
-                let s = diffSec % 60;
-                durationStr = (m > 0 ? m + "m " : "") + s + "s";
-            }
-            database.ref('callHistory/' + currentUsername).push({
-                peer: window.currentCallTarget,
-                type: currentCallType,
-                direction: currentCallDirection,
-                duration: durationStr,
-                timestamp: Date.now(),
-                timeStr: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-            });
-        }
-        
-        if(notifyRemote) {
-            let targetUname = window.currentCallTarget || (window.currentCallData ? window.currentCallData.from : null);
-            if(targetUname) {
-                database.ref('calls/' + targetUname).set({ type: 'end' });
-            }
-        }
-        database.ref('calls/' + currentUsername).remove();
-
         callStartTime = 0; currentCallDirection = ''; currentCallType = ''; window.currentCallTarget = null;
         
         if(localStream) { localStream.getTracks().forEach(track => track.stop()); }
@@ -1042,7 +846,6 @@
         }
     }
 
-    // --- ड्रैगेबल (खिसकने वाले) लोगो का लॉजिक ---
     let avatarEl = document.getElementById('callAvatarPreview');
     let isAvatarDragging = false, avStartX, avStartY, avInitialX, avInitialY;
 
