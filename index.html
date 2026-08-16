@@ -57,8 +57,9 @@
         .fab-secondary { bottom: 160px; background: var(--surface); color: var(--primary); border: 1px solid var(--border); }
         .fab-pencil { position: fixed; bottom: 160px; right: 28px; width: 45px; height: 45px; background: var(--surface); color: var(--text-muted); border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.15); cursor: pointer; z-index: 90; border: 1px solid var(--border);}
 
+        /* 🔥 FIX: Changed width to 25% for 4 Tabs 🔥 */
         .bottom-nav { flex-shrink: 0; background: var(--nav-bg); display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid var(--border); z-index: 100;}
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); cursor: pointer; width: 33.3%;}
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); cursor: pointer; width: 25%;}
         .nav-item span { font-size: 11px; font-weight: 600; }
         .nav-item.active { color: var(--primary); }
 
@@ -169,12 +170,14 @@
         <div class="search-bar-container" id="homeSearchBar"><input type="text" id="homeSearchInput" placeholder="Search chats..." onkeyup="filterChats()"></div>
 
         <div class="container">
+            <!-- CHATS TAB -->
             <div id="chatsTab" class="tab-content active">
                 <div id="chatsList"></div>
                 <div class="fab fab-secondary" onclick="openNewGroupModal()"><i class="material-icons">group_add</i></div>
                 <div class="fab" onclick="openNewChatModal()"><i class="material-icons">add_comment</i></div>
             </div>
 
+            <!-- STATUS TAB -->
             <div id="statusTab" class="tab-content">
                 <div class="status-tray" id="statusTray"></div>
                 <div id="statusList"></div>
@@ -182,6 +185,16 @@
                 <div class="fab" onclick="openImageStatusModal()"><i class="material-icons">camera_alt</i></div>
             </div>
 
+            <!-- 🔥 NEW CALLS TAB 🔥 -->
+            <div id="callsTab" class="tab-content">
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:15px 20px; border-bottom:1px solid var(--border);">
+                    <h3 style="margin:0; font-size:18px; color:var(--text);">Recent Calls</h3>
+                    <i class="material-icons" style="color:#E91E63; cursor:pointer;" onclick="clearAllCalls()" title="Clear Call History">delete_sweep</i>
+                </div>
+                <div id="callsList"></div>
+            </div>
+
+            <!-- SETTINGS TAB -->
             <div id="settingsTab" class="tab-content">
                 <div style="text-align:center; padding: 30px 20px 20px;">
                     <div class="avatar" style="margin: 0 auto 15px auto; width:110px; height:110px; font-size:45px; border: 4px solid var(--primary); cursor:pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.1);" id="profileAvatar" onclick="document.getElementById('editProfileAvatarFile').click()">U</div>
@@ -201,7 +214,6 @@
 
                 <div class="settings-section"><div class="settings-row" onclick="logoutUser()"><i class="material-icons settings-row-icon" style="color:#E91E63;">logout</i><div class="settings-row-text" style="color:#E91E63;">Log Out securely</div></div></div>
                 
-                <!-- 🔥 COPYRIGHT & BRANDING 🔥 -->
                 <div class="made-in-india">
                     MAKE IN INDIA<span>🇮🇳</span>
                     <div class="copyright-line">Copyright &copy; 2026 ISB Chat. All Rights Reserved.</div>
@@ -209,9 +221,11 @@
             </div>
         </div>
 
+        <!-- 🔥 NAVIGATION BAR UPDATED WITH CALLS 🔥 -->
         <div class="bottom-nav">
             <div class="nav-item active" onclick="switchNav('chatsTab', this)"><i class="material-icons">chat_bubble</i><span>Chats</span></div>
             <div class="nav-item" onclick="switchNav('statusTab', this)"><i class="material-icons">donut_large</i><span>Status</span></div>
+            <div class="nav-item" onclick="switchNav('callsTab', this)"><i class="material-icons">call</i><span>Calls</span></div>
             <div class="nav-item" onclick="switchNav('settingsTab', this)"><i class="material-icons">settings</i><span>Settings</span></div>
         </div>
     </div>
@@ -261,6 +275,7 @@
         
         <video id="remoteVideo" autoplay playsinline style="width:100%; height:100%; position:absolute; top:0; left:0; object-fit:cover; z-index:-1; display:none; background:#111;"></video>
         <video id="localVideo" autoplay playsinline muted style="width:110px; height:150px; position:absolute; bottom:130px; right:20px; border-radius:12px; border:2px solid white; object-fit:cover; box-shadow:0 10px 20px rgba(0,0,0,0.5); display:none; background:#333;"></video>
+        <audio id="remoteAudio" autoplay playsinline style="display:none;"></audio>
         
         <div style="position:absolute; bottom:40px; display:flex; gap:40px; align-items:center;">
             <button id="btnAcceptCall" onclick="acceptCall()" style="display:none; background:#25D366; border:none; border-radius:50%; width:65px; height:65px; color:white; box-shadow:0 10px 20px rgba(37,211,102,0.4); cursor:pointer;"><i class="material-icons" style="font-size:30px;">call</i></button>
@@ -288,20 +303,26 @@
     const firebaseConfig = { apiKey: "AIzaSyA-d_mtHg1Age9ZggTWF3ABhUd_xn2PDKM", authDomain: "isb-messenger-75093.firebaseapp.com", databaseURL: "https://isb-messenger-75093-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "isb-messenger-75093", storageBucket: "isb-messenger-75093.firebasestorage.app", messagingSenderId: "970755431087", appId: "1:970755431087:web:09171e2ebca48e1b91125a" };
     firebase.initializeApp(firebaseConfig); const database = firebase.database();
 
-    const themes = [ { id: "default", color: "#3F51B5" }, { id: "dark", color: "#121212" }, { id: "telegram", color: "#2AABEE" }, { id: "sunset", color: "#FF5722" }, { id: "forest", color: "#2E7D32" }, { id: "ruby", color: "#E91E63" }, { id: "cyberpunk", color: "#00E5FF" }, { id: "coffee", color: "#795548" }, { id: "mint", color: "#00BFA5" }, { id: "gold", color: "#FFB300" }, { id: "orchid", color: "#9C27B0" }, { id: "amoled", color: "#000000" } ];
+    const themes = [ { id: "default", color: "#3F51B5" }, { id: "dark", color: "#121212" }, { id: "telegram", color: "#2AABEE" }, { id: "sunset", color: "#FF5722" }, { id: "forest", color: "#2E7D32" }, { id: "ruby", color: "#E91E63" }, { id: "cyberpunk", color: "#00E5FF" }, { id: "amoled", color: "#000000" } ];
 
     let currentUserEmail = null, currentUsername = null, currentAvatar = null, myHideStatus = false;
     let currentChatContact = null, isGroupChat = false, activeChatPresenceListener = null, currentChatTargetUname = null;
     let selectedFileData = null, selectedFileName = null, statusFileData = null, tempSetupAvatarData = null;
     let isListeningToFirebase = false;
 
-    let APP_STATE = { msgs: [], groups: [], statuses: [], users: {} };
+    // 🔥 ADDED callLogs array to APP_STATE 🔥
+    let APP_STATE = { msgs: [], groups: [], statuses: [], users: {}, callLogs: [] };
     window.statusPlaylist = []; 
     let waActiveUser = null, waUserStatusGroup = [], waActiveIndex = 0, waTimer = null, waIsChatMedia = false; 
     let activeActionMsg = null;
 
-    let peerConnection = null, localStream = null, remoteStream = null, isCallActive = false, callData = null;
+    let peerConnection = null, localStream = null, remoteStream = null, isCallActive = false;
     const rtcConfig = { iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }] };
+
+    // 🔥 CALL TRACKING VARIABLES 🔥
+    let callStartTime = 0;
+    let currentCallDirection = '';
+    let currentCallType = '';
 
     window.onload = function() {
         applyTheme(localStorage.getItem('isb_theme') || 'default');
@@ -345,24 +366,15 @@
         });
     }
 
-    // 🔥 POPUP OUTSIDE CLICK TO CLOSE & MENU CLOSE 🔥
     window.onclick = function(event) {
-        // Close Modals
         if (event.target.classList.contains('modal-overlay')) {
-            // Protect setup profile if user is new
             if(event.target.id === 'setupProfileModal' && !currentUsername) return; 
-            
             event.target.style.display = "none";
-            // Extra resets
             if(event.target.id === 'imageStatusModal' || event.target.id === 'textStatusModal') closeStatusModal();
         }
-        
-        // Close Chat Dropdown Menu
         if (!event.target.matches('.material-icons') || event.target.innerText !== 'more_vert') {
             let dropdown = document.getElementById("chatMenuDropdown");
-            if (dropdown && dropdown.style.display === "block") {
-                dropdown.style.display = "none";
-            }
+            if (dropdown && dropdown.style.display === "block") { dropdown.style.display = "none"; }
         }
     };
 
@@ -403,9 +415,27 @@
         database.ref('groups').on('child_added', function(snapshot) { let g = snapshot.val(); if(g && g.members.includes(currentUserEmail)) { if(!APP_STATE.groups.some(grp => grp.id === g.id)) { APP_STATE.groups.push(g); loadChatsList(); } } });
         database.ref('statuses').on('child_added', function(snapshot) { let s = snapshot.val(); s.fbKey = snapshot.key; if(s) { if(!APP_STATE.statuses.some(st => st.id === s.id)) { APP_STATE.statuses.push(s); loadStatusList(); } } });
         database.ref('statuses').on('child_removed', function(snapshot) { let removedSts = snapshot.val(); APP_STATE.statuses = APP_STATE.statuses.filter(s => s.id !== removedSts.id); loadStatusList(); });
+        
+        // 🔥 LOAD CALL HISTORY 🔥
+        database.ref('callHistory/' + currentUsername).on('value', function(snapshot) {
+            APP_STATE.callLogs = [];
+            snapshot.forEach(child => {
+                let log = child.val(); log.key = child.key;
+                APP_STATE.callLogs.push(log);
+            });
+            APP_STATE.callLogs.sort((a, b) => b.timestamp - a.timestamp);
+            loadCallsList();
+        });
     }
 
-    function switchNav(tabId, el) { document.querySelectorAll('.tab-content, .nav-item').forEach(t => t.classList.remove('active')); document.getElementById(tabId).classList.add('active'); el.classList.add('active'); if(tabId === 'chatsTab') loadChatsList(); if(tabId === 'statusTab') loadStatusList(); }
+    function switchNav(tabId, el) { 
+        document.querySelectorAll('.tab-content, .nav-item').forEach(t => t.classList.remove('active')); 
+        document.getElementById(tabId).classList.add('active'); 
+        el.classList.add('active'); 
+        if(tabId === 'chatsTab') loadChatsList(); 
+        if(tabId === 'statusTab') loadStatusList(); 
+        if(tabId === 'callsTab') loadCallsList(); 
+    }
 
     const keyWorkerCode = `self.onmessage=function(e){let pwd=e.data.password;let salt=new Uint8Array(e.data.salt);let bigKey=new Uint8Array(128);for(let i=0;i<128;i++){bigKey[i]=pwd.charCodeAt(i%pwd.length)^salt[i%salt.length]^(i%256);}self.postMessage({bigKey:bigKey.buffer},[bigKey.buffer]);};`;
     const mathWorkerCode = `self.onmessage=function(e){let buffer=new Uint8Array(e.data.buffer);let isEncrypt=e.data.action==='encrypt';let bigKey=new Uint8Array(e.data.bigKey);let chunkIdx=e.data.chunkIdx;let G1=0x12345678,G2=0x87654321,G3=0xDEADBEEF,G4=0xCAFEBABE;for(let i=0;i<128;i++){let c=bigKey[i];G1=(G1>>>1)^(c<<24);G2=(G2<<3)^c;G3^=(G1>>>5);G4=(G4<<1)^(G2>>>2);}G1^=chunkIdx;G2^=(Math.imul(chunkIdx,13)>>>0);G3^=(Math.imul(chunkIdx,17)>>>0);G4^=(Math.imul(chunkIdx,19)>>>0);let dv=new DataView(buffer.buffer,buffer.byteOffset,buffer.byteLength);let words=Math.floor(buffer.length/4);let baseWordIndex=chunkIdx*1048576;for(let i=0;i<words;i++){let sizeNum=baseWordIndex+i+1;let x=sizeNum;let x2=Math.imul(x,x)>>>0;let x3=Math.imul(x2,x)>>>0;let x4=Math.imul(x3,x)>>>0;let x5=Math.imul(x4,x)>>>0;let x6=Math.imul(x5,x)>>>0;let x7=Math.imul(x6,x)>>>0;let x8=Math.imul(x7,x)>>>0;let pMode=bigKey[sizeNum%128]%6;let powerVal=(x3&((pMode===0)?0xFFFFFFFF:0))|(x4&((pMode===1)?0xFFFFFFFF:0))|(x5&((pMode===2)?0xFFFFFFFF:0))|(x6&((pMode===3)?0xFFFFFFFF:0))|(x7&((pMode===4)?0xFFFFFFFF:0))|(x8&((pMode===5)?0xFFFFFFFF:0));let pVal=bigKey[(sizeNum+15)%128];let rotInner=(Math.imul(pVal,Math.imul(pVal,pVal))>>>0)%31+1;let rotOuter=(Math.imul(powerVal%1000,powerVal%1000)+rotInner)%31+1;G1=(G1+powerVal)>>>0;G2=(G2^G1)>>>0;G2=((G2<<rotInner)|(G2>>>(32-rotInner)))>>>0;G3=(G3+G2)>>>0;G4=(G4^G3)>>>0;G4=((G4<<rotOuter)|(G4>>>(32-rotOuter)))>>>0;let g32=(G1+G2+G3+G4)>>>0;let y=(g32%10000)+1;let y2=Math.imul(y,y)>>>0;let y3=Math.imul(y2,y)>>>0;let y4=Math.imul(y3,y)>>>0;let y5=Math.imul(y4,y)>>>0;let y6=Math.imul(y5,y)>>>0;let y7=Math.imul(y6,y)>>>0;let y8=Math.imul(y7,y)>>>0;let dpMode=bigKey[(sizeNum+64)%128]%6;let dPowerVal=(y3&((dpMode===0)?0xFFFFFFFF:0))|(y4&((dpMode===1)?0xFFFFFFFF:0))|(y5&((dpMode===2)?0xFFFFFFFF:0))|(y6&((dpMode===3)?0xFFFFFFFF:0))|(y7&((dpMode===4)?0xFFFFFFFF:0))|(y8&((dpMode===5)?0xFFFFFFFF:0));let dpVal=bigKey[(sizeNum+42)%128];let dRotInner=(Math.imul(dpVal,Math.imul(dpVal,dpVal))>>>0)%31+1;let dRotOuter=(Math.imul(dPowerVal%1000,dPowerVal%1000)+dRotInner)%31+1;g32=(g32+dPowerVal)>>>0;g32=(g32^(g32>>>15))>>>0;g32=((g32<<dRotInner)|(g32>>>(32-dRotInner)))>>>0;g32=((g32<<dRotOuter)|(g32>>>(32-dRotOuter)))>>>0;let pwdGarbage=(bigKey[(sizeNum*7)%128])|(bigKey[(sizeNum*11)%128]<<8)|(bigKey[(sizeNum*13)%128]<<16)|(bigKey[(sizeNum*17)%128]<<24);g32=(g32+pwdGarbage)>>>0;g32=(g32^(pwdGarbage>>>7))>>>0;let opMode=bigKey[(sizeNum+32)%128]%3;if(isEncrypt){let d32=dv.getUint32(i*4,true);let opA=(d32+g32)>>>0;let opS=(d32-g32)>>>0;let opX=(d32^g32)>>>0;d32=(opA&((opMode===0)?0xFFFFFFFF:0))|(opS&((opMode===1)?0xFFFFFFFF:0))|(opX&((opMode===2)?0xFFFFFFFF:0));dv.setUint32(i*4,d32,true);G3=(G3^d32)>>>0;}else{let c32=dv.getUint32(i*4,true);let opA=(c32-g32)>>>0;let opS=(c32+g32)>>>0;let opX=(c32^g32)>>>0;let p32=(opA&((opMode===0)?0xFFFFFFFF:0))|(opS&((opMode===1)?0xFFFFFFFF:0))|(opX&((opMode===2)?0xFFFFFFFF:0));dv.setUint32(i*4,p32,true);G3=(G3^c32)>>>0;}}let rem=buffer.length%4;if(rem>0){let off=buffer.length-rem;for(let i=0;i<rem;i++){let sizeNum=baseWordIndex+words+i+1;let x=sizeNum;let x2=Math.imul(x,x)>>>0;let x3=Math.imul(x2,x)>>>0;let x4=Math.imul(x3,x)>>>0;let x5=Math.imul(x4,x)>>>0;let x6=Math.imul(x5,x)>>>0;let x7=Math.imul(x6,x)>>>0;let x8=Math.imul(x7,x)>>>0;let pMode=bigKey[sizeNum%128]%6;let tVal=(pMode===0)?x3:(pMode===1)?x4:(pMode===2)?x5:(pMode===3)?x6:(pMode===4)?x7:x8;let pVal=bigKey[(sizeNum+5)%128];let rIn=(Math.imul(pVal,Math.imul(pVal,pVal))>>>0)%7+1;let rOut=(Math.imul(tVal%100,tVal%100)+rIn)%7+1;G1=(G1+tVal)>>>0;let gCombined=(G1^G2^G3^G4)>>>0;gCombined=((gCombined<<rIn)|(gCombined>>>(32-rIn)))>>>0;gCombined=((gCombined<<rOut)|(gCombined>>>(32-rOut)))>>>0;let pwdGarbageByte=bigKey[(sizeNum*7)%128];let gByte=((gCombined+pwdGarbageByte+(Math.imul(sizeNum%100,sizeNum%100)>>>0))&0xFF)^(pwdGarbageByte>>2);let opMode=bigKey[(sizeNum+32)%128]%3;if(isEncrypt){let dB=buffer[off+i];let oA=(dB+gByte)&0xFF;let oS=(dB-gByte+256)&0xFF;let oX=(dB^gByte)&0xFF;dB=(opMode===0)?oA:((opMode===1)?oS:oX);buffer[off+i]=dB;G3=(G3^dB)>>>0;}else{let cB=buffer[off+i];let oA=(cB-gByte+256)&0xFF;let oS=(cB+gByte)&0xFF;let oX=(cB^gByte)&0xFF;let pB=(opMode===0)?oA:((opMode===1)?oS:oX);buffer[off+i]=pB;G3=(G3^cB)>>>0;}}}self.postMessage({type:'chunk_done',buffer:buffer.buffer,chunkIdx:chunkIdx},[buffer.buffer]);};`;
@@ -521,11 +551,17 @@
     function renderWaStatus() { clearTimeout(waTimer); let st = waUserStatusGroup[waActiveIndex]; let barContainer = document.getElementById('waProgressBarContainer'); barContainer.innerHTML = ''; for(let i=0; i<waUserStatusGroup.length; i++) { let fillWidth = (i < waActiveIndex) ? '100%' : '0%'; barContainer.innerHTML += `<div class="wa-progress-segment"><div class="wa-progress-fill" id="waFill_${i}" style="width:${fillWidth}"></div></div>`; } openMediaViewer(st.id, 'status'); if(st.decryptedData !== "txt" && !st.decryptedData.startsWith("data:video/") && !st.decryptedData.startsWith("data:application/pdf")) { let fillBar = document.getElementById(`waFill_${waActiveIndex}`); if(fillBar) { void fillBar.offsetWidth; fillBar.style.transition = "width 10s linear"; fillBar.classList.add('filling'); } waTimer = setTimeout(() => { nextWaStatus(); }, 10000); } else if (st.decryptedData === "txt" || st.decryptedData.startsWith("data:application/pdf")) { let fillBar = document.getElementById(`waFill_${waActiveIndex}`); if(fillBar) { void fillBar.offsetWidth; fillBar.style.transition = "width 5s linear"; fillBar.classList.add('filling'); } waTimer = setTimeout(() => { nextWaStatus(); }, 5000); } }
     function nextWaStatus() { if(waActiveIndex < waUserStatusGroup.length - 1) { waActiveIndex++; renderWaStatus(); } else closeWaStatus(); } function prevWaStatus() { if(waActiveIndex > 0) { waActiveIndex--; renderWaStatus(); } else renderWaStatus(); } function closeWaStatus() { clearTimeout(waTimer); document.getElementById('waStatusViewer').style.display = 'none'; document.getElementById('waStatusContent').innerHTML = ""; currentPdf = null; }
 
+    // 🔥 P2P WEBRTC CALLING ENGINE WITH DURATION & HISTORY 🔥
     function initCallListener() {
         if(!currentUsername) return;
         database.ref('calls/' + currentUsername).on('value', async snapshot => {
             const data = snapshot.val();
             if(data && !isCallActive && data.type === 'offer') {
+                callStartTime = 0;
+                currentCallDirection = 'incoming';
+                currentCallType = data.callType;
+                window.currentCallTarget = data.from;
+
                 document.getElementById('callStatusText').innerText = "Incoming Call...";
                 document.getElementById('callTypeText').innerText = (data.callType === 'video') ? "Video Call from @" + data.from : "Audio Call from @" + data.from;
                 let uInfo = APP_STATE.users[data.from];
@@ -547,6 +583,11 @@
         let targetUname = getUserInfoByEmail(currentChatContact).username;
         await database.ref('calls/' + targetUname).remove();
         
+        callStartTime = 0;
+        currentCallDirection = 'outgoing';
+        currentCallType = callType;
+        window.currentCallTarget = targetUname;
+
         document.getElementById('callStatusText').innerText = `Calling @${targetUname}...`;
         document.getElementById('callTypeText').innerText = (callType === 'video') ? "Video Call" : "Voice Call";
         let uInfo = APP_STATE.users[targetUname];
@@ -562,16 +603,20 @@
             localStream = await navigator.mediaDevices.getUserMedia({ video: callType === 'video', audio: true });
             if(callType === 'video') { document.getElementById('localVideo').style.display = 'block'; document.getElementById('localVideo').srcObject = localStream; }
             
-            peerConnection = new RTCPeerConnection(rtcConfig); remoteStream = new MediaStream(); document.getElementById('remoteVideo').srcObject = remoteStream;
-
+            peerConnection = new RTCPeerConnection(rtcConfig); remoteStream = new MediaStream(); 
+            
             localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+            
             peerConnection.ontrack = event => { 
                 event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track)); 
+                document.getElementById('remoteVideo').srcObject = remoteStream;
+                document.getElementById('remoteAudio').srcObject = remoteStream;
                 if(callType === 'video') { document.getElementById('remoteVideo').style.display = 'block'; }
                 document.getElementById('callStatusText').innerText = "Connected";
+                callStartTime = Date.now(); // Start Duration Timer
             };
 
-            peerConnection.onicecandidate = event => { if(event.candidate) database.ref('calls/' + targetUname + '/candidates').push(event.candidate.toJSON()); };
+            peerConnection.onicecandidate = event => { if(event.candidate) database.ref('calls/' + targetUname + '/callerCandidates').push(event.candidate.toJSON()); };
 
             const offer = await peerConnection.createOffer(); await peerConnection.setLocalDescription(offer);
             await database.ref('calls/' + targetUname).set({ type: 'offer', from: currentUsername, callType: callType, sdp: offer.sdp });
@@ -581,7 +626,7 @@
                 if(answer && peerConnection && !peerConnection.currentRemoteDescription) { const answerDesc = new RTCSessionDescription({ type: 'answer', sdp: answer.sdp }); await peerConnection.setRemoteDescription(answerDesc); }
             });
 
-            database.ref('calls/' + currentUsername + '/candidates').on('child_added', snapshot => {
+            database.ref('calls/' + targetUname + '/receiverCandidates').on('child_added', snapshot => {
                 if(peerConnection) peerConnection.addIceCandidate(new RTCIceCandidate(snapshot.val()));
             });
         } catch(e) { alert("Camera/Mic Permission Denied!"); endCall(); }
@@ -595,16 +640,20 @@
             localStream = await navigator.mediaDevices.getUserMedia({ video: data.callType === 'video', audio: true });
             if(data.callType === 'video') { document.getElementById('localVideo').style.display = 'block'; document.getElementById('localVideo').srcObject = localStream; }
 
-            peerConnection = new RTCPeerConnection(rtcConfig); remoteStream = new MediaStream(); document.getElementById('remoteVideo').srcObject = remoteStream;
-
+            peerConnection = new RTCPeerConnection(rtcConfig); remoteStream = new MediaStream(); 
+            
             localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+            
             peerConnection.ontrack = event => { 
                 event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track)); 
+                document.getElementById('remoteVideo').srcObject = remoteStream;
+                document.getElementById('remoteAudio').srcObject = remoteStream;
                 if(data.callType === 'video') document.getElementById('remoteVideo').style.display = 'block';
                 document.getElementById('callStatusText').innerText = "Connected";
+                callStartTime = Date.now(); // Start Duration Timer
             };
 
-            peerConnection.onicecandidate = event => { if(event.candidate) database.ref('calls/' + data.from + '/candidates').push(event.candidate.toJSON()); };
+            peerConnection.onicecandidate = event => { if(event.candidate) database.ref('calls/' + currentUsername + '/receiverCandidates').push(event.candidate.toJSON()); };
 
             const offerDesc = new RTCSessionDescription({ type: 'offer', sdp: data.sdp }); await peerConnection.setRemoteDescription(offerDesc);
 
@@ -612,7 +661,7 @@
 
             await database.ref('calls/' + currentUsername + '/answer').set({ type: 'answer', sdp: answer.sdp });
 
-            database.ref('calls/' + data.from + '/candidates').on('child_added', snapshot => {
+            database.ref('calls/' + currentUsername + '/callerCandidates').on('child_added', snapshot => {
                 if(peerConnection) peerConnection.addIceCandidate(new RTCIceCandidate(snapshot.val()));
             });
         } catch(e) { alert("Camera/Mic Permission Denied!"); endCall(); }
@@ -620,11 +669,35 @@
 
     function endCall(notifyRemote = true) {
         isCallActive = false; document.getElementById('callOverlay').style.display = 'none';
+        
+        // 🔥 Calculate Duration and Save History 🔥
+        if (window.currentCallTarget && currentCallDirection) {
+            let durationStr = "Missed";
+            if (callStartTime > 0) {
+                let diffSec = Math.floor((Date.now() - callStartTime) / 1000);
+                let m = Math.floor(diffSec / 60);
+                let s = diffSec % 60;
+                durationStr = (m > 0 ? m + "m " : "") + s + "s";
+            }
+            database.ref('callHistory/' + currentUsername).push({
+                peer: window.currentCallTarget,
+                type: currentCallType,
+                direction: currentCallDirection,
+                duration: durationStr,
+                timestamp: Date.now(),
+                timeStr: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            });
+        }
+        
+        callStartTime = 0; currentCallDirection = ''; currentCallType = ''; window.currentCallTarget = null;
+        
         if(localStream) { localStream.getTracks().forEach(track => track.stop()); }
         if(remoteStream) { remoteStream.getTracks().forEach(track => track.stop()); }
         if(peerConnection) { peerConnection.close(); peerConnection = null; }
         
-        document.getElementById('localVideo').srcObject = null; document.getElementById('remoteVideo').srcObject = null;
+        document.getElementById('localVideo').srcObject = null; 
+        document.getElementById('remoteVideo').srcObject = null;
+        document.getElementById('remoteAudio').srcObject = null;
         
         if(notifyRemote) {
             let targetUname = window.currentCallData ? window.currentCallData.from : (currentChatContact ? getUserInfoByEmail(currentChatContact).username : null);
@@ -633,6 +706,47 @@
         }
         window.currentCallData = null;
     }
+
+    // 🔥 LOAD & RENDER CALL HISTORY 🔥
+    function loadCallsList() {
+        let html = "";
+        APP_STATE.callLogs.forEach(log => {
+            let uInfo = APP_STATE.users[log.peer];
+            let dName = uInfo ? log.peer : log.peer;
+            let avatarHtml = (uInfo && uInfo.avatar) ? `<img src="${uInfo.avatar}">` : dName.charAt(0).toUpperCase();
+            
+            let dirIcon = log.direction === 'incoming' ? 'call_received' : 'call_made';
+            let dirColor = log.duration === 'Missed' ? '#E91E63' : (log.direction === 'incoming' ? '#25D366' : '#2AABEE');
+            let typeIcon = log.type === 'video' ? 'videocam' : 'call';
+            
+            html += `<div class="list-item">
+                <div class="avatar">${avatarHtml}</div>
+                <div class="list-info" onclick="openChat('${uInfo ? uInfo.email : log.peer}', false, '${dName}')">
+                    <div class="list-title">@${dName}</div>
+                    <div class="list-subtitle" style="display:flex; align-items:center;">
+                        <i class="material-icons" style="font-size:14px; color:${dirColor}; margin-right:4px;">${dirIcon}</i>
+                        ${log.timeStr} &bull; ${log.duration}
+                    </div>
+                </div>
+                <i class="material-icons" style="color:var(--primary); font-size:22px; margin-right:15px;">${typeIcon}</i>
+                <i class="material-icons" style="color:var(--text-muted); cursor:pointer; font-size:22px;" onclick="deleteSingleCall('${log.key}')">delete_outline</i>
+            </div>`;
+        });
+        document.getElementById('callsList').innerHTML = html || `<div style="text-align:center; padding:30px 20px; color:gray;"><i class="material-icons" style="font-size:50px; opacity:0.5;">phone_missed</i><p>No Recent Calls</p></div>`;
+    }
+
+    function deleteSingleCall(key) {
+        if(confirm("Delete this call log?")) {
+            database.ref('callHistory/' + currentUsername + '/' + key).remove();
+        }
+    }
+
+    function clearAllCalls() {
+        if(APP_STATE.callLogs.length === 0) return;
+        if(confirm("Clear entire call history? This cannot be undone.")) {
+            database.ref('callHistory/' + currentUsername).remove();
+        }
+    }
 </script>
 </body>
-                                                                                                    </html>
+</html>
