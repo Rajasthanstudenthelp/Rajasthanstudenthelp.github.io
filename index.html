@@ -1,111 +1,972 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rajasthan Student Help - Latest Jobs, Admit Card & Result</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, interactive-widget=resizes-content">
+    <title>ISB-24 Premium Web3</title>
+    
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    
+    <!-- PDF.js Engine -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    
+    <!-- Google Login API -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
     <style>
-        body { font-family: 'Arial', sans-serif; background-color: #f0f2f5; margin: 0; padding: 0; }
+        /* BRAHMA CORE FONTS */
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+        /* 12 PREMIUM THEMES RESTORED */
+        :root { --primary: #3F51B5; --primary-dark: #303F9F; --bg: #f0f2f5; --surface: #ffffff; --text: #1c1e21; --text-muted: #65676B; --border: #e4e6eb; --msg-sent: #E8EAF6; --msg-recv: #ffffff; --nav-bg: #ffffff; }
+        [data-theme="dark"] { --primary: #5C6BC0; --primary-dark: #3F51B5; --bg: #121212; --surface: #1e1e1e; --text: #e4e6eb; --text-muted: #b0b3b8; --border: #333333; --msg-sent: #2c387e; --msg-recv: #242526; --nav-bg: #1e1e1e; }
+        [data-theme="telegram"] { --primary: #2AABEE; --bg: #f4f4f4; --surface: #ffffff; --text: #222222; --border: #e0e0e0; }
+        [data-theme="sunset"] { --primary: #FF5722; --bg: #fdf8f5; --surface: #ffffff; --text: #3e2723; --border: #fbe9e7; }
+        [data-theme="forest"] { --primary: #2E7D32; --bg: #f1f8e9; --surface: #ffffff; --text: #1b5e20; --border: #c8e6c9; }
+        [data-theme="ruby"] { --primary: #E91E63; --bg: #fce4ec; --surface: #ffffff; --text: #4a148c; --border: #f8bbd0; }
+        [data-theme="cyberpunk"] { --primary: #00E5FF; --bg: #09090b; --surface: #17171c; --text: #00E5FF; --border: #006064; }
+        [data-theme="amoled"] { --primary: #ffffff; --bg: #000000; --surface: #0a0a0a; --text: #ffffff; --border: #222222; }
         
-        /* हेडर डिज़ाइन */
-        header { background-color: #8b0000; color: white; padding: 15px; text-align: center; border-bottom: 5px solid #ffcc00; }
-        header h1 { margin: 0; font-size: 28px; text-transform: uppercase; }
-        header p { margin: 5px 0 0 0; font-size: 14px; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body, html { height: 100%; height: 100dvh; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0;}
         
-        /* चलती हुई न्यूज़ (Marquee) */
-        .scrolling-news { background-color: #ffffcc; border-bottom: 2px solid #cc0000; padding: 8px; font-weight: bold; font-size: 16px; }
-        .scrolling-news a { color: #0000ff; text-decoration: none; margin-right: 30px; }
-        .scrolling-news a:hover { color: #ff0000; text-decoration: underline; }
+        #authScreen { height: 100%; height: 100dvh; display:flex; align-items:center; justify-content:center; }
+        #mainApp { height: 100%; height: 100dvh; display: flex; flex-direction: column; }
         
-        /* 3 बॉक्स का डिज़ाइन */
-        .container { display: flex; flex-wrap: wrap; justify-content: space-between; padding: 15px; max-width: 1200px; margin: auto; }
-        .box { background-color: white; border: 1px solid #ccc; border-radius: 5px; width: 32%; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .app-bar { flex-shrink: 0; background-color: var(--surface); color: var(--primary); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 100; border-bottom: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.05);}
+        .app-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+        .app-bar-icons { display: flex; gap: 15px; align-items: center; }
+        .app-bar i { font-size: 24px; cursor: pointer; color: var(--text-muted); transition: color 0.2s; }
         
-        /* बॉक्स के टाइटल (Latest Job, Admit Card, Result) */
-        .box-title { color: white; padding: 10px; text-align: center; font-size: 18px; font-weight: bold; border-top-left-radius: 5px; border-top-right-radius: 5px; }
-        .bg-jobs { background-color: #005580; }
-        .bg-admit { background-color: #00802b; }
-        .bg-result { background-color: #cc4400; }
+        .container { flex: 1; overflow-y: auto; padding-bottom: 70px; }
+        .tab-content { display: none; animation: fadeIn 0.3s ease-out; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .animate-spin { animation: spin 1s linear infinite; }
+
+        .list-item { display: flex; align-items: center; padding: 15px 20px; cursor: pointer; background: var(--surface); transition: 0.2s; margin: 5px 10px; border-radius: 12px; border: 1px solid transparent;}
+        .avatar { width: 54px; height: 54px; background: var(--primary); color: var(--surface); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 22px; font-weight: bold; margin-right: 15px; flex-shrink: 0; overflow:hidden;}
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .status-ring { outline: 3px solid #25D366; outline-offset: 2px; }
+        .list-info { flex: 1; overflow: hidden; }
+        .list-title { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .list-subtitle { font-size: 14px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .list-time { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+
+        .fab { position: fixed; bottom: 85px; right: 20px; width: 60px; height: 60px; background: #25D366; color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 10px 20px rgba(0,0,0,0.15); cursor: pointer; z-index: 90;}
+        .fab-secondary { bottom: 160px; background: var(--surface); color: var(--primary); border: 1px solid var(--border); }
+        .fab-pencil { position: fixed; bottom: 160px; right: 28px; width: 45px; height: 45px; background: var(--surface); color: var(--text-muted); border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.15); cursor: pointer; z-index: 90; border: 1px solid var(--border);}
+
+        .bottom-nav { flex-shrink: 0; background: var(--nav-bg); display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid var(--border); z-index: 100;}
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); cursor: pointer; width: 33.3%;}
+        .nav-item span { font-size: 11px; font-weight: 600; }
+        .nav-item.active { color: var(--primary); }
+
+        .chat-window { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg); z-index: 200; flex-direction: column; }
+        .chat-header { flex-shrink: 0; background: var(--surface); padding: 10px 15px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid var(--border);}
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; scroll-behavior: smooth; }
+        .chat-input-area { flex-shrink: 0; background: var(--surface); padding: 10px 15px; display: flex; gap: 12px; align-items: center; border-top: 1px solid var(--border);}
+        .chat-input-area input[type="text"] { flex: 1; padding: 15px 20px; border-radius: 30px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 15px; outline: none;}
+        .btn-send { width: 50px; height: 50px; background: var(--primary); color: var(--surface); border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; flex-shrink: 0;}
         
-        /* बॉक्स के अंदर के लिंक */
-        .box ul { list-style-type: none; padding: 0; margin: 0; }
-        .box ul li { border-bottom: 1px solid #eee; }
-        .box ul li:last-child { border-bottom: none; }
-        .box ul li a { display: block; padding: 10px 15px; text-decoration: none; color: #0033cc; font-weight: bold; font-size: 15px; }
-        .box ul li a:hover { background-color: #f9f9f9; color: #ff0000; text-decoration: underline; }
+        .bubble { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 15px; line-height: 1.5; position: relative; word-wrap: break-word; cursor: pointer; user-select: none;}
+        .bubble.sent { align-self: flex-end; background: var(--msg-sent); color: var(--text); border-bottom-right-radius: 4px;}
+        .bubble.received { align-self: flex-start; background: var(--msg-recv); color: var(--text); border-bottom-left-radius: 4px; border: 1px solid var(--border);}
+        .bubble-time { font-size: 11px; color: var(--text-muted); text-align: right; margin-top: 5px; display: block; opacity: 0.8;}
+
+        .auth-container { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .auth-box { background: var(--surface); padding: 40px 30px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); width: 100%; max-width: 380px; text-align: center;}
         
-        /* फूटर (Disclaimer) */
-        footer { background-color: #333; color: white; text-align: center; padding: 15px; margin-top: 10px; font-size: 12px; line-height: 1.5; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right:0; bottom:0; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px);}
+        .modal-content { background: var(--surface); width: 92%; max-width: 400px; border-radius: 24px; padding: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); position: relative;}
         
-        /* मोबाइल स्क्रीन के लिए सेटिंग */
-        @media (max-width: 768px) { 
-            .box { width: 100%; } 
-            .container { padding: 10px; }
-        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h3 { margin: 0; font-size: 20px; color: var(--text); font-weight: 800;}
+        .close-btn { background: none; border: none; color: var(--text-muted); font-size: 28px; cursor: pointer; padding: 0; transition: 0.2s;}
+        
+        .upload-area { border: 2px dashed var(--primary); border-radius: 16px; padding: 40px 20px; text-align: center; cursor: pointer; margin-bottom: 20px; background: rgba(63, 81, 181, 0.05); transition: 0.3s; position: relative;}
+        .upload-icon { font-size: 48px; color: var(--primary); margin-bottom: 10px; }
+        .upload-text { font-size: 16px; color: var(--text); font-weight: 700; margin-bottom: 5px;}
+        .status-preview-box { display:none; width:100%; height:180px; border-radius:12px; margin-bottom:20px; object-fit:contain; background:#000; border: 1px solid var(--border); box-shadow: 0 5px 15px rgba(0,0,0,0.1);}
+
+        /* Setup Profile Profile */
+        .profile-pic-upload { width: 100px; height: 100px; border-radius: 50%; background: var(--bg); border: 2px dashed var(--primary); display: flex; justify-content: center; align-items: center; margin: 0 auto 20px auto; cursor: pointer; overflow: hidden; position: relative;}
+        .profile-pic-upload img { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* Settings Tab UI Elements */
+        .settings-box { background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:12px 15px; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center;}
+        .settings-box-label { font-size:11px; color:var(--text-muted); font-weight:bold; letter-spacing:0.5px; margin-bottom:3px;}
+        .settings-box-value { font-weight:bold; font-size:16px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+
+        .theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 10px 20px; }
+        .theme-circle { width: 50px; height: 50px; border-radius: 50%; cursor: pointer; border: 3px solid transparent;}
+        .theme-circle.active { border-color: var(--text); transform: scale(1.1); }
+
+        .status-tray { display: flex; overflow-x: auto; gap: 12px; padding: 10px 20px; scroll-snap-type: x mandatory; }
+        .status-tray::-webkit-scrollbar { display: none; }
+        .status-card { width: 105px; height: 150px; border-radius: 16px; background: var(--surface); position: relative; flex-shrink: 0; border: 1px solid var(--border); overflow: hidden; background-size: cover; background-position: center; cursor: pointer;}
+        .status-card-avatar { position: absolute; top: 10px; left: 10px; width: 36px; height: 36px; border-radius: 50%; border: 2px solid #25D366; background: var(--surface); display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--text); z-index: 2; overflow:hidden;}
+        .status-card-avatar img { width: 100%; height: 100%; object-fit: cover;}
+        .status-card-name { position: absolute; bottom: 10px; left: 10px; right: 10px; font-size: 12px; font-weight: 700; color: white; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 2;}
+        .status-card-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.8)); z-index: 1;}
+
+        .wa-status-viewer { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: #000; z-index: 4000; flex-direction: column; color: white;}
+        .wa-progress-container { display: flex; gap: 4px; padding: 10px 10px 0 10px; position: absolute; top: 0; width: 100%; z-index: 4002; }
+        .wa-progress-segment { flex: 1; height: 3px; background: rgba(255,255,255,0.3); border-radius: 2px; overflow: hidden; }
+        .wa-progress-fill { height: 100%; background: white; width: 0%; }
+        .wa-header { display:flex; justify-content:space-between; align-items:center; padding:20px 15px; position:absolute; top:5px; width:100%; z-index:4002; background:linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);}
+        .wa-content { flex: 1; position: relative; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; overflow: hidden; background: #000;}
+        .wa-status-caption { position: absolute; bottom: 40px; width: 100%; text-align: center; padding: 10px 20px; background: rgba(0,0,0,0.6); font-size: 15px; word-wrap: break-word; z-index:4002;}
+        
+        .wa-tap-left { position: absolute; top:0; left:0; width: 35%; height: 100%; z-index: 4001; cursor: pointer;}
+        .wa-tap-right { position: absolute; top:0; right:0; width: 65%; height: 100%; z-index: 4001; cursor: pointer;}
     </style>
 </head>
-<body>
+<body data-theme="default">
 
-<header>
-    <h1>Rajasthan Student Help</h1>
-    <p>Sabse Tez Job Alerts Aur Educational News</p>
-</header>
+    <div id="authScreen" class="auth-container">
+        <div class="auth-box">
+            <i class="material-icons shield-icon" style="font-size:70px; color:var(--primary);">fingerprint</i>
+            <h2 style="font-weight:800;">ISB Premium</h2>
+            <p style="color:var(--text-muted); font-size:14px; margin-bottom:30px;">End-to-End Encrypted Web3 Network.</p>
+            <div id="googleButtonContainer" style="display: flex; justify-content: center; min-height:50px;"></div>
+        </div>
+    </div>
 
-<!-- चलती हुई न्यूज़ की लाइन -->
-<div class="scrolling-news">
-    <marquee onmouseover="this.stop();" onmouseout="this.start();">
-        <a href="#">🔥 Rajasthan Patwari 2026 Notification Out - Apply Now</a> ||
-        <a href="#">🔥 RPSC 1st Grade Teacher Vacancy 2026 Online Form</a> ||
-        <a href="#">🔥 SSC CHSL & MTS 2026 New Update</a>
-    </marquee>
-</div>
+    <div id="mainApp" style="display: none;">
+        <div class="app-bar">
+            <div class="app-title">ISB Messenger</div>
+            <div class="app-bar-icons">
+                <i class="material-icons" onclick="syncDrive()" id="syncIcon">sync</i>
+            </div>
+        </div>
 
-<div class="container">
+        <div class="container">
+            <div id="chatsTab" class="tab-content active">
+                <div id="chatsList"></div>
+                <div class="fab fab-secondary" onclick="openNewGroupModal()"><i class="material-icons">group_add</i></div>
+                <div class="fab" onclick="openNewChatModal()"><i class="material-icons">add_comment</i></div>
+            </div>
+
+            <div id="statusTab" class="tab-content">
+                <div class="status-tray" id="statusTray"></div>
+                <div id="statusList"></div>
+                <div class="fab-pencil" onclick="openTextStatusModal()"><i class="material-icons">edit</i></div>
+                <div class="fab" onclick="openImageStatusModal()"><i class="material-icons">camera_alt</i></div>
+            </div>
+
+            <!-- 🔥 UPDATED PREMIUM SETTINGS TAB 🔥 -->
+            <div id="settingsTab" class="tab-content">
+                <div style="text-align:center; padding: 30px 20px 10px;">
+                    <div class="avatar" style="margin: 0 auto 20px auto; width:110px; height:110px; font-size:45px; border: 4px solid var(--primary); cursor:pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.1);" id="profileAvatar" onclick="document.getElementById('editProfileAvatarFile').click()">U</div>
+                    <input type="file" id="editProfileAvatarFile" accept="image/*" style="display:none;" onchange="updateProfileAvatar(event)">
+                    
+                    <!-- Username Box -->
+                    <div class="settings-box">
+                        <div style="text-align:left; flex:1; overflow:hidden;">
+                            <div class="settings-box-label">USERNAME</div>
+                            <div class="settings-box-value" id="profileUsernameDisplay">@username</div>
+                        </div>
+                        <i class="material-icons" style="color:var(--primary); cursor:pointer; font-size:20px; padding:5px;" onclick="editUsernameModal()">edit</i>
+                    </div>
+
+                    <!-- Gmail Box -->
+                    <div class="settings-box">
+                        <div style="text-align:left; flex:1; overflow:hidden;">
+                            <div class="settings-box-label">GMAIL ACCOUNT</div>
+                            <div class="settings-box-value" id="profileEmailDisplay" style="font-size:14px; opacity:0.9;">user@gmail.com</div>
+                        </div>
+                        <i class="material-icons" style="color:var(--text-muted); font-size:20px; padding:5px;">email</i>
+                    </div>
+
+                </div>
+                
+                <div style="padding: 10px 20px; font-weight: bold; color: var(--primary);">Premium Themes</div>
+                <div class="theme-grid" id="themeGrid"></div>
+                <div class="list-item" onclick="logoutUser()" style="margin-top:20px; margin-bottom:30px;"><i class="material-icons" style="margin-right:15px; color:#E91E63;">logout</i><div class="list-info"><div class="list-title" style="color:#E91E63;">Log Out</div></div></div>
+            </div>
+        </div>
+
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="switchNav('chatsTab', this)"><i class="material-icons">chat_bubble</i><span>Chats</span></div>
+            <div class="nav-item" onclick="switchNav('statusTab', this)"><i class="material-icons">donut_large</i><span>Status</span></div>
+            <div class="nav-item" onclick="switchNav('settingsTab', this)"><i class="material-icons">settings</i><span>Settings</span></div>
+        </div>
+    </div>
+
+    <!-- CHAT WINDOW -->
+    <div id="chatWindow" class="chat-window">
+        <div class="chat-header">
+            <i class="material-icons" onclick="closeChat()">arrow_back_ios_new</i>
+            <div class="avatar" id="chatAvatar" style="width:42px; height:42px;">U</div>
+            <div style="flex:1;"><div style="font-size:17px; font-weight:700;" id="chatTitle">User</div></div>
+        </div>
+        <div class="chat-messages" id="chatMessagesBox"></div>
+        <div id="selectedFileBar"><span id="selectedFileNameDisplay">File selected</span><i class="material-icons" style="cursor:pointer;" onclick="cancelSelectedFile()">close</i></div>
+        <div class="chat-input-area">
+            <div class="attach-btn" onclick="document.getElementById('fileAttachment').click()"><i class="material-icons">add</i></div>
+            <input type="file" id="fileAttachment" style="display:none;" accept="image/*,video/mp4,application/pdf" onchange="handleFileSelect(event)">
+            <input type="text" id="chatInputMsg" placeholder="Message...">
+            <button class="btn-send" onclick="sendChatMessage()"><i class="material-icons">send</i></button>
+        </div>
+    </div>
+
+    <!-- UNIVERSAL FULL SCREEN MEDIA VIEWER ENGINE -->
+    <div id="waStatusViewer" class="wa-status-viewer">
+        <div class="wa-progress-container" id="waProgressBarContainer"></div>
+        <div class="wa-header">
+            <div style="display:flex; align-items:center; gap:12px; cursor:pointer; z-index:4005;" onclick="closeWaStatus()">
+                <i class="material-icons">arrow_back</i>
+                <div class="avatar" id="waStatusAvatar" style="width:40px; height:40px;">U</div>
+                <div style="display:flex; flex-direction:column;"><span id="waStatusName" style="font-weight:700;">Name</span><span id="waStatusTime" style="font-size:12px; opacity:0.8;">Time</span></div>
+            </div>
+            <div style="display:flex; align-items:center; gap:15px; z-index:4005;">
+                <a id="waStatusDownloadBtn" style="color:white; display:none;"><i class="material-icons">download</i></a>
+                <i class="material-icons" id="waStatusDeleteBtn" style="color:#E91E63; display:none; cursor:pointer;" onclick="deleteActiveStatus()">delete</i>
+            </div>
+        </div>
+        <div class="wa-content" id="waStatusContent"></div>
+        <div class="wa-tap-left" id="waTapLeft" onclick="prevWaStatus()" style="display:none;"></div>
+        <div class="wa-tap-right" id="waTapRight" onclick="nextWaStatus()" style="display:none;"></div>
+    </div>
+
+    <!-- PROFILE SETUP MODAL -->
+    <div id="setupProfileModal" class="modal-overlay">
+        <div class="modal-content" style="text-align:center;">
+            <h3 style="margin-top:0; color:var(--text);">Create Your Profile</h3>
+            <p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">Choose a unique username and photo</p>
+            
+            <div class="profile-pic-upload" onclick="document.getElementById('setupAvatarFile').click()">
+                <img id="setupAvatarPreview" style="display:none;">
+                <i class="material-icons" id="setupAvatarIcon" style="font-size:40px; color:var(--primary);">camera_alt</i>
+            </div>
+            <input type="file" id="setupAvatarFile" accept="image/*" style="display:none;" onchange="previewSetupAvatar(event)">
+            
+            <input type="text" id="setupUsernameInput" placeholder="@username" style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:20px; font-weight:bold; font-size:16px; outline:none; text-align:center;">
+            
+            <button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:bold; font-size:16px; box-shadow:0 4px 10px rgba(0,0,0,0.15); cursor:pointer;" onclick="saveProfileSetup()">SAVE PROFILE</button>
+            <button id="cancelSetupBtn" style="width:100%; padding:15px; background:transparent; color:var(--text-muted); border:none; margin-top:10px; cursor:pointer; display:none;" onclick="document.getElementById('setupProfileModal').style.display='none'">CANCEL</button>
+        </div>
+    </div>
+
+    <!-- 🔥 UPDATED NEW CHAT MODAL (DUAL SEARCH) 🔥 -->
+    <div id="newChatModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header"><h3>New Chat</h3><button class="close-btn" onclick="document.getElementById('newChatModal').style.display='none'"><i class="material-icons">cancel</i></button></div>
+            <!-- DUAL INPUT BOX -->
+            <input type="text" id="newChatInput" placeholder="Enter Gmail OR Username..." style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:15px; font-weight:bold;">
+            <button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px;" onclick="startNewChat()">START CHAT</button>
+        </div>
+    </div>
     
-    <!-- 1. LATEST JOBS BOX -->
-    <div class="box">
-        <div class="box-title bg-jobs">Latest Jobs</div>
-        <ul>
-            <!-- नई नौकरी यहाँ डालें (बस नीचे वाली लाइन कॉपी करके पेस्ट करें और नाम बदल दें) -->
-            <li><a href="cet-details.html">Rajasthan CET (Graduation) Online Form 2026</a></li>
-            <li><a href="#">Rajasthan Patwari Recruitment 2026</a></li>
-            <li><a href="#">RPSC 1st Grade Teacher 2026</a></li>
-            <li><a href="#">Rajasthan Safai Karamchari Bharti 2026</a></li>
-            <li><a href="#">Railway RRB NTPC Online Form</a></li>
-            <li><a href="#">SSC MTS / CHSL New Vacancy 2026</a></li>
-        </ul>
+    <div id="newGroupModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h3>New Group</h3><button class="close-btn" onclick="document.getElementById('newGroupModal').style.display='none'"><i class="material-icons">cancel</i></button></div><input type="text" id="newGroupName" placeholder="Group Name" style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:15px;"><textarea id="newGroupEmails" placeholder="Usernames OR Gmails (comma separated)" style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:15px;"></textarea><button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px;" onclick="createGroup()">CREATE GROUP</button></div></div>
+    
+    <div id="textStatusModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h3>Type Status</h3><button class="close-btn" onclick="closeStatusModal()"><i class="material-icons">cancel</i></button></div><textarea id="statusTextOnly" rows="4" placeholder="What's on your mind?" style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:15px; font-weight:bold; font-size:18px; outline:none; resize:none;"></textarea><button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:bold; font-size:16px; box-shadow:0 4px 10px rgba(0,0,0,0.15); cursor:pointer;" onclick="postStatus('text')">POST STATUS</button></div></div>
+    
+    <div id="imageStatusModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header"><h3>Upload Media</h3><button class="close-btn" onclick="closeStatusModal()"><i class="material-icons">cancel</i></button></div>
+            <div class="upload-area" id="statusUploadArea" onclick="document.getElementById('statusFile').click()">
+                <i class="material-icons upload-icon">cloud_upload</i>
+                <div class="upload-text">Tap to select Image or Video</div>
+                <div style="font-size:12px; color:var(--text-muted); margin-top:5px;">Max size 5MB (MP4, JPG, PNG)</div>
+            </div>
+            <img id="statusImgPreview" class="status-preview-box" />
+            <video id="statusVidPreview" class="status-preview-box" muted autoplay playsinline loop></video>
+            <input type="file" id="statusFile" accept="image/*,video/mp4" style="display:none;" onchange="handleStatusFile(event)">
+            <input type="text" id="statusCaption" placeholder="Add a caption..." style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:15px; font-weight:bold; font-size:15px; outline:none;">
+            <button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:bold; font-size:16px; box-shadow:0 4px 10px rgba(0,0,0,0.15); cursor:pointer;" onclick="postStatus('image')">POST STATUS</button>
+        </div>
     </div>
 
-    <!-- 2. ADMIT CARD BOX -->
-    <div class="box">
-        <div class="box-title bg-admit">Admit Card</div>
-        <ul>
-            <!-- नया एडमिट कार्ड यहाँ डालें -->
-            <li><a href="#">Rajasthan CET 2026 Admit Card</a></li>
-            <li><a href="#">PTET 2026 Admit Card Download</a></li>
-            <li><a href="#">BSTC Pre DElEd Admit Card</a></li>
-            <li><a href="#">SSC GD Constable Admit Card</a></li>
-        </ul>
-    </div>
+    <!-- MESSAGE OPTIONS MODAL -->
+    <div id="msgOptionsModal" class="modal-overlay"><div class="modal-content" style="text-align:center;"><h3 style="margin-top:0;">Message Options</h3><button onclick="shareSelectedMsg()" style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px; margin-bottom:10px; font-weight:bold;">SHARE FILE / MESSAGE</button><button onclick="deleteSelectedMsg()" style="width:100%; padding:15px; background:#E91E63; color:white; border:none; border-radius:12px; margin-bottom:10px; font-weight:bold;">DELETE FOR ALL</button><button onclick="document.getElementById('msgOptionsModal').style.display='none'" style="width:100%; padding:15px; background:transparent; border:2px solid var(--border); color:var(--text); border-radius:12px; font-weight:bold;">CANCEL</button></div></div>
 
-    <!-- 3. RESULT BOX -->
-    <div class="box">
-        <div class="box-title bg-result">Result</div>
-        <ul>
-            <!-- नया रिजल्ट यहाँ डालें -->
-            <li><a href="#">RBSE 10th & 12th Board Result 2026</a></li>
-            <li><a href="#">Rajasthan Police Constable Final Result</a></li>
-            <li><a href="#">UPSC NDA / CDS Result 2026</a></li>
-            <li><a href="#">Railway Group D Result Update</a></li>
-        </ul>
-    </div>
+<script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-</div>
+    const ISB_CLIENT_ID = "1091629496669-5881hgv7d4t01eepcq60u8mmdkguc1cn.apps.googleusercontent.com";
+    const firebaseConfig = { apiKey: "AIzaSyA-d_mtHg1Age9ZggTWF3ABhUd_xn2PDKM", authDomain: "isb-messenger-75093.firebaseapp.com", databaseURL: "https://isb-messenger-75093-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "isb-messenger-75093", storageBucket: "isb-messenger-75093.firebasestorage.app", messagingSenderId: "970755431087", appId: "1:970755431087:web:09171e2ebca48e1b91125a" };
+    firebase.initializeApp(firebaseConfig); const database = firebase.database();
 
-<footer>
-    <p><strong>Disclaimer:</strong> This is an unofficial informational website. We are not associated with the Rajasthan Government, Central Government, or any official body. All updates are gathered from public sources for educational purposes.</p>
-    <p>&copy; 2026 Rajasthan Student Help</p>
-</footer>
+    const themes = [ { id: "default", color: "#3F51B5" }, { id: "dark", color: "#121212" }, { id: "telegram", color: "#2AABEE" }, { id: "sunset", color: "#FF5722" }, { id: "forest", color: "#2E7D32" }, { id: "ruby", color: "#E91E63" }, { id: "cyberpunk", color: "#00E5FF" }, { id: "coffee", color: "#795548" }, { id: "mint", color: "#00BFA5" }, { id: "gold", color: "#FFB300" }, { id: "orchid", color: "#9C27B0" }, { id: "amoled", color: "#000000" } ];
 
+    let currentUserEmail = null, currentUsername = null, currentAvatar = null;
+    let currentChatContact = null, isGroupChat = false;
+    let selectedFileData = null, selectedFileName = null, statusFileData = null, tempSetupAvatarData = null;
+    let isListeningToFirebase = false;
+
+    let APP_STATE = { msgs: [], groups: [], statuses: [], users: {} };
+    window.statusPlaylist = []; 
+    let waActiveUser = null, waUserStatusGroup = [], waActiveIndex = 0, waTimer = null, waIsChatMedia = false; 
+    let activeActionMsg = null;
+
+    window.onload = function() {
+        applyTheme(localStorage.getItem('isb_theme') || 'default');
+        currentUserEmail = localStorage.getItem("isb_email");
+        if(currentUserEmail) initAppFlow();
+        else {
+            if(typeof google !== 'undefined') { try { google.accounts.id.initialize({ client_id: ISB_CLIENT_ID, callback: handleCredentialResponse }); google.accounts.id.renderButton(document.getElementById("googleButtonContainer"), { theme: "filled_blue", size: "large", text: "continue_with" }); } catch(e) {} }
+        }
+    };
+
+    function applyTheme(themeId) { 
+        document.body.setAttribute('data-theme', themeId); 
+        localStorage.setItem('isb_theme', themeId); 
+        document.getElementById('themeGrid').innerHTML = themes.map(t => `<div class="theme-circle ${t.id === themeId ? 'active' : ''}" style="background-color: ${t.color};" onclick="applyTheme('${t.id}')"></div>`).join(''); 
+    }
+
+    function handleCredentialResponse(response) {
+        try {
+            let base64 = response.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+            let jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+            currentUserEmail = JSON.parse(jsonPayload).email; localStorage.setItem("isb_email", currentUserEmail); initAppFlow();
+        } catch(e) { alert("Login Failed"); }
+    }
+    
+    function logoutUser() { localStorage.removeItem("isb_email"); location.reload(); }
+    
+    function initAppFlow() {
+        document.getElementById('authScreen').style.display = 'none';
+        
+        database.ref('users').on('value', snapshot => {
+            APP_STATE.users = snapshot.val() || {};
+            let foundUname = Object.keys(APP_STATE.users).find(k => APP_STATE.users[k].email === currentUserEmail);
+            
+            if(foundUname) {
+                currentUsername = foundUname;
+                currentAvatar = APP_STATE.users[foundUname].avatar;
+                
+                // Set Settings UI text
+                document.getElementById('profileUsernameDisplay').innerText = "@" + currentUsername;
+                document.getElementById('profileEmailDisplay').innerText = currentUserEmail;
+                
+                document.getElementById('profileAvatar').innerHTML = currentAvatar ? `<img src="${currentAvatar}">` : currentUsername.charAt(0).toUpperCase();
+                
+                document.getElementById('mainApp').style.display = 'flex';
+                document.getElementById('setupProfileModal').style.display = 'none';
+                startFirebaseSync();
+                
+                loadChatsList(); loadStatusList();
+            } else {
+                document.getElementById('mainApp').style.display = 'none';
+                document.getElementById('cancelSetupBtn').style.display = 'none';
+                document.getElementById('setupProfileModal').style.display = 'flex';
+            }
+        });
+    }
+
+    function previewSetupAvatar(e) {
+        let file = e.target.files[0]; if(!file) return;
+        let reader = new FileReader();
+        reader.onload = function(evt) {
+            let img = new Image();
+            img.onload = function() {
+                let canvas = document.createElement('canvas');
+                let MAX_WIDTH = 200; let scaleSize = MAX_WIDTH / img.width;
+                canvas.width = MAX_WIDTH; canvas.height = img.height * scaleSize;
+                let ctx = canvas.getContext("2d"); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                tempSetupAvatarData = canvas.toDataURL("image/jpeg", 0.7);
+                document.getElementById('setupAvatarIcon').style.display = 'none';
+                let prev = document.getElementById('setupAvatarPreview'); prev.style.display = 'block'; prev.src = tempSetupAvatarData;
+            }
+            img.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    async function saveProfileSetup() {
+        let uNameInput = document.getElementById('setupUsernameInput').value.trim().toLowerCase();
+        if(uNameInput.length < 3) return alert("Username must be at least 3 characters.");
+        if(uNameInput.includes(" ")) return alert("Username cannot contain spaces.");
+        if(APP_STATE.users[uNameInput] && APP_STATE.users[uNameInput].email !== currentUserEmail) { return alert("Username already taken! Try another."); }
+
+        if(currentUsername && currentUsername !== uNameInput) { await database.ref('users/' + currentUsername).remove(); }
+
+        let finalAvatar = tempSetupAvatarData || currentAvatar || "";
+        await database.ref('users/' + uNameInput).set({ email: currentUserEmail, avatar: finalAvatar });
+        document.getElementById('setupProfileModal').style.display = 'none';
+    }
+
+    function editUsernameModal() {
+        tempSetupAvatarData = null; document.getElementById('setupUsernameInput').value = currentUsername;
+        if(currentAvatar) {
+            document.getElementById('setupAvatarIcon').style.display = 'none';
+            document.getElementById('setupAvatarPreview').style.display = 'block';
+            document.getElementById('setupAvatarPreview').src = currentAvatar;
+        }
+        document.getElementById('cancelSetupBtn').style.display = 'block';
+        document.getElementById('setupProfileModal').style.display = 'flex';
+    }
+
+    function updateProfileAvatar(e) {
+        let file = e.target.files[0]; if(!file) return;
+        let reader = new FileReader();
+        reader.onload = function(evt) {
+            let img = new Image();
+            img.onload = function() {
+                let canvas = document.createElement('canvas');
+                let MAX_WIDTH = 200; let scaleSize = MAX_WIDTH / img.width;
+                canvas.width = MAX_WIDTH; canvas.height = img.height * scaleSize;
+                let ctx = canvas.getContext("2d"); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                let newAv = canvas.toDataURL("image/jpeg", 0.7);
+                database.ref('users/' + currentUsername).update({ avatar: newAv });
+            }
+            img.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function getUserInfoByEmail(email) {
+        let found = Object.entries(APP_STATE.users).find(([k, v]) => v.email === email);
+        if(found) return { username: found[0], avatar: found[1].avatar };
+        return { username: email.split('@')[0], avatar: null };
+    }
+
+    function startFirebaseSync() {
+        if(isListeningToFirebase) return; isListeningToFirebase = true;
+        
+        database.ref('messages').on('child_added', function(snapshot) {
+            let m = snapshot.val(); if(!m) return; m.fbKey = snapshot.key;
+            if (!APP_STATE.msgs.some(msg => msg.id === m.id)) {
+                let isMyGroupMsg = m.isGroup && APP_STATE.groups.some(g => g.id === m.to);
+                let isPersonalMsg = !m.isGroup && (m.from === currentUserEmail || m.to === currentUserEmail);
+                if (isMyGroupMsg || isPersonalMsg) {
+                    APP_STATE.msgs.push(m); loadChatsList();
+                    if(currentChatContact && ((!m.isGroup && ((m.from===currentUserEmail && m.to===currentChatContact) || (m.from===currentChatContact && m.to===currentUserEmail))) || (m.isGroup && m.to===currentChatContact))) appendSingleMessage(m);
+                }
+            }
+        });
+
+        database.ref('messages').on('child_removed', function(snapshot) {
+            let removedMsg = snapshot.val(); APP_STATE.msgs = APP_STATE.msgs.filter(m => m.id !== removedMsg.id);
+            let el = document.getElementById(`msg_${removedMsg.id}`); if(el) el.remove(); loadChatsList();
+        });
+
+        database.ref('groups').on('child_added', function(snapshot) {
+            let g = snapshot.val(); if(g && g.members.includes(currentUserEmail)) { if(!APP_STATE.groups.some(grp => grp.id === g.id)) { APP_STATE.groups.push(g); loadChatsList(); } }
+        });
+
+        database.ref('statuses').on('child_added', function(snapshot) {
+            let s = snapshot.val(); s.fbKey = snapshot.key;
+            if(s) { if(!APP_STATE.statuses.some(st => st.id === s.id)) { APP_STATE.statuses.push(s); loadStatusList(); } }
+        });
+
+        database.ref('statuses').on('child_removed', function(snapshot) {
+            let removedSts = snapshot.val(); APP_STATE.statuses = APP_STATE.statuses.filter(s => s.id !== removedSts.id); loadStatusList();
+        });
+    }
+
+    function switchNav(tabId, el) { document.querySelectorAll('.tab-content, .nav-item').forEach(t => t.classList.remove('active')); document.getElementById(tabId).classList.add('active'); el.classList.add('active'); if(tabId === 'chatsTab') loadChatsList(); if(tabId === 'statusTab') loadStatusList(); }
+
+    const keyWorkerCode = `self.onmessage=function(e){let pwd=e.data.password;let salt=new Uint8Array(e.data.salt);let bigKey=new Uint8Array(128);for(let i=0;i<128;i++){bigKey[i]=pwd.charCodeAt(i%pwd.length)^salt[i%salt.length]^(i%256);}self.postMessage({bigKey:bigKey.buffer},[bigKey.buffer]);};`;
+    const mathWorkerCode = `self.onmessage=function(e){let buffer=new Uint8Array(e.data.buffer);let isEncrypt=e.data.action==='encrypt';let bigKey=new Uint8Array(e.data.bigKey);let chunkIdx=e.data.chunkIdx;let G1=0x12345678,G2=0x87654321,G3=0xDEADBEEF,G4=0xCAFEBABE;for(let i=0;i<128;i++){let c=bigKey[i];G1=(G1>>>1)^(c<<24);G2=(G2<<3)^c;G3^=(G1>>>5);G4=(G4<<1)^(G2>>>2);}G1^=chunkIdx;G2^=(Math.imul(chunkIdx,13)>>>0);G3^=(Math.imul(chunkIdx,17)>>>0);G4^=(Math.imul(chunkIdx,19)>>>0);let dv=new DataView(buffer.buffer,buffer.byteOffset,buffer.byteLength);let words=Math.floor(buffer.length/4);let baseWordIndex=chunkIdx*1048576;for(let i=0;i<words;i++){let sizeNum=baseWordIndex+i+1;let x=sizeNum;let x2=Math.imul(x,x)>>>0;let x3=Math.imul(x2,x)>>>0;let x4=Math.imul(x3,x)>>>0;let x5=Math.imul(x4,x)>>>0;let x6=Math.imul(x5,x)>>>0;let x7=Math.imul(x6,x)>>>0;let x8=Math.imul(x7,x)>>>0;let pMode=bigKey[sizeNum%128]%6;let powerVal=(x3&((pMode===0)?0xFFFFFFFF:0))|(x4&((pMode===1)?0xFFFFFFFF:0))|(x5&((pMode===2)?0xFFFFFFFF:0))|(x6&((pMode===3)?0xFFFFFFFF:0))|(x7&((pMode===4)?0xFFFFFFFF:0))|(x8&((pMode===5)?0xFFFFFFFF:0));let pVal=bigKey[(sizeNum+15)%128];let rotInner=(Math.imul(pVal,Math.imul(pVal,pVal))>>>0)%31+1;let rotOuter=(Math.imul(powerVal%1000,powerVal%1000)+rotInner)%31+1;G1=(G1+powerVal)>>>0;G2=(G2^G1)>>>0;G2=((G2<<rotInner)|(G2>>>(32-rotInner)))>>>0;G3=(G3+G2)>>>0;G4=(G4^G3)>>>0;G4=((G4<<rotOuter)|(G4>>>(32-rotOuter)))>>>0;let g32=(G1+G2+G3+G4)>>>0;let y=(g32%10000)+1;let y2=Math.imul(y,y)>>>0;let y3=Math.imul(y2,y)>>>0;let y4=Math.imul(y3,y)>>>0;let y5=Math.imul(y4,y)>>>0;let y6=Math.imul(y5,y)>>>0;let y7=Math.imul(y6,y)>>>0;let y8=Math.imul(y7,y)>>>0;let dpMode=bigKey[(sizeNum+64)%128]%6;let dPowerVal=(y3&((dpMode===0)?0xFFFFFFFF:0))|(y4&((dpMode===1)?0xFFFFFFFF:0))|(y5&((dpMode===2)?0xFFFFFFFF:0))|(y6&((dpMode===3)?0xFFFFFFFF:0))|(y7&((dpMode===4)?0xFFFFFFFF:0))|(y8&((dpMode===5)?0xFFFFFFFF:0));let dpVal=bigKey[(sizeNum+42)%128];let dRotInner=(Math.imul(dpVal,Math.imul(dpVal,dpVal))>>>0)%31+1;let dRotOuter=(Math.imul(dPowerVal%1000,dPowerVal%1000)+dRotInner)%31+1;g32=(g32+dPowerVal)>>>0;g32=(g32^(g32>>>15))>>>0;g32=((g32<<dRotInner)|(g32>>>(32-dRotInner)))>>>0;g32=((g32<<dRotOuter)|(g32>>>(32-dRotOuter)))>>>0;let pwdGarbage=(bigKey[(sizeNum*7)%128])|(bigKey[(sizeNum*11)%128]<<8)|(bigKey[(sizeNum*13)%128]<<16)|(bigKey[(sizeNum*17)%128]<<24);g32=(g32+pwdGarbage)>>>0;g32=(g32^(pwdGarbage>>>7))>>>0;let opMode=bigKey[(sizeNum+32)%128]%3;if(isEncrypt){let d32=dv.getUint32(i*4,true);let opA=(d32+g32)>>>0;let opS=(d32-g32)>>>0;let opX=(d32^g32)>>>0;d32=(opA&((opMode===0)?0xFFFFFFFF:0))|(opS&((opMode===1)?0xFFFFFFFF:0))|(opX&((opMode===2)?0xFFFFFFFF:0));dv.setUint32(i*4,d32,true);G3=(G3^d32)>>>0;}else{let c32=dv.getUint32(i*4,true);let opA=(c32-g32)>>>0;let opS=(c32+g32)>>>0;let opX=(c32^g32)>>>0;let p32=(opA&((opMode===0)?0xFFFFFFFF:0))|(opS&((opMode===1)?0xFFFFFFFF:0))|(opX&((opMode===2)?0xFFFFFFFF:0));dv.setUint32(i*4,p32,true);G3=(G3^c32)>>>0;}}let rem=buffer.length%4;if(rem>0){let off=buffer.length-rem;for(let i=0;i<rem;i++){let sizeNum=baseWordIndex+words+i+1;let x=sizeNum;let x2=Math.imul(x,x)>>>0;let x3=Math.imul(x2,x)>>>0;let x4=Math.imul(x3,x)>>>0;let x5=Math.imul(x4,x)>>>0;let x6=Math.imul(x5,x)>>>0;let x7=Math.imul(x6,x)>>>0;let x8=Math.imul(x7,x)>>>0;let pMode=bigKey[sizeNum%128]%6;let tVal=(pMode===0)?x3:(pMode===1)?x4:(pMode===2)?x5:(pMode===3)?x6:(pMode===4)?x7:x8;let pVal=bigKey[(sizeNum+5)%128];let rIn=(Math.imul(pVal,Math.imul(pVal,pVal))>>>0)%7+1;let rOut=(Math.imul(tVal%100,tVal%100)+rIn)%7+1;G1=(G1+tVal)>>>0;let gCombined=(G1^G2^G3^G4)>>>0;gCombined=((gCombined<<rIn)|(gCombined>>>(32-rIn)))>>>0;gCombined=((gCombined<<rOut)|(gCombined>>>(32-rOut)))>>>0;let pwdGarbageByte=bigKey[(sizeNum*7)%128];let gByte=((gCombined+pwdGarbageByte+(Math.imul(sizeNum%100,sizeNum%100)>>>0))&0xFF)^(pwdGarbageByte>>2);let opMode=bigKey[(sizeNum+32)%128]%3;if(isEncrypt){let dB=buffer[off+i];let oA=(dB+gByte)&0xFF;let oS=(dB-gByte+256)&0xFF;let oX=(dB^gByte)&0xFF;dB=(opMode===0)?oA:((opMode===1)?oS:oX);buffer[off+i]=dB;G3=(G3^dB)>>>0;}else{let cB=buffer[off+i];let oA=(cB-gByte+256)&0xFF;let oS=(cB+gByte)&0xFF;let oX=(cB^gByte)&0xFF;let pB=(opMode===0)?oA:((opMode===1)?oS:oX);buffer[off+i]=pB;G3=(G3^cB)>>>0;}}}self.postMessage({type:'chunk_done',buffer:buffer.buffer,chunkIdx:chunkIdx},[buffer.buffer]);};`;
+    function base64ToUint8(base64) { let binary = atob(base64.replace(/\s+/g, '')); let len = binary.length; let bytes = new Uint8Array(len); for (let i = 0; i < len; i++) { bytes[i] = binary.charCodeAt(i); } return bytes; }
+    function uint8ToBase64(bytes) { let binary = ''; let len = bytes.byteLength; let chunkSize = 0x8000; for (let i = 0; i < len; i += chunkSize) { binary += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + chunkSize, len))); } return btoa(binary); }
+
+    async function runISBText(text, password, isEncrypt) {
+        return new Promise((resolve, reject) => {
+            let buffer, salt;
+            if (isEncrypt) { buffer = new TextEncoder().encode(text); salt = crypto.getRandomValues(new Uint8Array(32)); } 
+            else { try { buffer = base64ToUint8(text); } catch(e) { reject("Invalid Code"); return; } salt = buffer.slice(0, 32); buffer = buffer.slice(32); }
+            let kw = new Worker(URL.createObjectURL(new Blob([keyWorkerCode], {type:'application/javascript'})));
+            kw.onmessage = function(e) {
+                let bigKey = e.data.bigKey; kw.terminate();
+                let mw = new Worker(URL.createObjectURL(new Blob([mathWorkerCode], {type:'application/javascript'})));
+                mw.onmessage = function(e2) {
+                    mw.terminate(); let outBuf = new Uint8Array(e2.data.buffer);
+                    if (isEncrypt) { let finalArr = new Uint8Array(32 + outBuf.length); finalArr.set(salt, 0); finalArr.set(outBuf, 32); resolve(uint8ToBase64(finalArr)); } 
+                    else { resolve(new TextDecoder().decode(outBuf)); }
+                };
+                mw.postMessage({buffer: buffer.buffer, action: isEncrypt ? 'encrypt' : 'bigKey', bigKey: bigKey, chunkIdx: 0}, [buffer.buffer, bigKey]);
+            };
+            kw.postMessage({password: password, salt: salt.buffer});
+        });
+    }
+
+    function base64ToBlobUrl(base64Data) {
+        try {
+            let arr = base64Data.split(','); let mime = arr[0].match(/:(.*?);/)[1];
+            let bstr = atob(arr[1]); let n = bstr.length; let u8arr = new Uint8Array(n);
+            for(let i=0; i<n; i++){ u8arr[i] = bstr.charCodeAt(i); }
+            let blob = new Blob([u8arr], {type: mime});
+            return URL.createObjectURL(blob);
+        } catch(e) { return base64Data; }
+    }
+    
+    function dataURItoBlob(dataURI) {
+        let parts = dataURI.split(','); let mime = parts[0].match(/:(.*?);/)[1];
+        let bstr = atob(parts[1]); let n = bstr.length; let u8arr = new Uint8Array(n);
+        for(let i=0; i<n; i++){ u8arr[i] = bstr.charCodeAt(i); }
+        return new Blob([u8arr], {type: mime});
+    }
+
+    function handleFileSelect(event) {
+        let file = event.target.files[0]; if(!file) return;
+        if(file.size > 5 * 1024 * 1024) return alert("⚠️ Max File Size 5MB.");
+        let reader = new FileReader();
+        reader.onload = function(e) {
+            selectedFileData = e.target.result; selectedFileName = file.name;
+            document.getElementById('selectedFileBar').style.display = 'flex';
+        };
+        reader.readAsDataURL(file);
+    }
+    function cancelSelectedFile() { selectedFileData = null; selectedFileName = null; document.getElementById('fileAttachment').value = ""; document.getElementById('selectedFileBar').style.display = 'none'; }
+    function openNewChatModal() { document.getElementById('newChatModal').style.display = 'flex'; }
+    
+    // 🔥 DOUBLE ENGINE START CHAT (Gmail or Username) 🔥
+    function startNewChat() {
+        let inputVal = document.getElementById('newChatInput').value.trim().toLowerCase();
+        if(!inputVal) return alert("Enter Username or Gmail!");
+        
+        let targetEmail = ""; let targetUname = "";
+
+        if(inputVal.includes("@")) {
+            // It's a Gmail ID
+            targetEmail = inputVal;
+            let uInfo = getUserInfoByEmail(targetEmail);
+            targetUname = (uInfo.username !== targetEmail.split('@')[0]) ? uInfo.username : inputVal; 
+        } else {
+            // It's a Username
+            if(inputVal.startsWith("@")) inputVal = inputVal.substring(1);
+            let targetUser = APP_STATE.users[inputVal];
+            if(!targetUser) return alert("Username not found!");
+            targetEmail = targetUser.email; targetUname = inputVal;
+        }
+        
+        document.getElementById('newChatModal').style.display = 'none'; 
+        openChat(targetEmail, false, targetUname);
+    }
+
+    function openNewGroupModal() { document.getElementById('newGroupModal').style.display = 'flex'; }
+    
+    // 🔥 DOUBLE ENGINE CREATE GROUP (Gmails or Usernames) 🔥
+    function createGroup() {
+        let gName = document.getElementById('newGroupName').value.trim();
+        let inputs = document.getElementById('newGroupEmails').value.toLowerCase().split(',').map(e => e.trim());
+        if(!gName || inputs.length === 0) return alert("Enter valid name and at least 1 contact");
+        
+        let gEmails = [currentUserEmail];
+        for(let val of inputs) {
+            if(!val) continue;
+            if(val.includes("@")) {
+                gEmails.push(val);
+            } else {
+                if(val.startsWith("@")) val = val.substring(1);
+                if(APP_STATE.users[val]) gEmails.push(APP_STATE.users[val].email);
+            }
+        }
+        
+        database.ref('groups').push({ id: 'grp_' + Date.now(), name: gName, members: [...new Set(gEmails)], createdBy: currentUserEmail });
+        document.getElementById('newGroupModal').style.display = 'none'; alert("Group created securely!");
+    }
+
+    function loadChatsList() {
+        let contacts = {};
+        APP_STATE.msgs.forEach(m => {
+            if(!m.isGroup && (m.from === currentUserEmail || m.to === currentUserEmail)) {
+                let other = (m.from === currentUserEmail) ? m.to : m.from;
+                if(!contacts[other]) contacts[other] = { email: other, lastMsg: m.payload.length > 500 ? "📁 Media / File" : "🔒 Encrypted Message", time: m.time, isGroup: false };
+                else { contacts[other].time = m.time; contacts[other].lastMsg = m.payload.length > 500 ? "📁 Media / File" : "🔒 Encrypted Message"; }
+            }
+        });
+        APP_STATE.groups.forEach(g => { contacts[g.id] = { email: g.id, name: g.name + " (Group)", lastMsg: "Tap to view group", time: "Active", isGroup: true }; });
+        let html = "";
+        for(let c in contacts) {
+            let info = contacts[c]; 
+            let dName = info.name; let dAv = null;
+            if(!info.isGroup) {
+                let uInfo = getUserInfoByEmail(info.email);
+                dName = uInfo.username; dAv = uInfo.avatar;
+            }
+            
+            let avatarHtml = dAv ? `<img src="${dAv}">` : (info.isGroup ? "G" : dName.charAt(0).toUpperCase());
+            html += `<div class="list-item" onclick="openChat('${info.email}', ${info.isGroup}, '${dName}')"><div class="avatar">${avatarHtml}</div><div class="list-info"><div class="list-title">${dName}</div><div class="list-subtitle"><i class="material-icons" style="font-size:14px; color:var(--primary);">lock</i> ${info.lastMsg}</div></div><div class="list-time">${info.time.split(',')[1] || info.time}</div></div>`;
+        }
+        document.getElementById("chatsList").innerHTML = html || `<div style="text-align:center; padding:20px; color:gray;">No Messages Yet</div>`;
+    }
+
+    function openChat(id, isGroup, chatName = null) {
+        currentChatContact = id; isGroupChat = isGroup;
+        document.getElementById('chatTitle').innerText = chatName ? chatName : id; 
+        
+        let dAv = null;
+        if(!isGroup) { let uInfo = getUserInfoByEmail(id); dAv = uInfo.avatar; }
+        
+        document.getElementById('chatAvatar').innerHTML = dAv ? `<img src="${dAv}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">` : (isGroup ? "G" : chatName.charAt(0).toUpperCase());
+        
+        document.getElementById('chatWindow').style.display = 'flex';
+        cancelSelectedFile(); document.getElementById('chatInputMsg').value = ""; document.getElementById('chatInputMsg').disabled = false; renderChatMessages();
+    }
+    function closeChat() { document.getElementById('chatWindow').style.display = 'none'; currentChatContact = null; isGroupChat = false; cancelSelectedFile(); loadChatsList(); }
+    
+    function renderChatMessages() {
+        let box = document.getElementById('chatMessagesBox'); box.innerHTML = "";
+        let chatHistory = APP_STATE.msgs.filter(m => { return isGroupChat ? m.isGroup && m.to === currentChatContact : !m.isGroup && ((m.from === currentUserEmail && m.to === currentChatContact) || (m.from === currentChatContact && m.to === currentUserEmail)); });
+        chatHistory.forEach(m => { appendSingleMessage(m); });
+        setTimeout(() => box.scrollTop = box.scrollHeight, 100);
+    }
+
+    async function appendSingleMessage(m) {
+        let box = document.getElementById('chatMessagesBox'); if(document.getElementById(`msg_${m.id}`)) return;
+        let isSentByMe = (m.from === currentUserEmail), cls = isSentByMe ? "sent" : "received", timeStr = m.time.split(',')[1] || m.time;
+        let bubble = document.createElement('div'); bubble.className = `bubble ${cls}`; bubble.id = `msg_${m.id}`;
+        
+        let uInfo = getUserInfoByEmail(m.from);
+        let senderHtml = (!isSentByMe && m.isGroup) ? `<span style="font-size:11px; font-weight:bold; color:var(--primary); margin-bottom:4px; display:block;">${uInfo.username}</span>` : "";
+        
+        bubble.innerHTML = `${senderHtml}<span style="font-size:12px;"><i class="material-icons animate-spin" style="font-size:12px; vertical-align:middle;">sync</i> Decrypting...</span> <span class="bubble-time">${timeStr}</span>`;
+        box.appendChild(bubble); box.scrollTop = box.scrollHeight;
+        
+        let pwd = isGroupChat ? m.to : m.from; 
+        try {
+            let decrypted = m.decryptedFullText || await runISBText(m.payload, pwd, false);
+            m.decryptedFullText = decrypted; 
+            if(decrypted.startsWith("ISB_FILE|||")) {
+                let parts = decrypted.split("|||"); m.decryptedName = parts[1]; m.decryptedData = parts[2];
+                let isImg = m.decryptedData.startsWith("data:image/");
+                let isVid = m.decryptedData.startsWith("data:video/");
+                let content = "";
+                
+                if(isImg || isVid) {
+                    if(isImg) {
+                        content = `<img src="${m.decryptedData}" style="max-width:100%; max-height:250px; border-radius:8px; display:block; object-fit:contain;">`;
+                    } else {
+                        content = `<div style="position:relative;"><div style="width:200px; height:150px; background:#000; border-radius:8px; display:flex; align-items:center; justify-content:center;"><i class="material-icons" style="font-size:50px; color:white;">play_circle_outline</i></div><div style="font-size:11px; margin-top:5px; color:gray;">${m.decryptedName}</div></div>`;
+                    }
+                } else {
+                    let iconType = m.decryptedData.startsWith("data:application/pdf") ? "picture_as_pdf" : "insert_drive_file";
+                    content = `<div style="display:flex; gap:10px; align-items:center; background:rgba(0,0,0,0.03); padding:10px; border-radius:8px;">
+                        <i class="material-icons" style="font-size:30px; color:var(--primary);">${iconType}</i>
+                        <div><div style="font-weight:bold; font-size:14px; max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${m.decryptedName}</div></div>
+                    </div>`;
+                }
+                document.getElementById(`msg_${m.id}`).innerHTML = `${senderHtml}${content}<span class="bubble-time">${timeStr}</span>`;
+            } else { document.getElementById(`msg_${m.id}`).innerHTML = `${senderHtml}${decrypted} <span class="bubble-time">${timeStr}</span>`; }
+        } catch(e) { document.getElementById(`msg_${m.id}`).innerHTML = `${senderHtml}<span style="color:#E91E63; font-size:13px;">Corrupted</span>`; }
+
+        bubble.onclick = () => { if(m.decryptedData) openMediaViewer(m.id, 'msg'); };
+
+        let pressTimer;
+        let startPress = (e) => { pressTimer = setTimeout(() => { activeActionMsg = m; document.getElementById('msgOptionsModal').style.display='flex'; }, 600); };
+        let endPress = () => { clearTimeout(pressTimer); };
+        
+        bubble.addEventListener('touchstart', startPress); bubble.addEventListener('touchend', endPress); bubble.addEventListener('touchmove', endPress);
+        bubble.addEventListener('mousedown', startPress); bubble.addEventListener('mouseup', endPress); bubble.addEventListener('mousemove', endPress);
+        bubble.oncontextmenu = (e) => { e.preventDefault(); activeActionMsg = m; document.getElementById('msgOptionsModal').style.display='flex'; };
+    }
+
+    async function sendChatMessage() {
+        let input = document.getElementById('chatInputMsg'), msg = input.value.trim(), payloadToEncrypt = "";
+        if(selectedFileData) { payloadToEncrypt = `ISB_FILE|||${selectedFileName}|||${selectedFileData}`; } else { if(!msg) return; payloadToEncrypt = msg; }
+        let sendBtn = document.querySelector('.btn-send'); sendBtn.disabled = true; input.disabled = true;
+        try {
+            let encryptionPwd = isGroupChat ? currentChatContact : currentUserEmail; 
+            let encryptedPayload = await runISBText(payloadToEncrypt, encryptionPwd, true);
+            await database.ref('messages').push({ id: Date.now() + Math.random().toString().substring(2,8), from: currentUserEmail, to: currentChatContact, payload: encryptedPayload, time: new Date().toLocaleString(), isGroup: isGroupChat });
+            input.value = ""; cancelSelectedFile(); sendBtn.disabled = false; input.disabled = false; input.focus();
+            setTimeout(() => { document.getElementById('chatMessagesBox').scrollTop = document.getElementById('chatMessagesBox').scrollHeight; }, 100);
+        } catch(e) { alert("Encryption Error"); sendBtn.disabled = false; input.disabled = false; }
+    }
+
+    async function shareSelectedMsg() {
+        document.getElementById('msgOptionsModal').style.display='none';
+        if(!activeActionMsg) return;
+        try {
+            if(activeActionMsg.decryptedData && activeActionMsg.decryptedData.startsWith("data:")) {
+                let blob = dataURItoBlob(activeActionMsg.decryptedData);
+                let file = new File([blob], activeActionMsg.decryptedName || "ISB_Media", {type: blob.type});
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({ files: [file], title: activeActionMsg.decryptedName });
+                } else { await navigator.share({ title: 'ISB File', text: 'File Attached: ' + activeActionMsg.decryptedName }); }
+            } else { await navigator.share({ title: 'ISB Message', text: activeActionMsg.decryptedFullText }); }
+        } catch(e) { console.log("Share failed", e); }
+    }
+
+    function deleteSelectedMsg() {
+        document.getElementById('msgOptionsModal').style.display='none';
+        if(!activeActionMsg) return;
+        let confirmText = (activeActionMsg.from === currentUserEmail) ? "Delete your message for everyone?" : "Delete this message?";
+        if(!confirm(confirmText)) return;
+        database.ref('messages').orderByChild('id').equalTo(activeActionMsg.id).once('value', snapshot => { snapshot.forEach(child => child.ref.remove()); });
+        activeActionMsg = null;
+    }
+
+    function closeStatusModal() {
+        document.getElementById('imageStatusModal').style.display = 'none';
+        document.getElementById('textStatusModal').style.display = 'none';
+        document.getElementById('statusUploadArea').style.display = 'block';
+        document.getElementById('statusVidPreview').style.display = 'none';
+        document.getElementById('statusImgPreview').style.display = 'none';
+        document.getElementById('statusCaption').value = "";
+        statusFileData = null;
+        document.getElementById('statusFile').value = "";
+    }
+    function openTextStatusModal() { closeStatusModal(); document.getElementById('textStatusModal').style.display = 'flex'; document.getElementById('statusTextOnly').value = ""; }
+    function openImageStatusModal() { closeStatusModal(); document.getElementById('imageStatusModal').style.display = 'flex'; }
+    
+    function handleStatusFile(event) {
+        let file = event.target.files[0]; if(!file) return;
+        if(file.size > 5 * 1024 * 1024) return alert("⚠️ Max File Size 5MB.");
+        let reader = new FileReader(); 
+        reader.onload = function(e) { 
+            statusFileData = e.target.result; 
+            document.getElementById('statusUploadArea').style.display = 'none';
+            if(file.type.startsWith('video/')) {
+                let v = document.getElementById('statusVidPreview');
+                v.style.display = 'block'; document.getElementById('statusImgPreview').style.display = 'none';
+                v.src = e.target.result;
+            } else {
+                let i = document.getElementById('statusImgPreview');
+                i.style.display = 'block'; document.getElementById('statusVidPreview').style.display = 'none';
+                i.src = e.target.result;
+            }
+        }; 
+        reader.readAsDataURL(file);
+    }
+    
+    async function postStatus(type) {
+        let myActive = APP_STATE.statuses.filter(s => s.from === currentUserEmail && (Date.now() - s.timestamp < 24*60*60*1000));
+        if(myActive.length >= 5) { alert("Limit Reached! You can only keep 5 active statuses. Please delete an old status first."); return; }
+
+        let payloadToEncrypt = "";
+        if(type === 'text') {
+            let txt = document.getElementById('statusTextOnly').value.trim(); if(!txt) return;
+            payloadToEncrypt = `ISB_TXT_STATUS|||${txt}`; 
+        } else {
+            if(!statusFileData) return; let cap = document.getElementById('statusCaption').value.trim();
+            payloadToEncrypt = `ISB_IMG_STATUS|||${statusFileData}|||${cap}`; 
+        }
+        closeStatusModal();
+        let encrypted = await runISBText(payloadToEncrypt, currentUserEmail, true); 
+        await database.ref('statuses').push({ id: 'sts_' + Date.now(), from: currentUserEmail, payload: encrypted, timestamp: Date.now(), timeStr: new Date().toLocaleTimeString() }); 
+    }
+    
+    async function loadStatusList() {
+        let myContacts = new Set();
+        APP_STATE.msgs.forEach(m => { if(!m.isGroup) myContacts.add(m.from === currentUserEmail ? m.to : m.from); });
+        myContacts.add(currentUserEmail); 
+
+        let now = Date.now(), validStatuses = APP_STATE.statuses.filter(s => myContacts.has(s.from) && (now - s.timestamp < 24 * 60 * 60 * 1000));
+        
+        window.statusPlaylist = [];
+        for(let s of validStatuses) {
+            if(!s.decryptedFullText) { try { s.decryptedFullText = await runISBText(s.payload, s.from, false); } catch(e){} }
+            if(s.decryptedFullText) {
+                if(s.decryptedFullText.startsWith("ISB_IMG_STATUS|||")) {
+                    let parts = s.decryptedFullText.split("|||"); s.decryptedData = parts[1]; s.decryptedName = parts[2];
+                } else if(s.decryptedFullText.startsWith("ISB_TXT_STATUS|||")) {
+                    s.decryptedData = "txt"; s.decryptedName = s.decryptedFullText.split("|||")[1];
+                }
+                window.statusPlaylist.push(s);
+            }
+        }
+        window.statusPlaylist.sort((a,b) => a.timestamp - b.timestamp);
+
+        let userGroups = {};
+        window.statusPlaylist.forEach(s => { if(!userGroups[s.from]) userGroups[s.from] = []; userGroups[s.from].push(s); });
+
+        let trayHtml = `
+        <div class="status-card" onclick="openImageStatusModal()">
+            <div class="status-card-avatar" style="border:none;"><div style="background:var(--bg); width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative;">${currentAvatar ? `<img src="${currentAvatar}">` : (currentUserEmail?currentUserEmail.charAt(0).toUpperCase():'U')}<div class="status-card-add-icon">+</div></div></div>
+            <div style="background:var(--surface); display:flex; justify-content:center; align-items:center; height:100%;"></div>
+            <div class="status-card-name" style="color:var(--text); text-shadow:none; text-align:center;">Add Status</div>
+        </div>`;
+
+        for(let user in userGroups) {
+            let userSts = userGroups[user]; let lastSt = userSts[userSts.length - 1];
+            let uInfo = getUserInfoByEmail(user);
+            
+            let bgStyle = `background-color: var(--primary);`;
+            if (lastSt.decryptedData.startsWith("data:image/")) { bgStyle = `background-image: url('${lastSt.decryptedData}');`; } 
+            else if (lastSt.decryptedData.startsWith("data:video/")) { bgStyle = `background-color: #000;`; }
+            
+            let dName = (user === currentUserEmail) ? "My Status" : uInfo.username;
+            let avatarHtml = uInfo.avatar ? `<img src="${uInfo.avatar}">` : user.charAt(0).toUpperCase();
+            
+            trayHtml += `<div class="status-card" style="${bgStyle}" onclick="viewUserStatus('${user}')"><div class="status-card-overlay"></div><div class="status-card-avatar">${avatarHtml}</div><div class="status-card-name">${dName}</div></div>`;
+        }
+        document.getElementById('statusTray').innerHTML = trayHtml;
+
+        let listHtml = "";
+        for(let user in userGroups) {
+            if(user === currentUserEmail) continue; 
+            let st = userGroups[user][userGroups[user].length - 1]; 
+            let uInfo = getUserInfoByEmail(user);
+            let avatarHtml = uInfo.avatar ? `<img src="${uInfo.avatar}">` : user.charAt(0).toUpperCase();
+            listHtml += `<div class="list-item" onclick="viewUserStatus('${user}')"><div class="avatar status-ring">${avatarHtml}</div><div class="list-info"><div class="list-title">${uInfo.username}</div><div class="list-subtitle">${st.timeStr}</div></div></div>`;
+        }
+        document.getElementById('statusList').innerHTML = listHtml || `<div style="text-align:center; padding:20px; color:gray;">No Updates Yet</div>`;
+    }
+
+    let currentPdf = null; let currentPdfPage = 1;
+    async function renderPdfPage(num) {
+        if(!currentPdf) return;
+        let canvas = document.getElementById('pdfCanvas'); let ctx = canvas.getContext('2d');
+        let page = await currentPdf.getPage(num); 
+        let viewport = page.getViewport({scale: window.innerWidth > 600 ? 1.5 : 1.0});
+        canvas.height = viewport.height; canvas.width = viewport.width;
+        await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+        document.getElementById('pdfPageNum').innerText = num;
+    }
+    function changePdfPage(offset) { 
+        if(!currentPdf) return; 
+        let newPage = currentPdfPage + offset; 
+        if(newPage >= 1 && newPage <= currentPdf.numPages) { currentPdfPage = newPage; renderPdfPage(currentPdfPage); } 
+    }
+
+    async function openMediaViewer(msgId, source) {
+        waIsChatMedia = (source === 'msg');
+        document.getElementById('waStatusViewer').style.display = 'flex';
+        document.getElementById('waProgressBarContainer').innerHTML = ''; 
+        
+        let m = waIsChatMedia ? APP_STATE.msgs.find(x => x.id === msgId) : window.statusPlaylist.find(x => x.id === msgId);
+        let fData = m.decryptedData, fName = m.decryptedName;
+        
+        let uInfo = getUserInfoByEmail(m.from);
+        document.getElementById('waStatusName').innerText = waIsChatMedia ? "Media" : uInfo.username;
+        document.getElementById('waStatusTime').innerText = waIsChatMedia ? m.time : m.timeStr;
+        document.getElementById('waStatusAvatar').innerHTML = uInfo.avatar ? `<img src="${uInfo.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : uInfo.username.charAt(0).toUpperCase();
+        
+        let dBtn = document.getElementById('waStatusDownloadBtn');
+        let tapLeft = document.getElementById('waTapLeft');
+        let tapRight = document.getElementById('waTapRight');
+        let delBtn = document.getElementById('waStatusDeleteBtn');
+        
+        if(waIsChatMedia) {
+            dBtn.style.display = 'block'; 
+            dBtn.href = base64ToBlobUrl(fData); 
+            dBtn.download = fName;
+            delBtn.style.display = 'none'; 
+            tapLeft.style.display = 'none';
+            tapRight.style.display = 'none';
+        } else {
+            dBtn.style.display = 'none';
+            tapLeft.style.display = 'block';
+            tapRight.style.display = 'block';
+            if(m.from === currentUserEmail) { delBtn.style.display = 'block'; } else { delBtn.style.display = 'none'; }
+        }
+
+        let contentBox = document.getElementById('waStatusContent');
+        contentBox.innerHTML = `<i class="material-icons animate-spin" style="font-size:50px;">sync</i>`;
+
+        if (fData.startsWith("data:application/pdf")) {
+            contentBox.innerHTML = `
+                <div style="position:absolute; top:80px; background:var(--surface); width:90%; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.2); display:flex; justify-content:space-between; align-items:center; padding:10px 20px; z-index:4005; border:1px solid var(--border);">
+                    <i class="material-icons" onclick="changePdfPage(-1)" style="color:var(--primary); font-size:30px; cursor:pointer;">navigate_before</i>
+                    <span style="color:var(--text); font-weight:bold; font-size:16px;">Page <span id="pdfPageNum">1</span> / <span id="pdfPageCount">-</span></span>
+                    <i class="material-icons" onclick="changePdfPage(1)" style="color:var(--primary); font-size:30px; cursor:pointer;">navigate_next</i>
+                </div>
+                <div style="width:100%; height:100%; overflow:auto; display:flex; justify-content:center; align-items:flex-start; padding-top:150px; padding-bottom:50px; background:var(--bg);">
+                    <canvas id="pdfCanvas" style="max-width:95%; background:white; box-shadow:0 5px 15px rgba(0,0,0,0.2); border-radius:8px;"></canvas>
+                </div>`;
+            
+            try {
+                let pdfBase64 = fData.split(',')[1];
+                let pdfBinaryString = atob(pdfBase64);
+                let pdfBytes = new Uint8Array(pdfBinaryString.length);
+                for (let i = 0; i < pdfBinaryString.length; i++) { pdfBytes[i] = pdfBinaryString.charCodeAt(i); }
+                
+                let loadingTask = pdfjsLib.getDocument({data: pdfBytes});
+                currentPdf = await loadingTask.promise;
+                document.getElementById('pdfPageCount').innerText = currentPdf.numPages;
+                currentPdfPage = 1;
+                renderPdfPage(currentPdfPage);
+            } catch (error) {
+                contentBox.innerHTML = `<div style="text-align:center; color:#E91E63; margin-top:50px;"><h2>⚠️ PDF Error</h2><p>File might be corrupted.</p></div>`;
+            }
+            return;
+        }
+
+        let bUrl = base64ToBlobUrl(fData);
+
+        if(fData.startsWith("data:video/")) {
+            let controlsAttr = waIsChatMedia ? "controls" : ""; 
+            
+            let vidHtml = `<video id="activeVideoPlayer" src="${bUrl}" ${controlsAttr} playsinline style="width:100%; height:100%; object-fit:contain; background:#000; outline:none;"></video>`;
+            if(fName && !waIsChatMedia) { vidHtml += `<div class="wa-status-caption">${fName}</div>`; }
+            
+            contentBox.innerHTML = vidHtml;
+            let video = document.getElementById('activeVideoPlayer');
+            
+            try {
+                let playPromise = video.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        if(!waIsChatMedia) video.muted = true; 
+                        video.play().catch(e => { if(waIsChatMedia) video.controls = true; });
+                    });
+                }
+            } catch(e) { if(waIsChatMedia) video.controls = true; }
+
+            if(!waIsChatMedia) {
+                video.onended = () => { nextWaStatus(); };
+                video.onloadedmetadata = () => {
+                    clearTimeout(waTimer);
+                    let fillBar = document.getElementById(`waFill_${waActiveIndex}`);
+                    if(fillBar) { fillBar.style.transition = `width ${video.duration}s linear`; fillBar.classList.add('filling'); }
+                    waTimer = setTimeout(() => { nextWaStatus(); }, video.duration * 1000 + 500);
+                };
+            }
+        } 
+        else if (fData.startsWith("data:image/")) {
+            contentBox.innerHTML = `<img src="${bUrl}" style="width:100%; height:100%; object-fit:contain;">`;
+            if(fName && !waIsChatMedia) contentBox.innerHTML += `<div class="wa-status-caption">${fName}</div>`;
+        } 
+        else {
+            if(fData === "txt") { contentBox.innerHTML = `<div style="width:100%; height:100%; display:flex; justify-content:center; align-items:center; background:var(--primary); padding:30px; font-size:28px; text-align:center; word-wrap:break-word;">${fName}</div>`; } 
+            else { contentBox.innerHTML = `<div style="text-align:center;"><h2>📁 File</h2><p>${fName}</p></div>`; }
+        }
+    }
+
+    function deleteActiveStatus() {
+        let st = waUserStatusGroup[waActiveIndex];
+        if(!st) return;
+        if(confirm("Delete this status permanently?")) {
+            database.ref('statuses').orderByChild('id').equalTo(st.id).once('value', snapshot => { snapshot.forEach(child => child.ref.remove()); });
+            closeWaStatus();
+        }
+    }
+
+    function viewUserStatus(userEmail) {
+        waActiveUser = userEmail; waUserStatusGroup = window.statusPlaylist.filter(s => s.from === userEmail);
+        if(waUserStatusGroup.length === 0) return;
+        waActiveIndex = 0; renderWaStatus();
+    }
+
+    function renderWaStatus() {
+        clearTimeout(waTimer);
+        let st = waUserStatusGroup[waActiveIndex];
+        
+        let barContainer = document.getElementById('waProgressBarContainer');
+        barContainer.innerHTML = '';
+        for(let i=0; i<waUserStatusGroup.length; i++) {
+            let fillWidth = (i < waActiveIndex) ? '100%' : '0%';
+            barContainer.innerHTML += `<div class="wa-progress-segment"><div class="wa-progress-fill" id="waFill_${i}" style="width:${fillWidth}"></div></div>`;
+        }
+        
+        openMediaViewer(st.id, 'status');
+
+        if(st.decryptedData !== "txt" && !st.decryptedData.startsWith("data:video/") && !st.decryptedData.startsWith("data:application/pdf")) {
+            let fillBar = document.getElementById(`waFill_${waActiveIndex}`);
+            if(fillBar) { void fillBar.offsetWidth; fillBar.style.transition = "width 10s linear"; fillBar.classList.add('filling'); }
+            waTimer = setTimeout(() => { nextWaStatus(); }, 10000);
+        } else if (st.decryptedData === "txt" || st.decryptedData.startsWith("data:application/pdf")) {
+            let fillBar = document.getElementById(`waFill_${waActiveIndex}`);
+            if(fillBar) { void fillBar.offsetWidth; fillBar.style.transition = "width 5s linear"; fillBar.classList.add('filling'); }
+            waTimer = setTimeout(() => { nextWaStatus(); }, 5000);
+        }
+    }
+
+    function nextWaStatus() { if(waActiveIndex < waUserStatusGroup.length - 1) { waActiveIndex++; renderWaStatus(); } else closeWaStatus(); }
+    function prevWaStatus() { if(waActiveIndex > 0) { waActiveIndex--; renderWaStatus(); } else renderWaStatus(); }
+    function closeWaStatus() { clearTimeout(waTimer); document.getElementById('waStatusViewer').style.display = 'none'; document.getElementById('waStatusContent').innerHTML = ""; currentPdf = null; }
+</script>
 </body>
 </html>
