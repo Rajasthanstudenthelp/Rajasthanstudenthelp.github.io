@@ -57,7 +57,6 @@
         .fab-secondary { bottom: 160px; background: var(--surface); color: var(--primary); border: 1px solid var(--border); }
         .fab-pencil { position: fixed; bottom: 160px; right: 28px; width: 45px; height: 45px; background: var(--surface); color: var(--text-muted); border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.15); cursor: pointer; z-index: 90; border: 1px solid var(--border);}
 
-        /* 🔥 FIX: Changed width to 25% for 4 Tabs 🔥 */
         .bottom-nav { flex-shrink: 0; background: var(--nav-bg); display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid var(--border); z-index: 100;}
         .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); cursor: pointer; width: 25%;}
         .nav-item span { font-size: 11px; font-weight: 600; }
@@ -94,7 +93,6 @@
         .upload-text { font-size: 16px; color: var(--text); font-weight: 700; margin-bottom: 5px;}
         .status-preview-box { display:none; width:100%; height:180px; border-radius:12px; margin-bottom:20px; object-fit:contain; background:#000; border: 1px solid var(--border); box-shadow: 0 5px 15px rgba(0,0,0,0.1);}
 
-        /* 🔥 PROFILE SETUP & SETTINGS 🔥 */
         .profile-pic-upload { width: 100px; height: 100px; border-radius: 50%; background: var(--bg); border: 2px dashed var(--primary); display: flex; justify-content: center; align-items: center; margin: 0 auto 20px auto; cursor: pointer; overflow: hidden; position: relative;}
         .profile-pic-upload img { width: 100%; height: 100%; object-fit: cover; }
         
@@ -106,7 +104,6 @@
         .settings-row-text { flex: 1; font-weight: bold; color: var(--text); font-size: 15px;}
         .settings-subtext { font-size: 11px; color: var(--text-muted); font-weight: normal; margin-top:2px;}
         
-        /* 🔥 COPYRIGHT & BRANDING 🔥 */
         .made-in-india { text-align: center; padding: 20px; color: var(--text-muted); font-size: 14px; font-weight: 800; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0.7; letter-spacing: 0.5px;}
         .made-in-india span { font-size: 22px; margin-top: 5px;}
         .copyright-line { font-size: 10px; margin-top: 15px; font-weight: normal; opacity: 0.8; letter-spacing: 0; }
@@ -267,18 +264,27 @@
         </div>
     </div>
 
-    <!-- CALL OVERLAY -->
+    <!-- CALL OVERLAY (UPDATED WITH MUTE & VIDEO SWITCH CONTROLS) -->
     <div id="callOverlay">
         <div class="call-avatar-glow" id="callAvatarPreview">U</div>
         <h2 id="callStatusText" style="color:white; margin:0 0 5px 0; font-size:24px;">Calling...</h2>
         <p id="callTypeText" style="color:#ddd; font-size:16px; margin-bottom:30px;">ISB Secure Call</p>
         
         <video id="remoteVideo" autoplay playsinline style="width:100%; height:100%; position:absolute; top:0; left:0; object-fit:cover; z-index:-1; display:none; background:#111;"></video>
-        <video id="localVideo" autoplay playsinline muted style="width:110px; height:150px; position:absolute; bottom:130px; right:20px; border-radius:12px; border:2px solid white; object-fit:cover; box-shadow:0 10px 20px rgba(0,0,0,0.5); display:none; background:#333;"></video>
-        <audio id="remoteAudio" autoplay playsinline style="display:none;"></audio>
+        <video id="localVideo" autoplay playsinline muted style="width:110px; height:150px; position:absolute; bottom:130px; right:20px; border-radius:12px; border:2px solid white; object-fit:cover; box-shadow:0 10px 20px rgba(0,0,0,0.5); display:none; background:#333; z-index: 10;"></video>
         
-        <div style="position:absolute; bottom:40px; display:flex; gap:40px; align-items:center;">
+        <!-- Hidden Audio tag for WebView Force Play -->
+        <audio id="remoteAudio" autoplay playsinline style="visibility:hidden; width:0px; height:0px;"></audio>
+        
+        <div style="position:absolute; bottom:40px; display:flex; gap:20px; align-items:center; z-index: 20;">
             <button id="btnAcceptCall" onclick="acceptCall()" style="display:none; background:#25D366; border:none; border-radius:50%; width:65px; height:65px; color:white; box-shadow:0 10px 20px rgba(37,211,102,0.4); cursor:pointer;"><i class="material-icons" style="font-size:30px;">call</i></button>
+            
+            <!-- 🔥 NEW: MUTE & VIDEO CONTROLS (Initially hidden until connected) 🔥 -->
+            <div id="callControls" style="display:none; gap:15px;">
+                <button id="btnMute" onclick="toggleMute()" style="background:rgba(255,255,255,0.2); border:none; border-radius:50%; width:55px; height:55px; color:white; cursor:pointer; backdrop-filter:blur(5px);"><i class="material-icons" id="muteIcon">mic</i></button>
+                <button id="btnVideoToggle" onclick="toggleVideo()" style="background:rgba(255,255,255,0.2); border:none; border-radius:50%; width:55px; height:55px; color:white; cursor:pointer; backdrop-filter:blur(5px);"><i class="material-icons" id="videoToggleIcon">videocam_off</i></button>
+            </div>
+
             <button onclick="endCall()" style="background:#E91E63; border:none; border-radius:50%; width:65px; height:65px; color:white; box-shadow:0 10px 20px rgba(233,30,99,0.4); cursor:pointer;"><i class="material-icons" style="font-size:30px;">call_end</i></button>
         </div>
     </div>
@@ -310,7 +316,6 @@
     let selectedFileData = null, selectedFileName = null, statusFileData = null, tempSetupAvatarData = null;
     let isListeningToFirebase = false;
 
-    // 🔥 ADDED callLogs array to APP_STATE 🔥
     let APP_STATE = { msgs: [], groups: [], statuses: [], users: {}, callLogs: [] };
     window.statusPlaylist = []; 
     let waActiveUser = null, waUserStatusGroup = [], waActiveIndex = 0, waTimer = null, waIsChatMedia = false; 
@@ -319,10 +324,11 @@
     let peerConnection = null, localStream = null, remoteStream = null, isCallActive = false;
     const rtcConfig = { iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }] };
 
-    // 🔥 CALL TRACKING VARIABLES 🔥
     let callStartTime = 0;
     let currentCallDirection = '';
     let currentCallType = '';
+    let isMuted = false;
+    let isVideoEnabled = false;
 
     window.onload = function() {
         applyTheme(localStorage.getItem('isb_theme') || 'default');
@@ -562,12 +568,17 @@
     function renderWaStatus() { clearTimeout(waTimer); let st = waUserStatusGroup[waActiveIndex]; let barContainer = document.getElementById('waProgressBarContainer'); barContainer.innerHTML = ''; for(let i=0; i<waUserStatusGroup.length; i++) { let fillWidth = (i < waActiveIndex) ? '100%' : '0%'; barContainer.innerHTML += `<div class="wa-progress-segment"><div class="wa-progress-fill" id="waFill_${i}" style="width:${fillWidth}"></div></div>`; } openMediaViewer(st.id, 'status'); if(st.decryptedData !== "txt" && !st.decryptedData.startsWith("data:video/") && !st.decryptedData.startsWith("data:application/pdf")) { let fillBar = document.getElementById(`waFill_${waActiveIndex}`); if(fillBar) { void fillBar.offsetWidth; fillBar.style.transition = "width 10s linear"; fillBar.classList.add('filling'); } waTimer = setTimeout(() => { nextWaStatus(); }, 10000); } else if (st.decryptedData === "txt" || st.decryptedData.startsWith("data:application/pdf")) { let fillBar = document.getElementById(`waFill_${waActiveIndex}`); if(fillBar) { void fillBar.offsetWidth; fillBar.style.transition = "width 5s linear"; fillBar.classList.add('filling'); } waTimer = setTimeout(() => { nextWaStatus(); }, 5000); } }
     function nextWaStatus() { if(waActiveIndex < waUserStatusGroup.length - 1) { waActiveIndex++; renderWaStatus(); } else closeWaStatus(); } function prevWaStatus() { if(waActiveIndex > 0) { waActiveIndex--; renderWaStatus(); } else renderWaStatus(); } function closeWaStatus() { clearTimeout(waTimer); document.getElementById('waStatusViewer').style.display = 'none'; document.getElementById('waStatusContent').innerHTML = ""; currentPdf = null; }
 
-    // 🔥 P2P WEBRTC CALLING ENGINE WITH DURATION & HISTORY 🔥
+    // 🔥 P2P WEBRTC CALLING ENGINE WITH DISCONNECT SYNC, AUDIO FIX, AND IN-CALL CONTROLS 🔥
     function initCallListener() {
         if(!currentUsername) return;
         database.ref('calls/' + currentUsername).on('value', async snapshot => {
             const data = snapshot.val();
-            if(data && !isCallActive && data.type === 'offer') {
+            
+            // 🔥 Disconnect Sync Fix: Check if remote sent 'end' signal
+            if(data && data.type === 'end') {
+                endCall(false); 
+            } 
+            else if(data && !isCallActive && data.type === 'offer') {
                 callStartTime = 0;
                 currentCallDirection = 'incoming';
                 currentCallType = data.callType;
@@ -579,14 +590,40 @@
                 document.getElementById('callAvatarPreview').innerHTML = (uInfo && uInfo.avatar) ? `<img src="${uInfo.avatar}">` : data.from.charAt(0).toUpperCase();
                 
                 document.getElementById('btnAcceptCall').style.display = 'block';
+                document.getElementById('callControls').style.display = 'none'; // Hide controls until accepted
                 document.getElementById('callOverlay').style.display = 'flex';
                 document.getElementById('remoteVideo').style.display = 'none';
                 document.getElementById('localVideo').style.display = 'none';
                 window.currentCallData = data;
             } else if (!data && isCallActive) {
+                // Fallback disconnect
                 endCall(false); 
             }
         });
+    }
+
+    // 🔥 Call Control Functions 🔥
+    function toggleMute() {
+        if(localStream) {
+            isMuted = !isMuted;
+            localStream.getAudioTracks().forEach(t => t.enabled = !isMuted);
+            document.getElementById('muteIcon').innerText = isMuted ? "mic_off" : "mic";
+            document.getElementById('btnMute').style.background = isMuted ? "rgba(233,30,99,0.8)" : "rgba(255,255,255,0.2)";
+        }
+    }
+
+    function toggleVideo() {
+        if(localStream && localStream.getVideoTracks().length > 0) {
+            isVideoEnabled = !isVideoEnabled;
+            localStream.getVideoTracks().forEach(t => t.enabled = isVideoEnabled);
+            document.getElementById('videoToggleIcon').innerText = isVideoEnabled ? "videocam" : "videocam_off";
+            document.getElementById('btnVideoToggle').style.background = isVideoEnabled ? "rgba(37,211,102,0.8)" : "rgba(255,255,255,0.2)";
+            
+            document.getElementById('localVideo').style.display = isVideoEnabled ? 'block' : 'none';
+            document.getElementById('remoteVideo').style.display = isVideoEnabled ? 'block' : 'none';
+        } else {
+            alert("Camera not accessible or permission denied!");
+        }
     }
 
     async function startCall(callType) {
@@ -598,6 +635,12 @@
         currentCallDirection = 'outgoing';
         currentCallType = callType;
         window.currentCallTarget = targetUname;
+
+        // Reset UI Controls
+        isMuted = false;
+        document.getElementById('muteIcon').innerText = "mic";
+        document.getElementById('btnMute').style.background = "rgba(255,255,255,0.2)";
+        document.getElementById('callControls').style.display = 'none';
 
         document.getElementById('callStatusText').innerText = `Calling @${targetUname}...`;
         document.getElementById('callTypeText').innerText = (callType === 'video') ? "Video Call" : "Voice Call";
@@ -611,8 +654,25 @@
         isCallActive = true;
 
         try {
-            localStream = await navigator.mediaDevices.getUserMedia({ video: callType === 'video', audio: true });
-            if(callType === 'video') { document.getElementById('localVideo').style.display = 'block'; document.getElementById('localVideo').srcObject = localStream; }
+            // Always try to get video so user can switch later
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            } catch(e) {
+                // Fallback to audio only if camera fails
+                localStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
+            }
+
+            isVideoEnabled = (callType === 'video');
+            if(localStream.getVideoTracks().length > 0) {
+                localStream.getVideoTracks().forEach(t => t.enabled = isVideoEnabled);
+                document.getElementById('videoToggleIcon').innerText = isVideoEnabled ? "videocam" : "videocam_off";
+                document.getElementById('btnVideoToggle').style.background = isVideoEnabled ? "rgba(37,211,102,0.8)" : "rgba(255,255,255,0.2)";
+            } else {
+                document.getElementById('btnVideoToggle').style.display = 'none'; // Hide switch if no camera
+            }
+            if(isVideoEnabled) { document.getElementById('localVideo').style.display = 'block'; document.getElementById('localVideo').srcObject = localStream; }
+            
+            document.getElementById('callControls').style.display = 'flex'; // Show controls
             
             peerConnection = new RTCPeerConnection(rtcConfig); remoteStream = new MediaStream(); 
             
@@ -622,6 +682,11 @@
                 event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track)); 
                 document.getElementById('remoteVideo').srcObject = remoteStream;
                 document.getElementById('remoteAudio').srcObject = remoteStream;
+                
+                // 🔥 WebView Audio Fix: Force Play 🔥
+                let playPromise = document.getElementById('remoteAudio').play();
+                if (playPromise !== undefined) { playPromise.catch(error => console.log("Audio autoplay blocked")); }
+
                 if(callType === 'video') { document.getElementById('remoteVideo').style.display = 'block'; }
                 document.getElementById('callStatusText').innerText = "Connected";
                 callStartTime = Date.now(); // Start Duration Timer
@@ -647,9 +712,30 @@
         document.getElementById('btnAcceptCall').style.display = 'none'; document.getElementById('callStatusText').innerText = "Connecting...";
         const data = window.currentCallData; isCallActive = true;
 
+        // Reset UI Controls
+        isMuted = false;
+        document.getElementById('muteIcon').innerText = "mic";
+        document.getElementById('btnMute').style.background = "rgba(255,255,255,0.2)";
+        document.getElementById('btnVideoToggle').style.display = 'block';
+
         try {
-            localStream = await navigator.mediaDevices.getUserMedia({ video: data.callType === 'video', audio: true });
-            if(data.callType === 'video') { document.getElementById('localVideo').style.display = 'block'; document.getElementById('localVideo').srcObject = localStream; }
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            } catch(e) {
+                localStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
+            }
+
+            isVideoEnabled = (data.callType === 'video');
+            if(localStream.getVideoTracks().length > 0) {
+                localStream.getVideoTracks().forEach(t => t.enabled = isVideoEnabled);
+                document.getElementById('videoToggleIcon').innerText = isVideoEnabled ? "videocam" : "videocam_off";
+                document.getElementById('btnVideoToggle').style.background = isVideoEnabled ? "rgba(37,211,102,0.8)" : "rgba(255,255,255,0.2)";
+            } else {
+                document.getElementById('btnVideoToggle').style.display = 'none';
+            }
+            if(isVideoEnabled) { document.getElementById('localVideo').style.display = 'block'; document.getElementById('localVideo').srcObject = localStream; }
+            
+            document.getElementById('callControls').style.display = 'flex'; // Show controls
 
             peerConnection = new RTCPeerConnection(rtcConfig); remoteStream = new MediaStream(); 
             
@@ -659,6 +745,11 @@
                 event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track)); 
                 document.getElementById('remoteVideo').srcObject = remoteStream;
                 document.getElementById('remoteAudio').srcObject = remoteStream;
+                
+                // 🔥 WebView Audio Fix: Force Play 🔥
+                let playPromise = document.getElementById('remoteAudio').play();
+                if (playPromise !== undefined) { playPromise.catch(error => console.log("Audio autoplay blocked")); }
+
                 if(data.callType === 'video') document.getElementById('remoteVideo').style.display = 'block';
                 document.getElementById('callStatusText').innerText = "Connected";
                 callStartTime = Date.now(); // Start Duration Timer
@@ -681,7 +772,7 @@
     function endCall(notifyRemote = true) {
         isCallActive = false; document.getElementById('callOverlay').style.display = 'none';
         
-        // 🔥 Calculate Duration and Save History 🔥
+        // Calculate Duration and Save History
         if (window.currentCallTarget && currentCallDirection) {
             let durationStr = "Missed";
             if (callStartTime > 0) {
@@ -700,6 +791,15 @@
             });
         }
         
+        // 🔥 Send Disconnect Signal 🔥
+        if(notifyRemote) {
+            let targetUname = window.currentCallTarget || (window.currentCallData ? window.currentCallData.from : null);
+            if(targetUname) {
+                database.ref('calls/' + targetUname).set({ type: 'end' });
+            }
+        }
+        database.ref('calls/' + currentUsername).remove();
+
         callStartTime = 0; currentCallDirection = ''; currentCallType = ''; window.currentCallTarget = null;
         
         if(localStream) { localStream.getTracks().forEach(track => track.stop()); }
@@ -709,16 +809,10 @@
         document.getElementById('localVideo').srcObject = null; 
         document.getElementById('remoteVideo').srcObject = null;
         document.getElementById('remoteAudio').srcObject = null;
-        
-        if(notifyRemote) {
-            let targetUname = window.currentCallData ? window.currentCallData.from : (currentChatContact ? getUserInfoByEmail(currentChatContact).username : null);
-            database.ref('calls/' + currentUsername).remove();
-            if(targetUname) database.ref('calls/' + targetUname).remove();
-        }
         window.currentCallData = null;
     }
 
-    // 🔥 LOAD & RENDER CALL HISTORY 🔥
+    // LOAD & RENDER CALL HISTORY
     function loadCallsList() {
         let html = "";
         APP_STATE.callLogs.forEach(log => {
