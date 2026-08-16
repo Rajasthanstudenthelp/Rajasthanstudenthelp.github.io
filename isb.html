@@ -19,19 +19,18 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     
     <style>
+        /* BRAHMA CORE FONTS */
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
         /* 12 PREMIUM THEMES RESTORED */
         :root { --primary: #3F51B5; --primary-dark: #303F9F; --bg: #f0f2f5; --surface: #ffffff; --text: #1c1e21; --text-muted: #65676B; --border: #e4e6eb; --msg-sent: #E8EAF6; --msg-recv: #ffffff; --nav-bg: #ffffff; }
         [data-theme="dark"] { --primary: #5C6BC0; --primary-dark: #3F51B5; --bg: #121212; --surface: #1e1e1e; --text: #e4e6eb; --text-muted: #b0b3b8; --border: #333333; --msg-sent: #2c387e; --msg-recv: #242526; --nav-bg: #1e1e1e; }
-        [data-theme="telegram"] { --primary: #2AABEE; --primary-dark: #229ED9; --bg: #f4f4f4; --surface: #ffffff; --text: #222222; --text-muted: #888888; --border: #e0e0e0; --msg-sent: #E1F0FA; --msg-recv: #ffffff; --nav-bg: #ffffff; }
-        [data-theme="sunset"] { --primary: #FF5722; --primary-dark: #E64A19; --bg: #fdf8f5; --surface: #ffffff; --text: #3e2723; --text-muted: #8d6e63; --border: #fbe9e7; --msg-sent: #fbe9e7; --msg-recv: #ffffff; --nav-bg: #ffffff; }
-        [data-theme="forest"] { --primary: #2E7D32; --primary-dark: #1B5E20; --bg: #f1f8e9; --surface: #ffffff; --text: #1b5e20; --text-muted: #7cb342; --border: #c8e6c9; --msg-sent: #e8f5e9; --msg-recv: #ffffff; --nav-bg: #ffffff; }
-        [data-theme="ruby"] { --primary: #E91E63; --primary-dark: #C2185B; --bg: #fce4ec; --surface: #ffffff; --text: #4a148c; --text-muted: #ab47bc; --border: #f8bbd0; --msg-sent: #fce4ec; --msg-recv: #ffffff; --nav-bg: #ffffff; }
-        [data-theme="cyberpunk"] { --primary: #00E5FF; --primary-dark: #00B8D4; --bg: #09090b; --surface: #17171c; --text: #00E5FF; --text-muted: #b2ebf2; --border: #006064; --msg-sent: #006064; --msg-recv: #17171c; --nav-bg: #17171c; }
-        [data-theme="coffee"] { --primary: #795548; --primary-dark: #5D4037; --bg: #efebe9; --surface: #ffffff; --text: #3e2723; --text-muted: #8d6e63; --border: #d7ccc8; --msg-sent: #d7ccc8; --msg-recv: #ffffff; --nav-bg: #ffffff; }
-        [data-theme="mint"] { --primary: #00BFA5; --primary-dark: #00897B; --bg: #e0f2f1; --surface: #ffffff; --text: #004d40; --text-muted: #26a69a; --border: #b2dfdb; --msg-sent: #e0f2f1; --msg-recv: #ffffff; --nav-bg: #ffffff; }
-        [data-theme="gold"] { --primary: #FFB300; --primary-dark: #FF8F00; --bg: #fff8e1; --surface: #ffffff; --text: #3e2723; --text-muted: #a1887f; --border: #ffecb3; --msg-sent: #ffecb3; --msg-recv: #ffffff; --nav-bg: #ffffff; }
-        [data-theme="orchid"] { --primary: #9C27B0; --primary-dark: #7B1FA2; --bg: #f3e5f5; --surface: #ffffff; --text: #4a148c; --text-muted: #ba68c8; --border: #e1bee7; --msg-sent: #f3e5f5; --msg-recv: #ffffff; --nav-bg: #ffffff; }
-        [data-theme="amoled"] { --primary: #ffffff; --primary-dark: #cccccc; --bg: #000000; --surface: #0a0a0a; --text: #ffffff; --text-muted: #666666; --border: #222222; --msg-sent: #1a1a1a; --msg-recv: #0a0a0a; --nav-bg: #050505; }
+        [data-theme="telegram"] { --primary: #2AABEE; --bg: #f4f4f4; --surface: #ffffff; --text: #222222; --border: #e0e0e0; }
+        [data-theme="sunset"] { --primary: #FF5722; --bg: #fdf8f5; --surface: #ffffff; --text: #3e2723; --border: #fbe9e7; }
+        [data-theme="forest"] { --primary: #2E7D32; --bg: #f1f8e9; --surface: #ffffff; --text: #1b5e20; --border: #c8e6c9; }
+        [data-theme="ruby"] { --primary: #E91E63; --bg: #fce4ec; --surface: #ffffff; --text: #4a148c; --border: #f8bbd0; }
+        [data-theme="cyberpunk"] { --primary: #00E5FF; --bg: #09090b; --surface: #17171c; --text: #00E5FF; --border: #006064; }
+        [data-theme="amoled"] { --primary: #ffffff; --bg: #000000; --surface: #0a0a0a; --text: #ffffff; --border: #222222; }
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body, html { height: 100%; height: 100dvh; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0;}
@@ -75,7 +74,7 @@
         .chat-input-area input[type="text"] { flex: 1; padding: 15px 20px; border-radius: 30px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 15px; outline: none;}
         .btn-send { width: 50px; height: 50px; background: var(--primary); color: var(--surface); border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; flex-shrink: 0;}
         
-        .bubble { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 15px; line-height: 1.5; position: relative; word-wrap: break-word;}
+        .bubble { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 15px; line-height: 1.5; position: relative; word-wrap: break-word; cursor: pointer; user-select: none;}
         .bubble.sent { align-self: flex-end; background: var(--msg-sent); color: var(--text); border-bottom-right-radius: 4px;}
         .bubble.received { align-self: flex-start; background: var(--msg-recv); color: var(--text); border-bottom-left-radius: 4px; border: 1px solid var(--border);}
         .bubble-time { font-size: 11px; color: var(--text-muted); text-align: right; margin-top: 5px; display: block; opacity: 0.8;}
@@ -176,6 +175,7 @@
             <div style="flex:1;"><div style="font-size:17px; font-weight:700;" id="chatTitle">User</div></div>
         </div>
         <div class="chat-messages" id="chatMessagesBox"></div>
+        <div id="selectedFileBar"><span id="selectedFileNameDisplay">File selected</span><i class="material-icons" style="cursor:pointer;" onclick="cancelSelectedFile()">close</i></div>
         <div class="chat-input-area">
             <div class="attach-btn" onclick="document.getElementById('fileAttachment').click()"><i class="material-icons">add</i></div>
             <input type="file" id="fileAttachment" style="display:none;" accept="image/*,video/mp4,application/pdf" onchange="handleFileSelect(event)">
@@ -193,7 +193,11 @@
                 <div class="avatar" id="waStatusAvatar" style="width:40px; height:40px;">U</div>
                 <div style="display:flex; flex-direction:column;"><span id="waStatusName" style="font-weight:700;">Name</span><span id="waStatusTime" style="font-size:12px; opacity:0.8;">Time</span></div>
             </div>
-            <a id="waStatusDownloadBtn" style="color:white; display:none;"><i class="material-icons">download</i></a>
+            <div style="display:flex; align-items:center; gap:15px; z-index:4005;">
+                <a id="waStatusDownloadBtn" style="color:white; display:none;"><i class="material-icons">download</i></a>
+                <!-- STATUS DELETE BUTTON -->
+                <i class="material-icons" id="waStatusDeleteBtn" style="color:#E91E63; display:none; cursor:pointer;" onclick="deleteActiveStatus()">delete</i>
+            </div>
         </div>
         
         <div class="wa-content" id="waStatusContent"></div>
@@ -204,10 +208,20 @@
     </div>
 
     <!-- MODALS -->
-    <div id="newChatModal" class="modal-overlay"><div class="modal-content"><h3>New Chat</h3><input type="email" id="newChatEmail" placeholder="Enter Gmail..."><button onclick="startNewChat()">START</button></div></div>
-    <div id="newGroupModal" class="modal-overlay"><div class="modal-content"><h3>New Group</h3><input type="text" id="newGroupName" placeholder="Group Name"><textarea id="newGroupEmails" placeholder="Emails separated by comma"></textarea><button onclick="createGroup()">CREATE</button></div></div>
-    <div id="textStatusModal" class="modal-overlay"><div class="modal-content"><h3>Status</h3><textarea id="statusTextOnly" placeholder="Type status..."></textarea><button onclick="postStatus('text')">POST</button></div></div>
-    <div id="imageStatusModal" class="modal-overlay"><div class="modal-content"><h3>Media Status</h3><input type="file" id="statusFile" accept="image/*,video/mp4" onchange="handleStatusFile(event)"><input type="text" id="statusCaption" placeholder="Caption..."><button onclick="postStatus('image')">UPLOAD</button></div></div>
+    <div id="newChatModal" class="modal-overlay"><div class="modal-content"><h3 style="margin-top:0;">New Chat</h3><input type="email" id="newChatEmail" placeholder="Enter Gmail..."><button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px;" onclick="startNewChat()">START</button></div></div>
+    <div id="newGroupModal" class="modal-overlay"><div class="modal-content"><h3 style="margin-top:0;">New Group</h3><input type="text" id="newGroupName" placeholder="Group Name"><textarea id="newGroupEmails" placeholder="Emails separated by comma"></textarea><button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px;" onclick="createGroup()">CREATE</button></div></div>
+    <div id="textStatusModal" class="modal-overlay"><div class="modal-content"><h3 style="margin-top:0;">Status</h3><textarea id="statusTextOnly" placeholder="Type status..."></textarea><button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px;" onclick="postStatus('text')">POST</button></div></div>
+    <div id="imageStatusModal" class="modal-overlay"><div class="modal-content"><h3 style="margin-top:0;">Media Status</h3><input type="file" id="statusFile" accept="image/*,video/mp4" onchange="handleStatusFile(event)"><input type="text" id="statusCaption" placeholder="Caption..."><button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px;" onclick="postStatus('image')">UPLOAD</button></div></div>
+
+    <!-- MESSAGE OPTIONS MODAL (LONG PRESS MENU) -->
+    <div id="msgOptionsModal" class="modal-overlay">
+        <div class="modal-content" style="text-align:center;">
+            <h3 style="margin-top:0;">Message Options</h3>
+            <button onclick="shareSelectedMsg()" style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px; margin-bottom:10px;">SHARE</button>
+            <button onclick="deleteSelectedMsg()" style="width:100%; padding:15px; background:#E91E63; color:white; border:none; border-radius:12px; margin-bottom:10px;">DELETE FOR ALL</button>
+            <button onclick="document.getElementById('msgOptionsModal').style.display='none'" style="width:100%; padding:15px; background:transparent; border:1px solid var(--border); color:var(--text); border-radius:12px;">CANCEL</button>
+        </div>
+    </div>
 
 <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
@@ -230,6 +244,9 @@
     let waActiveIndex = 0;
     let waTimer = null;
     let waIsChatMedia = false; 
+
+    // For Long Press Options
+    let activeActionMsg = null;
 
     window.onload = function() {
         applyTheme(localStorage.getItem('isb_theme') || 'default');
@@ -254,6 +271,8 @@
         } catch(e) { alert("Login Failed"); }
     }
     
+    function logoutUser() { localStorage.removeItem("isb_email"); location.reload(); }
+    
     function showMainApp() {
         document.getElementById('authScreen').style.display = 'none'; document.getElementById('mainApp').style.display = 'flex';
         document.getElementById('profileEmail').innerText = currentUserEmail; document.getElementById('profileAvatar').innerText = currentUserEmail.charAt(0).toUpperCase();
@@ -262,8 +281,11 @@
 
     function startFirebaseSync() {
         if(isListeningToFirebase) return; isListeningToFirebase = true;
+        
         database.ref('messages').on('child_added', function(snapshot) {
             let m = snapshot.val(); if(!m) return;
+            // Store firebase key for safe deletion
+            m.fbKey = snapshot.key;
             if (!APP_STATE.msgs.some(msg => msg.id === m.id)) {
                 let isMyGroupMsg = m.isGroup && APP_STATE.groups.some(g => g.id === m.to);
                 let isPersonalMsg = !m.isGroup && (m.from === currentUserEmail || m.to === currentUserEmail);
@@ -273,13 +295,32 @@
                 }
             }
         });
+
+        // 🔥 REALTIME DELETE LISTENER (CHAT)
+        database.ref('messages').on('child_removed', function(snapshot) {
+            let removedMsg = snapshot.val();
+            APP_STATE.msgs = APP_STATE.msgs.filter(m => m.id !== removedMsg.id);
+            let el = document.getElementById(`msg_${removedMsg.id}`);
+            if(el) el.remove();
+            loadChatsList();
+        });
+
         database.ref('groups').on('child_added', function(snapshot) {
             let g = snapshot.val();
             if(g && g.members.includes(currentUserEmail)) { if(!APP_STATE.groups.some(grp => grp.id === g.id)) { APP_STATE.groups.push(g); loadChatsList(); } }
         });
+
         database.ref('statuses').on('child_added', function(snapshot) {
             let s = snapshot.val();
+            s.fbKey = snapshot.key;
             if(s) { if(!APP_STATE.statuses.some(st => st.id === s.id)) { APP_STATE.statuses.push(s); loadStatusList(); } }
+        });
+
+        // 🔥 REALTIME DELETE LISTENER (STATUS)
+        database.ref('statuses').on('child_removed', function(snapshot) {
+            let removedSts = snapshot.val();
+            APP_STATE.statuses = APP_STATE.statuses.filter(s => s.id !== removedSts.id);
+            loadStatusList();
         });
     }
 
@@ -310,7 +351,7 @@
         });
     }
 
-    // THE PROVEN RAM BLOB URL MAKER (NO CRASH)
+    // THE PROVEN RAM BLOB URL MAKER
     function base64ToBlobUrl(base64Data) {
         try {
             let arr = base64Data.split(','); let mime = arr[0].match(/:(.*?);/)[1];
@@ -319,6 +360,14 @@
             let blob = new Blob([u8arr], {type: mime});
             return URL.createObjectURL(blob);
         } catch(e) { return base64Data; }
+    }
+    
+    // For Native File Sharing API
+    function dataURItoBlob(dataURI) {
+        let parts = dataURI.split(','); let mime = parts[0].match(/:(.*?);/)[1];
+        let bstr = atob(parts[1]); let n = bstr.length; let u8arr = new Uint8Array(n);
+        for(let i=0; i<n; i++){ u8arr[i] = bstr.charCodeAt(i); }
+        return new Blob([u8arr], {type: mime});
     }
 
     function handleFileSelect(event) {
@@ -412,7 +461,28 @@
                 }
                 document.getElementById(`msg_${m.id}`).innerHTML = `${senderHtml}${content}<span class="bubble-time">${timeStr}</span>`;
             } else { document.getElementById(`msg_${m.id}`).innerHTML = `${senderHtml}${decrypted} <span class="bubble-time">${timeStr}</span>`; }
-        } catch(e) { document.getElementById(`msg_${m.id}`).innerHTML = `${senderHtml}<span style="color:red; font-size:13px;">Corrupted</span>`; }
+        } catch(e) { document.getElementById(`msg_${m.id}`).innerHTML = `${senderHtml}<span style="color:#E91E63; font-size:13px;">Corrupted</span>`; }
+
+        // 🔥 LONG PRESS LISTENER (SHARE / DELETE)
+        let pressTimer;
+        let startPress = (e) => {
+            pressTimer = setTimeout(() => { activeActionMsg = m; document.getElementById('msgOptionsModal').style.display='flex'; }, 600);
+        };
+        let endPress = () => { clearTimeout(pressTimer); };
+        
+        bubble.addEventListener('touchstart', startPress);
+        bubble.addEventListener('touchend', endPress);
+        bubble.addEventListener('touchmove', endPress);
+        bubble.addEventListener('mousedown', startPress);
+        bubble.addEventListener('mouseup', endPress);
+        bubble.addEventListener('mousemove', endPress);
+        
+        // Native Context Menu block for browser
+        bubble.oncontextmenu = (e) => {
+            e.preventDefault();
+            activeActionMsg = m;
+            document.getElementById('msgOptionsModal').style.display='flex';
+        };
     }
 
     async function sendChatMessage() {
@@ -425,7 +495,44 @@
             await database.ref('messages').push({ id: Date.now() + Math.random().toString().substring(2,8), from: currentUserEmail, to: currentChatContact, payload: encryptedPayload, time: new Date().toLocaleString(), isGroup: isGroupChat });
             input.value = ""; cancelSelectedFile(); sendBtn.disabled = false; input.disabled = false; input.focus();
             setTimeout(() => { document.getElementById('chatMessagesBox').scrollTop = document.getElementById('chatMessagesBox').scrollHeight; }, 100);
-        } catch(e) { alert("Encryption Error"); sendBtn.disabled = false; input.disabled = false; }
+        } catch(e) { 
+            // 🔥 FIREBASE RULES ERROR EXPLANATION
+            alert("Database Error! Message Not Saved.\n\nYour Firebase Database Security Rules might have expired (30-day limit). Please go to Firebase Console -> Realtime Database -> Rules, and set '.read': 'true', '.write': 'true'."); 
+            sendBtn.disabled = false; input.disabled = false; 
+        }
+    }
+
+    // --- SHARE & DELETE MESSAGE LOGIC ---
+    async function shareSelectedMsg() {
+        document.getElementById('msgOptionsModal').style.display='none';
+        if(!activeActionMsg) return;
+        try {
+            if(activeActionMsg.decryptedData && activeActionMsg.decryptedData.startsWith("data:")) {
+                let blob = dataURItoBlob(activeActionMsg.decryptedData);
+                let file = new File([blob], activeActionMsg.decryptedName || "ISB_Media", {type: blob.type});
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({ files: [file], title: activeActionMsg.decryptedName });
+                } else {
+                    await navigator.share({ title: 'ISB File', text: 'File Attached: ' + activeActionMsg.decryptedName });
+                }
+            } else {
+                await navigator.share({ title: 'ISB Message', text: activeActionMsg.decryptedFullText });
+            }
+        } catch(e) { console.log("Share failed", e); }
+    }
+
+    function deleteSelectedMsg() {
+        document.getElementById('msgOptionsModal').style.display='none';
+        if(!activeActionMsg) return;
+        
+        let confirmText = (activeActionMsg.from === currentUserEmail) ? "Delete your message for everyone?" : "Delete this message?";
+        if(!confirm(confirmText)) return;
+        
+        // Remove from Firebase (triggers child_removed to auto-hide from screen)
+        database.ref('messages').orderByChild('id').equalTo(activeActionMsg.id).once('value', snapshot => {
+            snapshot.forEach(child => child.ref.remove());
+        });
+        activeActionMsg = null;
     }
 
     function openTextStatusModal() { document.getElementById('textStatusModal').style.display = 'flex'; document.getElementById('statusTextOnly').value = ""; }
@@ -436,6 +543,13 @@
     }
     
     async function postStatus(type) {
+        // 🔥 5 STATUS LIMIT LOGIC
+        let myActive = APP_STATE.statuses.filter(s => s.from === currentUserEmail && (Date.now() - s.timestamp < 24*60*60*1000));
+        if(myActive.length >= 5) {
+            alert("Limit Reached! You can only keep 5 active statuses. Please delete an old status first.");
+            return;
+        }
+
         let payloadToEncrypt = "";
         if(type === 'text') {
             let txt = document.getElementById('statusTextOnly').value.trim(); if(!txt) return;
@@ -453,6 +567,7 @@
         APP_STATE.msgs.forEach(m => { if(!m.isGroup) myContacts.add(m.from === currentUserEmail ? m.to : m.from); });
         myContacts.add(currentUserEmail); 
 
+        // 🔥 STATUS 24 HOUR RULE (Filters automatically)
         let now = Date.now(), validStatuses = APP_STATE.statuses.filter(s => myContacts.has(s.from) && (now - s.timestamp < 24 * 60 * 60 * 1000));
         
         window.statusPlaylist = [];
@@ -498,7 +613,7 @@
         document.getElementById('statusList').innerHTML = listHtml || `<div class="empty-state"><i class="material-icons">chat_bubble_outline</i><h3>No Updates Yet</h3></div>`;
     }
 
-    // --- FULL SCREEN MEDIA VIEWER (WhatsApp & MX Player Style) ---
+    // --- FULL SCREEN NATIVE MEDIA VIEWER ---
     async function openMediaViewer(msgId, source) {
         waIsChatMedia = (source === 'msg');
         document.getElementById('waStatusViewer').style.display = 'flex';
@@ -513,30 +628,38 @@
         let dBtn = document.getElementById('waStatusDownloadBtn');
         let tapLeft = document.getElementById('waTapLeft');
         let tapRight = document.getElementById('waTapRight');
+        let delBtn = document.getElementById('waStatusDeleteBtn');
         
         if(waIsChatMedia) {
-            // चैट मीडिया: प्लेयर कंट्रोल्स चालू होंगे, टैप-टू-स्किप बंद!
+            // 🔥 चैट का वीडियो: प्लेयर कंट्रोल्स चालू होंगे, टैप-टू-स्किप बंद!
             dBtn.style.display = 'block'; 
             dBtn.href = base64ToBlobUrl(fData); 
             dBtn.download = fName;
+            delBtn.style.display = 'none'; // Chat deletion done via long press
             tapLeft.style.display = 'none';
             tapRight.style.display = 'none';
         } else {
-            // स्टेटस: प्लेयर कंट्रोल्स छुप जाएंगे, दाएँ-बाएँ टैप चालू!
+            // 🔥 स्टेटस का वीडियो: प्लेयर कंट्रोल्स छुप जाएंगे, दाएँ-बाएँ टैप चालू!
             dBtn.style.display = 'none';
             tapLeft.style.display = 'block';
             tapRight.style.display = 'block';
+            
+            // अगर यह खुद का स्टेटस है, तो डिलीट बटन दिखाएं
+            if(m.from === currentUserEmail) {
+                delBtn.style.display = 'block';
+            } else {
+                delBtn.style.display = 'none';
+            }
         }
 
         let contentBox = document.getElementById('waStatusContent');
         contentBox.innerHTML = `<i class="material-icons animate-spin" style="font-size:50px;">sync</i>`;
 
-        // डिक्रिप्टेड डेटा को असली फाइल लिंक में बदलें
         let bUrl = base64ToBlobUrl(fData);
 
         // 1. FULL SCREEN VIDEO PLAYER
         if(fData.startsWith("data:video/")) {
-            let controlsAttr = waIsChatMedia ? "controls" : ""; // स्टेटस में कंट्रोल्स नहीं होंगे
+            let controlsAttr = waIsChatMedia ? "controls" : ""; 
             
             contentBox.innerHTML = `<video id="activeVideoPlayer" src="${bUrl}" ${controlsAttr} playsinline style="width:100%; height:100%; object-fit:contain; background:#000; outline:none;"></video>`;
             let video = document.getElementById('activeVideoPlayer');
@@ -556,7 +679,6 @@
             } catch(e) { if(waIsChatMedia) video.controls = true; }
 
             if(!waIsChatMedia) {
-                // स्टेटस है तो वीडियो खत्म होते ही आगे बढ़ो
                 video.onended = () => { nextWaStatus(); };
                 video.onloadedmetadata = () => {
                     clearTimeout(waTimer);
@@ -574,9 +696,25 @@
             contentBox.innerHTML = `<img src="${bUrl}" style="width:100%; height:100%; object-fit:contain;">`;
             if(fName && !waIsChatMedia) contentBox.innerHTML += `<div class="wa-status-caption">${fName}</div>`;
         } 
-        // 3. PDF & TEXT...
+        // 3. TEXT & PDF
         else {
-            contentBox.innerHTML = `<div style="text-align:center;"><h2>📁 File</h2><p>${fName}</p></div>`;
+            if(fData === "txt") {
+                contentBox.innerHTML = `<div style="width:100%; height:100%; display:flex; justify-content:center; align-items:center; background:var(--primary); padding:30px; font-size:28px; text-align:center; word-wrap:break-word;">${fName}</div>`;
+            } else {
+                contentBox.innerHTML = `<div style="text-align:center;"><h2>📁 File</h2><p>${fName}</p></div>`;
+            }
+        }
+    }
+
+    // --- STATUS DELETE LOGIC ---
+    function deleteActiveStatus() {
+        let st = waUserStatusGroup[waActiveIndex];
+        if(!st) return;
+        if(confirm("Delete this status permanently?")) {
+            database.ref('statuses').orderByChild('id').equalTo(st.id).once('value', snapshot => {
+                snapshot.forEach(child => child.ref.remove());
+            });
+            closeWaStatus();
         }
     }
 
