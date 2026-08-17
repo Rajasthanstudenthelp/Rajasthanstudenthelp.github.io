@@ -2,13 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!-- 🔥 Ultimate Viewport For Superfast Worldwide Devices 🔥 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#3F51B5">
     
     <title>ISB-24 Premium Web3</title>
     
+    <!-- Libraries -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
@@ -20,13 +23,34 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
 
         /* 🎨 THEMES */
-        :root { --primary: #3F51B5; --bg: #f0f2f5; --surface: #ffffff; --text: #1c1e21; --text-muted: #65676B; --border: #e4e6eb; --msg-sent: #E8EAF6; --msg-recv: #ffffff; --nav-bg: #ffffff; }
-        [data-theme="dark"] { --primary: #5C6BC0; --bg: #121212; --surface: #1e1e1e; --text: #e4e6eb; --text-muted: #b0b3b8; --border: #333333; --msg-sent: #2c387e; --msg-recv: #242526; --nav-bg: #1e1e1e; }
-        [data-theme="amoled"] { --primary: #ffffff; --bg: #000000; --surface: #0a0a0a; --text: #ffffff; --border: #222222; --msg-sent: #222222; --msg-recv: #111111; --nav-bg: #000000;}
-        [data-theme="telegram"] { --primary: #2AABEE; --bg: #f4f4f4; --surface: #ffffff; --text: #222222; --border: #e0e0e0; }
+        :root { 
+            --primary: #3F51B5; --primary-dark: #303F9F; --bg: #f0f2f5; 
+            --surface: #ffffff; --text: #1c1e21; --text-muted: #65676B; 
+            --border: #e4e6eb; --msg-sent: #E8EAF6; --msg-recv: #ffffff; --nav-bg: #ffffff; 
+        }
+        [data-theme="dark"] { 
+            --primary: #5C6BC0; --bg: #121212; --surface: #1e1e1e; 
+            --text: #e4e6eb; --text-muted: #b0b3b8; --border: #333333; 
+            --msg-sent: #2c387e; --msg-recv: #242526; --nav-bg: #1e1e1e; 
+        }
+        [data-theme="amoled"] { 
+            --primary: #ffffff; --bg: #000000; --surface: #0a0a0a; 
+            --text: #ffffff; --border: #222222; --msg-sent: #222222; 
+            --msg-recv: #111111; --nav-bg: #000000;
+        }
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body, html { height: 100vh; height: 100dvh; overflow: hidden; font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0;}
+        
+        body, html { 
+            height: 100vh; 
+            height: 100dvh; 
+            overflow: hidden; 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 0;
+        }
         
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
@@ -41,41 +65,44 @@
         .app-bar i { font-size: 26px; cursor: pointer; color: var(--text-muted); transition: color 0.2s; }
         
         .search-bar-container { display: none; padding: 10px 15px; background: var(--surface); border-bottom: 1px solid var(--border); animation: fadeIn 0.2s ease-out;}
-        .search-bar-container input { width: 100%; padding: 12px 20px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg); color: var(--text); outline: none; font-size: 14px;}
+        .search-bar-container input { width: 100%; padding: 12px 20px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 14px;}
         
         .container { flex: 1; overflow-y: auto; padding-bottom: 70px; scroll-behavior: smooth; }
         .tab-content { display: none; animation: fadeIn 0.3s ease-out; }
         .tab-content.active { display: block; }
+        
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes spin { 100% { transform: rotate(360deg); } }
         .animate-spin { animation: spin 1s linear infinite; }
 
         .list-item { display: flex; align-items: center; padding: 15px 20px; cursor: pointer; background: var(--surface); transition: background 0.2s; margin: 5px 10px; border-radius: 16px; border: 1px solid transparent;}
         .list-item:active { background: var(--bg); transform: scale(0.98); }
+        
         .avatar { width: 54px; height: 54px; background: var(--primary); color: var(--surface); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 22px; font-weight: bold; margin-right: 15px; flex-shrink: 0; overflow:hidden;}
         .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        
         .list-info { flex: 1; overflow: hidden; }
         .list-title { font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
         .list-subtitle { font-size: 14px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; font-weight: 500;}
         .list-time { font-size: 12px; color: var(--text-muted); font-weight: 600; }
 
-        .fab { position: fixed; bottom: 85px; right: 20px; width: 60px; height: 60px; background: #25D366; color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 10px 20px rgba(37,211,102,0.3); cursor: pointer; z-index: 90; transition: transform 0.2s;}
+        .fab { position: fixed; bottom: 85px; right: 20px; width: 60px; height: 60px; background: #25D366; color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 10px 20px rgba(37,211,102,0.3); cursor: pointer; z-index: 90;}
         .fab:active { transform: scale(0.9); }
         .fab-secondary { bottom: 160px; background: var(--surface); color: var(--primary); border: 1px solid var(--border); box-shadow: 0 5px 15px rgba(0,0,0,0.1);}
-        .fab-pencil { position: fixed; bottom: 160px; right: 28px; width: 45px; height: 45px; background: var(--surface); color: var(--text-muted); border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); cursor: pointer; z-index: 90; border: 1px solid var(--border);}
-
+        
         .bottom-nav { flex-shrink: 0; background: var(--nav-bg); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid var(--border); z-index: 100;}
         .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); cursor: pointer; width: 25%; transition: color 0.2s;}
         .nav-item span { font-size: 12px; font-weight: 800; }
         .nav-item.active { color: var(--primary); }
-        .nav-item.active i { transform: scale(1.1); transition: transform 0.2s; }
+        .nav-item.active i { transform: scale(1.1); }
 
         .chat-window { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg); z-index: 200; flex-direction: column; }
-        .chat-header { flex-shrink: 0; background: var(--surface); padding: 12px 15px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid var(--border); position: relative; box-shadow: 0 2px 10px rgba(0,0,0,0.05);}
+        .chat-header { flex-shrink: 0; background: var(--surface); padding: 12px 15px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid var(--border); box-shadow: 0 2px 10px rgba(0,0,0,0.05);}
         .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; scroll-behavior: smooth; }
+        
         .chat-input-area { flex-shrink: 0; background: var(--surface); padding: 10px 15px; display: flex; gap: 12px; align-items: center; border-top: 1px solid var(--border);}
-        .chat-input-area input[type="text"] { flex: 1; padding: 15px 20px; border-radius: 30px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 15px; outline: none; font-weight: 500;}
-        .btn-send { width: 50px; height: 50px; background: var(--primary); color: var(--surface); border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; flex-shrink: 0; transition: transform 0.2s;}
+        .chat-input-area input[type="text"] { flex: 1; padding: 15px 20px; border-radius: 30px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 15px; }
+        .btn-send { width: 50px; height: 50px; background: var(--primary); color: var(--surface); border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; flex-shrink: 0;}
         .btn-send:active { transform: scale(0.9); }
         
         .chat-menu-dropdown { display: none; position: absolute; right: 15px; top: 60px; background: var(--surface); box-shadow: 0 10px 30px rgba(0,0,0,0.2); border-radius: 12px; overflow: hidden; z-index: 300; border: 1px solid var(--border); min-width: 180px;}
@@ -88,63 +115,17 @@
         .bubble.received { align-self: flex-start; background: var(--msg-recv); color: var(--text); border-bottom-left-radius: 4px; border: 1px solid var(--border); box-shadow: 0 2px 5px rgba(0,0,0,0.05);}
         .bubble-time { font-size: 10px; color: var(--text-muted); text-align: right; margin-top: 5px; display: block; font-weight: 600;}
 
-        .auth-container { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; width: 100%;}
+        .auth-container { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; height: 100%;}
         .auth-box { background: var(--surface); padding: 40px 30px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); width: 100%; max-width: 400px; text-align: center; border: 1px solid var(--border);}
         
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; right:0; bottom:0; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center; backdrop-filter: blur(5px);}
         .modal-content { background: var(--surface); width: 92%; max-width: 400px; border-radius: 24px; padding: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); position: relative;}
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .modal-header h3 { margin: 0; font-size: 20px; color: var(--text); font-weight: 800;}
-        .close-btn { background: none; border: none; color: var(--text-muted); font-size: 28px; cursor: pointer; padding: 0; transition: 0.2s;}
         
-        .upload-area { border: 2px dashed var(--primary); border-radius: 16px; padding: 40px 20px; text-align: center; cursor: pointer; margin-bottom: 20px; background: rgba(63, 81, 181, 0.05); transition: 0.3s; position: relative;}
-        .upload-icon { font-size: 48px; color: var(--primary); margin-bottom: 10px; }
-        .upload-text { font-size: 16px; color: var(--text); font-weight: 800; margin-bottom: 5px;}
-        .status-preview-box { display:none; width:100%; height:180px; border-radius:12px; margin-bottom:20px; object-fit:contain; background:#000; border: 1px solid var(--border); box-shadow: 0 5px 15px rgba(0,0,0,0.1);}
-
-        .profile-pic-upload { width: 110px; height: 110px; border-radius: 50%; background: var(--bg); border: 3px dashed var(--primary); display: flex; justify-content: center; align-items: center; margin: 0 auto 20px auto; cursor: pointer; overflow: hidden; position: relative;}
-        .profile-pic-upload img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .settings-section { background: var(--surface); border-radius: 16px; border: 1px solid var(--border); margin: 0 15px 20px 15px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
-        .settings-row { display: flex; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--border); cursor: pointer; transition: 0.2s;}
-        .settings-row:hover { background: var(--bg); }
-        .settings-row:last-child { border-bottom: none; }
-        .settings-row-icon { color: var(--primary); margin-right: 15px; font-size: 26px; }
-        .settings-row-text { flex: 1; font-weight: 800; color: var(--text); font-size: 15px;}
-        .settings-subtext { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-top:2px;}
-        
-        .input-wrapper { position: relative; width: 100%; margin-bottom: 20px; }
-        .input-wrapper input { width: 100%; padding: 15px 45px 15px 15px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-weight: 800; font-size: 16px; outline: none; text-align: left; transition: border-color 0.2s;}
-        .input-wrapper input:focus { border-color: var(--primary); }
-        .input-icon-right { position: absolute; right: 15px; top: 15px; font-size: 24px; transition: 0.2s;}
-
-        .theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 10px 20px; }
-        .theme-circle { width: 50px; height: 50px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: transform 0.2s;}
-        .theme-circle.active { border-color: var(--text); transform: scale(1.15); box-shadow: 0 4px 10px rgba(0,0,0,0.2);}
-
         .status-tray { display: flex; overflow-x: auto; gap: 12px; padding: 15px 20px; scroll-snap-type: x mandatory; }
         .status-tray::-webkit-scrollbar { display: none; }
-        .status-card { width: 105px; height: 150px; border-radius: 16px; background: var(--surface); position: relative; flex-shrink: 0; border: 1px solid var(--border); overflow: hidden; background-size: cover; background-position: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: transform 0.2s;}
-        .status-card:active { transform: scale(0.95); }
-        .status-card-avatar { position: absolute; top: 10px; left: 10px; width: 36px; height: 36px; border-radius: 50%; border: 2px solid #25D366; background: var(--surface); display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--text); z-index: 2; overflow:hidden;}
-        .status-card-avatar img { width: 100%; height: 100%; object-fit: cover;}
-        .status-card-name { position: absolute; bottom: 10px; left: 10px; right: 10px; font-size: 12px; font-weight: 800; color: white; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 2;}
-        .status-card-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.8)); z-index: 1;}
-
-        .wa-status-viewer { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: #000; z-index: 4000; flex-direction: column; color: white;}
-        .wa-progress-container { display: flex; gap: 4px; padding: 10px 10px 0 10px; position: absolute; top: 0; width: 100%; z-index: 4002; }
-        .wa-progress-segment { flex: 1; height: 3px; background: rgba(255,255,255,0.3); border-radius: 2px; overflow: hidden; }
-        .wa-progress-fill { height: 100%; background: white; width: 0%; }
-        .wa-header { display:flex; justify-content:space-between; align-items:center; padding:20px 15px; position:absolute; top:5px; width:100%; z-index:4002; background:linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);}
-        .wa-content { flex: 1; position: relative; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; overflow: hidden; background: #000;}
-        .wa-status-caption { position: absolute; bottom: 40px; width: 100%; text-align: center; padding: 10px 20px; background: rgba(0,0,0,0.6); font-size: 15px; font-weight: 600; word-wrap: break-word; z-index:4002;}
-        .wa-tap-left { position: absolute; top:0; left:0; width: 35%; height: 100%; z-index: 4001; cursor: pointer;}
-        .wa-tap-right { position: absolute; top:0; right:0; width: 65%; height: 100%; z-index: 4001; cursor: pointer;}
+        .status-card { width: 105px; height: 150px; border-radius: 16px; background: var(--surface); position: relative; flex-shrink: 0; border: 1px solid var(--border); overflow: hidden; background-size: cover; background-position: center; cursor: pointer;}
         
-        .crop-container { width: 100%; max-width: 250px; height: 250px; margin: 0 auto 15px auto; background: var(--bg); border-radius: 50%; overflow: hidden; border: 3px solid var(--primary); position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.2); touch-action: none;}
-        #cropCanvas { position: absolute; top: 0; left: 0; cursor: move; }
-
-        /* 🔥 MASTERMIND NATIVE CALL UI STYLES 🔥 */
+        /* 🔥 ULTIMATE CALL UI STYLES 🔥 */
         #callOverlay { 
             display:none; 
             position:fixed; 
@@ -153,7 +134,7 @@
             width:100%; 
             height:100%; 
             background: #1a1a1a; 
-            z-index:999999; /* सबसे ऊपर रहेगा, कोई ब्राउज़र रोक नहीं सकता */
+            z-index:999999 !important; /* GUARANTEED TOP POPUP */
             flex-direction:column; 
             align-items:center; 
             justify-content:flex-start; 
@@ -178,7 +159,7 @@
 </head>
 <body data-theme="default">
 
-    <!-- Preloading Audio files to bypass strict Autoplay policies -->
+    <!-- Preloading Audio files -->
     <audio id="incomingRing" loop preload="auto" src="https://actions.google.com/sounds/v1/alarms/phone_ringing.ogg"></audio>
     <audio id="outgoingRing" loop preload="auto" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
 
@@ -195,6 +176,7 @@
 
     <!-- MAIN APP SCREEN -->
     <div id="mainApp" style="display: none;">
+        
         <div class="app-bar">
             <div class="app-title">ISB Chat</div>
             <div class="app-bar-icons">
@@ -210,7 +192,13 @@
         <div class="container">
             <!-- CHATS TAB -->
             <div id="chatsTab" class="tab-content active">
-                <div id="chatsList"></div>
+                <div id="chatsList">
+                    <!-- Superfast initial load happens here -->
+                    <div style="text-align:center; padding:50px 20px; color:var(--text-muted);">
+                        <i class="material-icons animate-spin" style="font-size:40px; color:var(--primary);">sync</i>
+                        <div style="margin-top:10px; font-weight:800; font-size:15px;">Loading Chats...</div>
+                    </div>
+                </div>
                 <div class="fab fab-secondary" onclick="openNewGroupModal()"><i class="material-icons">group_add</i></div>
                 <div class="fab" onclick="openNewChatModal()"><i class="material-icons">add_comment</i></div>
             </div>
@@ -247,16 +235,8 @@
                     <div class="settings-row" onclick="openBlockedUsersModal()"><i class="material-icons settings-row-icon" style="color:#E91E63;">block</i><div class="settings-row-text">Blocked Contacts</div><i class="material-icons" style="color:var(--border);">chevron_right</i></div>
                 </div>
 
-                <div style="padding: 10px 20px 5px; font-weight: 800; color: var(--text-muted); font-size:12px; letter-spacing: 1px;">THEMES</div>
-                <div class="settings-section" style="padding: 10px 0;"><div class="theme-grid" id="themeGrid"></div></div>
-
                 <div class="settings-section">
                     <div class="settings-row" onclick="logoutUser()"><i class="material-icons settings-row-icon" style="color:#E91E63;">logout</i><div class="settings-row-text" style="color:#E91E63;">Log Out securely</div></div>
-                </div>
-                
-                <div class="made-in-india" style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 14px; font-weight: 800; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                    MAKE IN INDIA<span>🇮🇳</span>
-                    <div style="font-size: 11px; color: #25D366; border: 1px solid #25D366; background: rgba(37,211,102,0.1); padding: 4px 10px; border-radius: 12px; margin-top: 8px;">⚡ ISB MASTERMIND ENGINE</div>
                 </div>
             </div>
         </div>
@@ -297,7 +277,7 @@
         </div>
 
         <div class="chat-messages" id="chatMessagesBox"></div>
-        <div id="selectedFileBar"><span id="selectedFileNameDisplay">File selected</span><i class="material-icons" style="cursor:pointer;" onclick="cancelSelectedFile()">close</i></div>
+        <div id="selectedFileBar" style="display:none; padding:10px; background:#fff; border-top:1px solid var(--border);"><span id="selectedFileNameDisplay">File selected</span><i class="material-icons" style="cursor:pointer;" onclick="cancelSelectedFile()">close</i></div>
         
         <div class="chat-input-area">
             <div class="attach-btn" onclick="document.getElementById('fileAttachment').click()"><i class="material-icons">add</i></div>
@@ -330,10 +310,12 @@
                 <button class="call-action-btn btn-decline" onclick="endCall(true)" style="width: 75px; height: 75px;"><i class="material-icons" style="font-size:36px;">call_end</i></button>
                 <button id="btnVideoToggle" onclick="toggleVideo()" style="background:rgba(255,255,255,0.2); border:none; border-radius:50%; width:60px; height:60px; color:white; cursor:pointer; backdrop-filter:blur(5px);"><i class="material-icons" id="videoToggleIcon" style="font-size:28px;">videocam_off</i></button>
             </div>
+
         </div>
     </div>
 
     <!-- MODALS AND MEDIA VIEWER -->
+    <!-- (Other modals like WA Status Viewer, Setup Profile, etc.) -->
     <div id="waStatusViewer" class="wa-status-viewer"><div class="wa-progress-container" id="waProgressBarContainer"></div><div class="wa-header"><div style="display:flex; align-items:center; gap:12px; cursor:pointer; z-index:4005;" onclick="closeWaStatus()"><i class="material-icons">arrow_back</i><div class="avatar" id="waStatusAvatar" style="width:40px; height:40px;">U</div><div style="display:flex; flex-direction:column;"><span id="waStatusName" style="font-weight:700;">Name</span><span id="waStatusTime" style="font-size:12px; opacity:0.8;">Time</span></div></div><div style="display:flex; align-items:center; gap:15px; z-index:4005;"><a id="waStatusDownloadBtn" style="color:white; display:none;"><i class="material-icons">download</i></a><i class="material-icons" id="waStatusDeleteBtn" style="color:#E91E63; display:none; cursor:pointer;" onclick="deleteActiveStatus()">delete</i></div></div><div class="wa-content" id="waStatusContent"></div><div class="wa-tap-left" id="waTapLeft" onclick="prevWaStatus()" style="display:none;"></div><div class="wa-tap-right" id="waTapRight" onclick="nextWaStatus()" style="display:none;"></div></div>
     <div id="setupProfileModal" class="modal-overlay"><div class="modal-content" style="text-align:center;"><h3 style="margin-top:0; color:var(--text);">Create Your Profile</h3><p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">Choose a unique username and photo</p><div class="profile-pic-upload" onclick="document.getElementById('setupAvatarFile').click()"><img id="setupAvatarPreview" style="display:none;"><i class="material-icons" id="setupAvatarIcon" style="font-size:40px; color:var(--primary);">camera_alt</i></div><input type="file" id="setupAvatarFile" accept="image/*" style="display:none;" onchange="handleImageSelection(event, 'setup')"><div class="input-wrapper"><input type="text" id="setupUsernameInput" placeholder="@username" oninput="validateUsernameInput()"><i class="material-icons input-icon-right" id="usernameStatusIcon" style="color:var(--text-muted);">info</i></div><button id="saveProfileBtn" disabled style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:16px; font-weight:800; font-size:16px; box-shadow:0 4px 10px rgba(0,0,0,0.15); cursor:pointer; opacity:0.5; transition:0.3s;" onclick="saveProfileSetup()">SAVE PROFILE</button><button id="cancelSetupBtn" style="width:100%; padding:15px; background:transparent; color:#E91E63; border:none; margin-top:10px; cursor:pointer; display:none; font-weight:800;" onclick="logoutUser()">LOGOUT & GO BACK</button></div></div>
     <div id="cropperModal" class="modal-overlay" style="z-index: 3000;"><div class="modal-content" style="text-align:center;"><h3 style="margin-top:0; color:var(--text);">Crop Photo</h3><p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;">Drag to adjust and use slider to zoom</p><div class="crop-container" id="cropBox"><canvas id="cropCanvas" width="250" height="250"></canvas></div><input type="range" id="cropZoomSlider" min="1" max="3" step="0.05" value="1" style="width:100%; margin-bottom:20px; accent-color:var(--primary);" oninput="drawCrop()"><div style="display:flex; gap:10px;"><button style="flex:1; padding:12px; background:transparent; border:2px solid var(--border); border-radius:12px; color:var(--text); font-weight:bold; cursor:pointer;" onclick="document.getElementById('cropperModal').style.display='none'">CANCEL</button><button style="flex:1; padding:12px; background:var(--primary); border:none; border-radius:12px; color:white; font-weight:bold; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.15);" onclick="applyCrop()">CROP & SAVE</button></div></div></div>
@@ -361,15 +343,8 @@
         appId: "1:970755431087:web:09171e2ebca48e1b91125a" 
     };
     
-    try { firebase.initializeApp(firebaseConfig); } catch(err) { console.error("Firebase Handled"); }
+    try { firebase.initializeApp(firebaseConfig); } catch(err) { console.error("Firebase Auth Handled"); }
     const database = firebase.database();
-
-    const themes = [ 
-        { id: "default", color: "#3F51B5" }, { id: "dark", color: "#121212" }, 
-        { id: "telegram", color: "#2AABEE" }, { id: "sunset", color: "#FF5722" }, 
-        { id: "forest", color: "#2E7D32" }, { id: "ruby", color: "#E91E63" }, 
-        { id: "cyberpunk", color: "#00E5FF" }, { id: "amoled", color: "#000000" } 
-    ];
 
     let currentUserEmail = null, currentUsername = null, currentAvatar = null, myHideStatus = false;
     let currentChatContact = null, isGroupChat = false, activeChatPresenceListener = null, currentChatTargetUname = null;
@@ -377,46 +352,62 @@
     let isListeningToFirebase = false, isChatsLoaded = false;
 
     let APP_STATE = { msgs: [], groups: [], statuses: [], users: [], callLogs: [] };
-    window.statusPlaylist = []; 
-    let waActiveUser = null, waUserStatusGroup = [], waActiveIndex = 0, waTimer = null, waIsChatMedia = false; 
-    let activeActionMsg = null;
+    
+    // ---------------------------------------------------------
+    // 2. THE CACHE SYSTEM (Never Forget & Superfast Load)
+    // ---------------------------------------------------------
+    function savePersistentCache() {
+        if(!currentUserEmail) return;
+        try {
+            // Save everything to localStorage so it never forgets
+            localStorage.setItem("isb_cache_msgs_" + currentUserEmail, JSON.stringify(APP_STATE.msgs));
+            localStorage.setItem("isb_cache_calls_" + currentUserEmail, JSON.stringify(APP_STATE.callLogs));
+            localStorage.setItem("isb_cache_groups_" + currentUserEmail, JSON.stringify(APP_STATE.groups));
+        } catch(e) { console.log("Cache Storage Full"); }
+    }
 
-    let peerConnection = null, localStream = null, remoteStream = null, isCallActive = false;
-    const rtcConfig = { 
-        iceServers: [
-            { urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] },
-            { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
-            { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
-            { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' }
-        ] 
-    };
+    function loadInstantCache() {
+        if(!currentUserEmail) return;
+        try {
+            let m = localStorage.getItem("isb_cache_msgs_" + currentUserEmail);
+            if(m) {
+                APP_STATE.msgs = JSON.parse(m);
+                isChatsLoaded = true; // First Arrow Hit!
+            }
+            let c = localStorage.getItem("isb_cache_calls_" + currentUserEmail);
+            if(c) APP_STATE.callLogs = JSON.parse(c);
+            
+            let g = localStorage.getItem("isb_cache_groups_" + currentUserEmail);
+            if(g) APP_STATE.groups = JSON.parse(g);
+        } catch(e) {}
+    }
 
-    let callStartTime = 0, currentCallDirection = '', currentCallType = '', isMuted = false, isVideoEnabled = false;
-
-    // 🔥 THE FIX: UPFRONT PERMISSION REQUEST (शुरुआत में परमिशन) 🔥
+    // ---------------------------------------------------------
+    // 3. SMART PERMISSIONS & LOGIN
+    // ---------------------------------------------------------
     async function askPermissionsUpfront() {
         try {
-            // यह ब्राउज़र को पॉपअप दिखाने के लिए मजबूर करेगा
+            // Request Notification
+            if ("Notification" in window && Notification.permission !== "granted") {
+                await Notification.requestPermission();
+            }
+            // Temporarily trigger camera/mic to save permission to Google ID
             let stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-            // जैसे ही परमिशन मिल जाए, कैमरा/माइक बंद कर दो ताकि लाइट जलती न रहे
-            stream.getTracks().forEach(t => t.stop());
-            console.log("Upfront Permissions Granted!");
+            stream.getTracks().forEach(t => t.stop()); // Stop immediately
+            document.getElementById('syncIcon').style.color = "var(--primary)";
+            console.log("Upfront Permissions Granted & Saved!");
         } catch(e) {
-            console.log("Upfront Permissions Denied or Ignored.");
+            console.log("Permissions Denied Upfront.");
         }
     }
 
-    const SYSTEM_CORES = navigator.hardwareConcurrency || 2;
-    const keyWorkerCode = `self.onmessage=function(e){let pwd=e.data.password;let salt=new Uint8Array(e.data.salt);let bigKey=new Uint8Array(128);for(let i=0;i<128;i++){bigKey[i]=pwd.charCodeAt(i%pwd.length)^salt[i%salt.length]^(i%256);}self.postMessage({bigKey:bigKey.buffer},[bigKey.buffer]);};`;
-    const mathWorkerCode = `self.onmessage=function(e){let buffer=new Uint8Array(e.data.buffer);let isEncrypt=e.data.action==='encrypt';let bigKey=new Uint8Array(e.data.bigKey);let chunkIdx=e.data.chunkIdx;let G1=0x12345678,G2=0x87654321,G3=0xDEADBEEF,G4=0xCAFEBABE;for(let i=0;i<128;i++){let c=bigKey[i];G1=(G1>>>1)^(c<<24);G2=(G2<<3)^c;G3^=(G1>>>5);G4=(G4<<1)^(G2>>>2);}G1^=chunkIdx;G2^=(Math.imul(chunkIdx,13)>>>0);G3^=(Math.imul(chunkIdx,17)>>>0);G4^=(Math.imul(chunkIdx,19)>>>0);let dv=new DataView(buffer.buffer,buffer.byteOffset,buffer.byteLength);let words=Math.floor(buffer.length/4);let baseWordIndex=chunkIdx*1048576;for(let i=0;i<words;i++){let sizeNum=baseWordIndex+i+1;let x=sizeNum;let x2=Math.imul(x,x)>>>0;let x3=Math.imul(x2,x)>>>0;let x4=Math.imul(x3,x)>>>0;let x5=Math.imul(x4,x)>>>0;let x6=Math.imul(x5,x)>>>0;let x7=Math.imul(x6,x)>>>0;let x8=Math.imul(x7,x)>>>0;let pMode=bigKey[sizeNum%128]%6;let powerVal=(x3&((pMode===0)?0xFFFFFFFF:0))|(x4&((pMode===1)?0xFFFFFFFF:0))|(x5&((pMode===2)?0xFFFFFFFF:0))|(x6&((pMode===3)?0xFFFFFFFF:0))|(x7&((pMode===4)?0xFFFFFFFF:0))|(x8&((pMode===5)?0xFFFFFFFF:0));let pVal=bigKey[(sizeNum+15)%128];let rotInner=(Math.imul(pVal,Math.imul(pVal,pVal))>>>0)%31+1;let rotOuter=(Math.imul(powerVal%1000,powerVal%1000)+rotInner)%31+1;G1=(G1+powerVal)>>>0;G2=(G2^G1)>>>0;G2=((G2<<rotInner)|(G2>>>(32-rotInner)))>>>0;G3=(G3+G2)>>>0;G4=(G4^G3)>>>0;G4=((G4<<rotOuter)|(G4>>>(32-rotOuter)))>>>0;let g32=(G1+G2+G3+G4)>>>0;let y=(g32%10000)+1;let y2=Math.imul(y,y)>>>0;let y3=Math.imul(y2,y)>>>0;let y4=Math.imul(y3,y)>>>0;let y5=Math.imul(y4,y)>>>0;let y6=Math.imul(y5,y)>>>0;let y7=Math.imul(y6,y)>>>0;let y8=Math.imul(y7,y)>>>0;let dpMode=bigKey[(sizeNum+64)%128]%6;let dPowerVal=(y3&((dpMode===0)?0xFFFFFFFF:0))|(y4&((dpMode===1)?0xFFFFFFFF:0))|(y5&((dpMode===2)?0xFFFFFFFF:0))|(y6&((dpMode===3)?0xFFFFFFFF:0))|(y7&((dpMode===4)?0xFFFFFFFF:0))|(y8&((dpMode===5)?0xFFFFFFFF:0));let dpVal=bigKey[(sizeNum+42)%128];let dRotInner=(Math.imul(dpVal,Math.imul(dpVal,dpVal))>>>0)%31+1;let dRotOuter=(Math.imul(dPowerVal%1000,dPowerVal%1000)+dRotInner)%31+1;g32=(g32+dPowerVal)>>>0;g32=(g32^(g32>>>15))>>>0;g32=((g32<<dRotInner)|(g32>>>(32-dRotInner)))>>>0;g32=((g32<<dRotOuter)|(g32>>>(32-dRotOuter)))>>>0;let pwdGarbage=(bigKey[(sizeNum*7)%128])|(bigKey[(sizeNum*11)%128]<<8)|(bigKey[(sizeNum*13)%128]<<16)|(bigKey[(sizeNum*17)%128]<<24);g32=(g32+pwdGarbage)>>>0;g32=(g32^(pwdGarbage>>>7))>>>0;let opMode=bigKey[(sizeNum+32)%128]%3;if(isEncrypt){let d32=dv.getUint32(i*4,true);let opA=(d32+g32)>>>0;let opS=(d32-g32)>>>0;let opX=(d32^g32)>>>0;d32=(opA&((opMode===0)?0xFFFFFFFF:0))|(opS&((opMode===1)?0xFFFFFFFF:0))|(opX&((opMode===2)?0xFFFFFFFF:0));dv.setUint32(i*4,d32,true);G3=(G3^d32)>>>0;}else{let c32=dv.getUint32(i*4,true);let opA=(c32-g32)>>>0;let opS=(c32+g32)>>>0;let opX=(c32^g32)>>>0;let p32=(opA&((opMode===0)?0xFFFFFFFF:0))|(opS&((opMode===1)?0xFFFFFFFF:0))|(opX&((opMode===2)?0xFFFFFFFF:0));dv.setUint32(i*4,p32,true);G3=(G3^c32)>>>0;}}let rem=buffer.length%4;if(rem>0){let off=buffer.length-rem;for(let i=0;i<rem;i++){let sizeNum=baseWordIndex+words+i+1;let x=sizeNum;let x2=Math.imul(x,x)>>>0;let x3=Math.imul(x2,x)>>>0;let x4=Math.imul(x3,x)>>>0;let x5=Math.imul(x4,x)>>>0;let x6=Math.imul(x5,x)>>>0;let x7=Math.imul(x6,x)>>>0;let x8=Math.imul(x7,x)>>>0;let pMode=bigKey[sizeNum%128]%6;let tVal=(pMode===0)?x3:(pMode===1)?x4:(pMode===2)?x5:(pMode===3)?x6:(pMode===4)?x7:x8;let pVal=bigKey[(sizeNum+5)%128];let rIn=(Math.imul(pVal,Math.imul(pVal,pVal))>>>0)%7+1;let rOut=(Math.imul(tVal%100,tVal%100)+rIn)%7+1;G1=(G1+tVal)>>>0;let gCombined=(G1^G2^G3^G4)>>>0;gCombined=((gCombined<<rIn)|(gCombined>>>(32-rIn)))>>>0;gCombined=((gCombined<<rOut)|(gCombined>>>(32-rOut)))>>>0;let pwdGarbageByte=bigKey[(sizeNum*7)%128];let gByte=((gCombined+pwdGarbageByte+(Math.imul(sizeNum%100,sizeNum%100)>>>0))&0xFF)^(pwdGarbageByte>>2);let opMode=bigKey[(sizeNum+32)%128]%3;if(isEncrypt){let dB=buffer[off+i];let oA=(dB+gByte)&0xFF;let oS=(dB-gByte+256)&0xFF;let oX=(dB^gByte)&0xFF;dB=(opMode===0)?oA:((opMode===1)?oS:oX);buffer[off+i]=dB;G3=(G3^dB)>>>0;}else{let cB=buffer[off+i];let oA=(cB-gByte+256)&0xFF;let oS=(cB+gByte)&0xFF;let oX=(cB^gByte)&0xFF;let pB=(opMode===0)?oA:((opMode===1)?oS:oX);buffer[off+i]=pB;G3=(G3^cB)>>>0;}}}self.postMessage({type:'chunk_done',buffer:buffer.buffer,chunkIdx:chunkIdx},[buffer.buffer]);};`;
-    const precompiledKeyWorkerURL = URL.createObjectURL(new Blob([keyWorkerCode], {type:'application/javascript'}));
-    const precompiledMathWorkerURL = URL.createObjectURL(new Blob([mathWorkerCode], {type:'application/javascript'}));
-
     window.onload = function() {
-        applyTheme(localStorage.getItem('isb_theme') || 'default');
+        let savedTheme = localStorage.getItem('isb_theme') || 'default';
+        document.body.setAttribute('data-theme', savedTheme);
         
         currentUserEmail = localStorage.getItem("isb_email");
         if(currentUserEmail) {
+            loadInstantCache(); // 🔥 0.001s Loading
             initAppFlow();
         } else { 
             let checkGoogle = setInterval(function() {
@@ -432,37 +423,33 @@
         }
     };
 
-    function applyTheme(themeId) { 
-        document.body.setAttribute('data-theme', themeId); 
-        localStorage.setItem('isb_theme', themeId); 
-        document.getElementById('themeGrid').innerHTML = themes.map(t => `<div class="theme-circle ${t.id === themeId ? 'active' : ''}" style="background-color: ${t.color};" onclick="applyTheme('${t.id}')"></div>`).join(''); 
-    }
-
     function handleCredentialResponse(response) {
         try {
-            document.getElementById('loginStatus').style.display = 'block';
             let base64 = response.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
             let jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
             currentUserEmail = JSON.parse(jsonPayload).email; 
             localStorage.setItem("isb_email", currentUserEmail); 
-            initAppFlow();
-        } catch(e) { 
-            alert("Login Failed. Please try again."); 
-            document.getElementById('loginStatus').style.display = 'none'; 
-        }
+            
+            // Ask permission immediately on first login
+            askPermissionsUpfront().then(() => {
+                initAppFlow();
+            });
+        } catch(e) { alert("Login Failed."); }
     }
 
     function logoutUser() { 
         localStorage.removeItem("isb_email"); 
-        localStorage.removeItem("isb_cached_msgs"); // Clear cache on logout
         location.reload(); 
     }
     
     function initAppFlow() {
         document.getElementById('authScreen').style.display = 'none';
         
-        // Login होते ही सबसे पहले परमिशन मांगो
-        askPermissionsUpfront();
+        // Show cached UI immediately
+        if(isChatsLoaded) {
+            document.getElementById('mainApp').style.display = 'flex';
+            loadChatsList();
+        }
 
         database.ref('users').on('value', snapshot => {
             APP_STATE.users = snapshot.val() || {};
@@ -472,10 +459,7 @@
                 currentUsername = foundUname; 
                 currentAvatar = APP_STATE.users[foundUname].avatar;
                 myHideStatus = APP_STATE.users[foundUname].hideStatus || false; 
-                updatePrivacyUI();
                 
-                if(typeof ISBAndroid !== 'undefined') { ISBAndroid.saveFCMToken(currentUsername); }
-
                 document.getElementById('profileUsernameDisplay').innerText = "@" + currentUsername;
                 document.getElementById('profileEmailDisplay').innerText = currentUserEmail;
                 document.getElementById('profileAvatar').innerHTML = currentAvatar ? `<img src="${currentAvatar}">` : currentUsername.charAt(0).toUpperCase();
@@ -483,8 +467,7 @@
                 document.getElementById('mainApp').style.display = 'flex';
                 document.getElementById('setupProfileModal').style.display = 'none';
                 
-                startFirebaseSync(); 
-                initPresence(); 
+                startFirebaseSync(); // 🔥 Background Live Sync
                 initCallListener();
             } else {
                 document.getElementById('mainApp').style.display = 'none';
@@ -494,204 +477,14 @@
         });
     }
 
-    window.onclick = function(event) {
-        if (event.target.classList.contains('modal-overlay')) {
-            if(event.target.id === 'setupProfileModal' && !currentUsername) return; 
-            event.target.style.display = "none";
-            if(event.target.id === 'imageStatusModal' || event.target.id === 'textStatusModal') closeStatusModal();
-        }
-        if (!event.target.matches('.material-icons') || event.target.innerText !== 'more_vert') {
-            let dropdown = document.getElementById("chatMenuDropdown");
-            if (dropdown && dropdown.style.display === "block") { dropdown.style.display = "none"; }
-        }
-    };
-
     // ---------------------------------------------------------
-    // 2. CORE FEATURES (Presence, Search, Settings)
-    // ---------------------------------------------------------
-    function initPresence() { 
-        let myStatusRef = database.ref('users/' + currentUsername); 
-        database.ref('.info/connected').on('value', snap => { 
-            if(snap.val() === true) { 
-                myStatusRef.child('isOnline').set(true); 
-                myStatusRef.child('isOnline').onDisconnect().set(false); 
-                myStatusRef.child('lastSeen').onDisconnect().set(firebase.database.ServerValue.TIMESTAMP); 
-            } 
-        }); 
-    }
-    
-    function togglePrivacy() { 
-        myHideStatus = !myHideStatus; 
-        database.ref('users/' + currentUsername).update({ hideStatus: myHideStatus }); 
-        updatePrivacyUI(); 
-    }
-    
-    function updatePrivacyUI() { 
-        let icon = document.getElementById('privacyToggleIcon'); 
-        let text = document.getElementById('privacyStatusText'); 
-        let mainIcon = document.getElementById('privacyMainIcon'); 
-        if(myHideStatus) { 
-            icon.innerText = "toggle_off"; icon.style.color = "var(--border)"; 
-            text.innerText = "Nobody (Hidden)"; 
-            mainIcon.innerText = "visibility_off"; mainIcon.style.color = "var(--text-muted)";
-        } else { 
-            icon.innerText = "toggle_on"; icon.style.color = "var(--primary)"; 
-            text.innerText = "Everyone (Visible)"; 
-            mainIcon.innerText = "visibility"; mainIcon.style.color = "var(--primary)";
-        } 
-    }
-
-    let cropImgObj = null, cropX = 0, cropY = 0, cropZoom = 1, baseScale = 1, isDragging = false, startX, startY, cropDest = '';
-    function handleImageSelection(e, dest) { let file = e.target.files[0]; if(!file) return; cropDest = dest; let reader = new FileReader(); reader.onload = function(evt) { cropImgObj = new Image(); cropImgObj.onload = function() { baseScale = Math.max(250 / cropImgObj.width, 250 / cropImgObj.height); cropZoom = 1; document.getElementById('cropZoomSlider').value = 1; cropX = (250 - (cropImgObj.width * baseScale)) / 2; cropY = (250 - (cropImgObj.height * baseScale)) / 2; document.getElementById('cropperModal').style.display = 'flex'; drawCrop(); }; cropImgObj.src = evt.target.result; }; reader.readAsDataURL(file); }
-    function drawCrop() { if(!cropImgObj) return; cropZoom = parseFloat(document.getElementById('cropZoomSlider').value); let canvas = document.getElementById('cropCanvas'); let ctx = canvas.getContext('2d'); ctx.clearRect(0,0,250,250); let w = cropImgObj.width * baseScale * cropZoom; let h = cropImgObj.height * baseScale * cropZoom; ctx.drawImage(cropImgObj, cropX, cropY, w, h); }
-    let cCanvas = document.getElementById('cropCanvas'); cCanvas.addEventListener('touchstart', e => { isDragging=true; startX=e.touches[0].clientX - cropX; startY=e.touches[0].clientY - cropY; }, {passive: false}); cCanvas.addEventListener('touchmove', e => { if(!isDragging)return; e.preventDefault(); cropX=e.touches[0].clientX - startX; cropY=e.touches[0].clientY - startY; drawCrop(); }, {passive: false}); cCanvas.addEventListener('touchend', e => { isDragging=false; }); cCanvas.addEventListener('mousedown', e => { isDragging=true; startX=e.clientX - cropX; startY=e.clientY - cropY; }); cCanvas.addEventListener('mousemove', e => { if(!isDragging)return; cropX=e.clientX - startX; cropY=e.clientY - startY; drawCrop(); }); cCanvas.addEventListener('mouseup', e => { isDragging=false; }); cCanvas.addEventListener('mouseleave', e => { isDragging=false; });
-    
-    function applyCrop() { 
-        let canvas = document.createElement('canvas'); canvas.width = 250; canvas.height = 250; 
-        canvas.getContext('2d').drawImage(document.getElementById('cropCanvas'), 0, 0); 
-        let base64 = canvas.toDataURL("image/jpeg", 0.8); 
-        if(cropDest === 'setup') { 
-            tempSetupAvatarData = base64; 
-            document.getElementById('setupAvatarIcon').style.display = 'none'; 
-            document.getElementById('setupAvatarPreview').style.display = 'block'; 
-            document.getElementById('setupAvatarPreview').src = base64; 
-        } else if (cropDest === 'settings') { 
-            database.ref('users/' + currentUsername).update({ avatar: base64 }); 
-        } 
-        document.getElementById('cropperModal').style.display = 'none'; 
-    }
-    
-    function validateUsernameInput() { let val = document.getElementById('setupUsernameInput').value.trim().toLowerCase(); let icon = document.getElementById('usernameStatusIcon'); let btn = document.getElementById('saveProfileBtn'); if(val.length < 3 || val.includes(" ")) { icon.innerText = "cancel"; icon.style.color = "#E91E63"; btn.disabled = true; btn.style.opacity = "0.5"; return; } if(APP_STATE.users[val] && APP_STATE.users[val].email !== currentUserEmail) { icon.innerText = "cancel"; icon.style.color = "#E91E63"; btn.disabled = true; btn.style.opacity = "0.5"; return; } icon.innerText = "check_circle"; icon.style.color = "#25D366"; btn.disabled = false; btn.style.opacity = "1"; }
-    
-    async function saveProfileSetup() { 
-        let uNameInput = document.getElementById('setupUsernameInput').value.trim().toLowerCase(); 
-        if(currentUsername && currentUsername !== uNameInput) { await database.ref('users/' + currentUsername).remove(); } 
-        let finalAvatar = tempSetupAvatarData || currentAvatar || ""; 
-        let oldBlocked = (currentUsername && APP_STATE.users[currentUsername]) ? APP_STATE.users[currentUsername].blocked : null; 
-        let newData = { email: currentUserEmail, avatar: finalAvatar, hideStatus: myHideStatus }; 
-        if(oldBlocked) newData.blocked = oldBlocked; 
-        await database.ref('users/' + uNameInput).set(newData); 
-        document.getElementById('setupProfileModal').style.display = 'none'; 
-    }
-    
-    function editUsernameModal() { 
-        tempSetupAvatarData = null; 
-        document.getElementById('setupUsernameInput').value = currentUsername; 
-        validateUsernameInput(); 
-        if(currentAvatar) { 
-            document.getElementById('setupAvatarIcon').style.display = 'none'; 
-            document.getElementById('setupAvatarPreview').style.display = 'block'; 
-            document.getElementById('setupAvatarPreview').src = currentAvatar; 
-        } 
-        document.getElementById('cancelSetupBtn').style.display = 'block'; 
-        document.getElementById('setupProfileModal').style.display = 'flex'; 
-    }
-    
-    function getUserInfoByEmail(email) { 
-        let found = Object.entries(APP_STATE.users).find(([k, v]) => v.email === email); 
-        if(found) return { username: found[0], avatar: found[1].avatar }; 
-        return { username: email.split('@')[0], avatar: null }; 
-    }
-
-    function toggleHomeSearch() { let sb = document.getElementById('homeSearchBar'); sb.style.display = (sb.style.display === 'block') ? 'none' : 'block'; if(sb.style.display === 'block') document.getElementById('homeSearchInput').focus(); else { document.getElementById('homeSearchInput').value = ""; filterChats(); } }
-    function filterChats() { let q = document.getElementById('homeSearchInput').value.toLowerCase(); let items = document.getElementById('chatsList').getElementsByClassName('list-item'); for(let i=0; i<items.length; i++) { let title = items[i].querySelector('.list-title').innerText.toLowerCase(); items[i].style.display = title.includes(q) ? 'flex' : 'none'; } }
-    function toggleChatSearch() { let sb = document.getElementById('chatSearchBar'); sb.style.display = (sb.style.display === 'block') ? 'none' : 'block'; if(sb.style.display === 'block') document.getElementById('chatSearchInput').focus(); else { document.getElementById('chatSearchInput').value = ""; filterChatMessages(); } }
-    function filterChatMessages() { let q = document.getElementById('chatSearchInput').value.toLowerCase(); let bubbles = document.getElementById('chatMessagesBox').getElementsByClassName('bubble'); for(let i=0; i<bubbles.length; i++) { if(q === "") { bubbles[i].style.display = 'block'; continue; } let text = bubbles[i].innerText.toLowerCase(); bubbles[i].style.display = text.includes(q) ? 'block' : 'none'; } }
-
-    function toggleChatMenu() { 
-        let menu = document.getElementById('chatMenuDropdown'); 
-        if(menu.style.display === 'block') { menu.style.display = 'none'; return; } 
-        if(isGroupChat) { 
-            document.getElementById('blockUserMenuText').style.display = 'none'; 
-        } else { 
-            document.getElementById('blockUserMenuText').style.display = 'flex'; 
-            let targetUname = getUserInfoByEmail(currentChatContact).username; 
-            let myBlocked = APP_STATE.users[currentUsername]?.blocked || {}; 
-            document.getElementById('blockUserMenuText').innerHTML = !!myBlocked[targetUname] ? `<i class="material-icons">check_circle</i> <span>Unblock User</span>` : `<i class="material-icons">block</i> <span>Block User</span>`; 
-        } 
-        menu.style.display = 'block'; 
-    }
-    
-    function togglePinChat() {
-        document.getElementById('chatMenuDropdown').style.display = 'none';
-        let targetId = isGroupChat ? currentChatContact : getUserInfoByEmail(currentChatContact).username;
-        let myPinned = APP_STATE.users[currentUsername]?.pinned || {};
-        if(myPinned[targetId]) {
-            database.ref('users/' + currentUsername + '/pinned/' + targetId).remove();
-        } else {
-            database.ref('users/' + currentUsername + '/pinned/' + targetId).set(true);
-        }
-        setTimeout(() => { loadChatsList(); openChat(currentChatContact, isGroupChat, document.getElementById('chatTitle').innerText); }, 300);
-    }
-
-    function toggleBlockUser() { 
-        document.getElementById('chatMenuDropdown').style.display = 'none'; 
-        let targetUname = getUserInfoByEmail(currentChatContact).username; 
-        let myBlocked = APP_STATE.users[currentUsername]?.blocked || {}; 
-        if(myBlocked[targetUname]) { 
-            database.ref('users/' + currentUsername + '/blocked/' + targetUname).remove(); 
-            alert(targetUname + " is unblocked."); 
-        } else { 
-            if(confirm("Block @" + targetUname + "?")) { 
-                database.ref('users/' + currentUsername + '/blocked/' + targetUname).set(true); 
-                alert(targetUname + " is now blocked."); 
-            } 
-        } 
-        loadChatsList(); 
-    }
-    
-    function openBlockedUsersModal() { 
-        let list = document.getElementById('blockedUsersList'); list.innerHTML = ""; 
-        let myBlocked = APP_STATE.users[currentUsername]?.blocked || {}; let keys = Object.keys(myBlocked); 
-        if(keys.length === 0) { 
-            list.innerHTML = "<div style='padding:20px; text-align:center; color:gray;'>No blocked users.</div>"; 
-        } else { 
-            keys.forEach(uname => { 
-                let av = APP_STATE.users[uname]?.avatar; 
-                let avatarHtml = av ? `<img src="${av}" style="width:100%;height:100%;object-fit:cover;">` : uname.charAt(0).toUpperCase(); 
-                list.innerHTML += `<div class="list-item"><div class="avatar" style="width:40px;height:40px;font-size:16px;">${avatarHtml}</div><div class="list-info"><div class="list-title">@${uname}</div></div><button style="padding:8px 12px; background:transparent; border:1px solid #E91E63; color:#E91E63; border-radius:8px; font-weight:bold;" onclick="unblockFromSettings('${uname}')">Unblock</button></div>`; 
-            }); 
-        } 
-        document.getElementById('blockedUsersModal').style.display = 'flex'; 
-    }
-    
-    function unblockFromSettings(uname) { 
-        database.ref('users/' + currentUsername + '/blocked/' + uname).remove(); 
-        setTimeout(openBlockedUsersModal, 500); 
-    }
-    
-    function clearCurrentChat() { 
-        document.getElementById('chatMenuDropdown').style.display = 'none'; 
-        if(confirm("Clear this chat history on your device?")) { 
-            APP_STATE.msgs = APP_STATE.msgs.filter(m => { 
-                if(isGroupChat) return m.to !== currentChatContact; 
-                return !((m.from === currentUserEmail && m.to === currentChatContact) || (m.from === currentChatContact && m.to === currentUserEmail)); 
-            }); 
-            // Update cache after clearing
-            localStorage.setItem("isb_cached_msgs", JSON.stringify(APP_STATE.msgs));
-            renderChatMessages(); 
-            loadChatsList(); 
-        } 
-    }
-
-    // ---------------------------------------------------------
-    // 3. THE "TWO ARROWS" SYNC (Instant Cache + Firebase Sync)
+    // 4. FIREBASE SYNC (The Second Arrow)
     // ---------------------------------------------------------
     function startFirebaseSync() {
         if(isListeningToFirebase) return; 
         isListeningToFirebase = true;
         
-        // 🎯 TIER 1 (First Arrow): Load Local Cache instantly
-        let cachedData = localStorage.getItem("isb_cached_msgs");
-        if(cachedData) {
-            try {
-                APP_STATE.msgs = JSON.parse(cachedData);
-                isChatsLoaded = true;
-                loadChatsList(); // Show instantly (0.001 seconds)
-            } catch(e) {}
-        }
-
-        // 🎯 TIER 2 (Second Arrow): Live Firebase Update (No Timers, No Errors)
+        // No 15-second timer. It silently syncs in the background.
         database.ref('messages').on('child_added', function(snapshot) { 
             let m = snapshot.val(); 
             if(!m) return; 
@@ -703,8 +496,7 @@
                 
                 if (isMyGroupMsg || isPersonalMsg) { 
                     APP_STATE.msgs.push(m); 
-                    // Update Local Cache on every new message
-                    localStorage.setItem("isb_cached_msgs", JSON.stringify(APP_STATE.msgs));
+                    savePersistentCache(); // Save to memory
                     loadChatsList(); 
                     if(currentChatContact && ((!m.isGroup && ((m.from===currentUserEmail && m.to===currentChatContact) || (m.from===currentChatContact && m.to===currentUserEmail))) || (m.isGroup && m.to===currentChatContact))) appendSingleMessage(m); 
                 } 
@@ -714,194 +506,50 @@
         database.ref('messages').on('child_removed', function(snapshot) { 
             let removedMsg = snapshot.val(); 
             APP_STATE.msgs = APP_STATE.msgs.filter(m => m.id !== removedMsg.id); 
-            localStorage.setItem("isb_cached_msgs", JSON.stringify(APP_STATE.msgs));
+            savePersistentCache();
             let el = document.getElementById(`msg_${removedMsg.id}`); if(el) el.remove(); loadChatsList(); 
         });
 
-        database.ref('groups').on('child_added', function(snapshot) { let g = snapshot.val(); if(g && g.members.includes(currentUserEmail)) { if(!APP_STATE.groups.some(grp => grp.id === g.id)) { APP_STATE.groups.push(g); loadChatsList(); } } });
-        database.ref('statuses').on('child_added', function(snapshot) { let s = snapshot.val(); s.fbKey = snapshot.key; if(s) { if(!APP_STATE.statuses.some(st => st.id === s.id)) { APP_STATE.statuses.push(s); loadStatusList(); } } });
-        database.ref('statuses').on('child_removed', function(snapshot) { let removedSts = snapshot.val(); APP_STATE.statuses = APP_STATE.statuses.filter(s => s.id !== removedSts.id); loadStatusList(); });
-        database.ref('callHistory/' + currentUsername).on('value', function(snapshot) { APP_STATE.callLogs = []; snapshot.forEach(child => { let log = child.val(); log.key = child.key; APP_STATE.callLogs.push(log); }); APP_STATE.callLogs.sort((a, b) => b.timestamp - a.timestamp); loadCallsList(); });
-        
-        // Ensure UI is refreshed
+        database.ref('callHistory/' + currentUsername).on('value', function(snapshot) { 
+            APP_STATE.callLogs = []; 
+            snapshot.forEach(child => { 
+                let log = child.val(); log.key = child.key; APP_STATE.callLogs.push(log); 
+            }); 
+            APP_STATE.callLogs.sort((a, b) => b.timestamp - a.timestamp); 
+            savePersistentCache();
+            loadCallsList(); 
+        });
+
+        // Trigger load just in case cache was empty
         loadChatsList();
     }
-
-    function switchNav(tabId, el) { 
-        document.querySelectorAll('.tab-content, .nav-item').forEach(t => t.classList.remove('active')); 
-        document.getElementById(tabId).classList.add('active'); el.classList.add('active'); 
-        if(tabId === 'chatsTab') loadChatsList(); 
-        if(tabId === 'statusTab') loadStatusList(); 
-        if(tabId === 'callsTab') loadCallsList(); 
-    }
-    
-    function base64ToUint8(base64) { let binary = atob(base64.replace(/\s+/g, '')); let len = binary.length; let bytes = new Uint8Array(len); for (let i = 0; i < len; i++) { bytes[i] = binary.charCodeAt(i); } return bytes; }
-    function uint8ToBase64(bytes) { let binary = ''; let len = bytes.byteLength; let chunkSize = 0x8000; for (let i = 0; i < len; i += chunkSize) { binary += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + chunkSize, len))); } return btoa(binary); }
-
-    async function runISBText(text, password, isEncrypt) {
-        return new Promise((resolve, reject) => {
-            let buffer, salt;
-            if (isEncrypt) { 
-                buffer = new TextEncoder().encode(text); salt = crypto.getRandomValues(new Uint8Array(32)); 
-            } else { 
-                try { buffer = base64ToUint8(text); } catch(e) { reject("Invalid Code"); return; } 
-                salt = buffer.slice(0, 32); buffer = buffer.slice(32); 
-            }
-            
-            try {
-                let kw = new Worker(precompiledKeyWorkerURL);
-                kw.onmessage = function(e) { 
-                    let bigKey = e.data.bigKey; kw.terminate(); 
-                    let mw = new Worker(precompiledMathWorkerURL); 
-                    mw.onmessage = function(e2) { 
-                        mw.terminate(); 
-                        let outBuf = new Uint8Array(e2.data.buffer); 
-                        if (isEncrypt) { 
-                            let finalArr = new Uint8Array(32 + outBuf.length); 
-                            finalArr.set(salt, 0); finalArr.set(outBuf, 32); 
-                            resolve(uint8ToBase64(finalArr)); 
-                        } else { resolve(new TextDecoder().decode(outBuf)); } 
-                    }; 
-                    mw.postMessage({buffer: buffer.buffer, action: isEncrypt ? 'encrypt' : 'bigKey', bigKey: bigKey, chunkIdx: 0}, [buffer.buffer, bigKey]); 
-                };
-                kw.postMessage({password: password, salt: salt.buffer});
-            } catch(e) { reject("Worker Error"); }
-        });
-    }
-
-    function base64ToBlobUrl(base64Data) { try { let arr = base64Data.split(','); let mime = arr[0].match(/:(.*?);/)[1]; let bstr = atob(arr[1]); let n = bstr.length; let u8arr = new Uint8Array(n); for(let i=0; i<n; i++){ u8arr[i] = bstr.charCodeAt(i); } return URL.createObjectURL(new Blob([u8arr], {type: mime})); } catch(e) { return base64Data; } }
-    function dataURItoBlob(dataURI) { let parts = dataURI.split(','); let mime = parts[0].match(/:(.*?);/)[1]; let bstr = atob(parts[1]); let n = bstr.length; let u8arr = new Uint8Array(n); for(let i=0; i<n; i++){ u8arr[i] = bstr.charCodeAt(i); } return new Blob([u8arr], {type: mime}); }
-    function handleFileSelect(event) { let file = event.target.files[0]; if(!file) return; if(file.size > 5 * 1024 * 1024) return alert("⚠️ Max File Size 5MB."); let reader = new FileReader(); reader.onload = function(e) { selectedFileData = e.target.result; selectedFileName = file.name; document.getElementById('selectedFileBar').style.display = 'flex'; }; reader.readAsDataURL(file); }
-    function cancelSelectedFile() { selectedFileData = null; selectedFileName = null; document.getElementById('fileAttachment').value = ""; document.getElementById('selectedFileBar').style.display = 'none'; }
-    function openNewChatModal() { document.getElementById('newChatModal').style.display = 'flex'; }
-    function startNewChat() { let inputVal = document.getElementById('newChatInput').value.trim().toLowerCase(); if(!inputVal) return alert("Enter Username or Gmail!"); let targetEmail = ""; let targetUname = ""; if(inputVal.includes("@")) { targetEmail = inputVal; let uInfo = getUserInfoByEmail(targetEmail); targetUname = (uInfo.username !== targetEmail.split('@')[0]) ? uInfo.username : inputVal; } else { if(inputVal.startsWith("@")) inputVal = inputVal.substring(1); let targetUser = APP_STATE.users[inputVal]; if(!targetUser) return alert("Username not found!"); targetEmail = targetUser.email; targetUname = inputVal; } document.getElementById('newChatModal').style.display = 'none'; openChat(targetEmail, false, targetUname); }
-    function openNewGroupModal() { document.getElementById('newGroupModal').style.display = 'flex'; }
-    function createGroup() { let gName = document.getElementById('newGroupName').value.trim(); let inputs = document.getElementById('newGroupEmails').value.toLowerCase().split(',').map(e => e.trim()); if(!gName || inputs.length === 0) return alert("Enter valid name and at least 1 contact"); let gEmails = [currentUserEmail]; for(let val of inputs) { if(!val) continue; if(val.includes("@")) gEmails.push(val); else { if(val.startsWith("@")) val = val.substring(1); if(APP_STATE.users[val]) gEmails.push(APP_STATE.users[val].email); } } database.ref('groups').push({ id: 'grp_' + Date.now(), name: gName, members: [...new Set(gEmails)], createdBy: currentUserEmail }); document.getElementById('newGroupModal').style.display = 'none'; alert("Group created securely!"); }
-
-    // ---------------------------------------------------------
-    // 4. CHAT MESSAGING UI
-    // ---------------------------------------------------------
-    function loadChatsList() {
-        let contactsObj = {};
-        APP_STATE.msgs.forEach(m => {
-            let msgTimeMs = m.timestamp || parseInt(m.id.substring(0,13)); 
-            if(!m.isGroup && (m.from === currentUserEmail || m.to === currentUserEmail)) { 
-                let other = (m.from === currentUserEmail) ? m.to : m.from; 
-                if(!contactsObj[other]) { contactsObj[other] = { id: other, email: other, lastMsg: m.payload.length > 500 ? "📁 Media / File" : "🔒 Encrypted Message", timeStr: m.time, timestamp: msgTimeMs, isGroup: false }; } else { if(msgTimeMs > contactsObj[other].timestamp) { contactsObj[other].timestamp = msgTimeMs; contactsObj[other].timeStr = m.time; contactsObj[other].lastMsg = m.payload.length > 500 ? "📁 Media / File" : "🔒 Encrypted Message"; } } 
-            }
-        });
-        APP_STATE.groups.forEach(g => { let grpMsgs = APP_STATE.msgs.filter(m => m.isGroup && m.to === g.id); let latestMs = 0; let lastMsgStr = "Tap to view group"; let lastTimeStr = "Active"; if(grpMsgs.length > 0) { let lastM = grpMsgs[grpMsgs.length - 1]; latestMs = lastM.timestamp || parseInt(lastM.id.substring(0,13)); lastMsgStr = lastM.payload.length > 500 ? "📁 Media / File" : "🔒 Encrypted Message"; lastTimeStr = lastM.time; } contactsObj[g.id] = { id: g.id, email: g.id, name: g.name + " (Group)", lastMsg: lastMsgStr, timeStr: lastTimeStr, timestamp: latestMs || Date.now(), isGroup: true }; }); 
-        
-        let contactsArr = Object.values(contactsObj);
-        contactsArr.sort((a, b) => { let aId = a.isGroup ? a.id : (getUserInfoByEmail(a.email).username || a.email); let bId = b.isGroup ? b.id : (getUserInfoByEmail(b.email).username || b.email); let myPinned = APP_STATE.users[currentUsername]?.pinned || {}; let aPin = myPinned[aId] ? 1 : 0; let bPin = myPinned[bId] ? 1 : 0; if (aPin !== bPin) return bPin - aPin; return b.timestamp - a.timestamp; });
-        
-        let html = "";
-        contactsArr.forEach(info => {
-            let dName = info.name; let dAv = null; let targetIdForPin = info.id;
-            if(!info.isGroup) { let uInfo = getUserInfoByEmail(info.email); dName = uInfo.username; dAv = uInfo.avatar; targetIdForPin = dName; let myBlocked = APP_STATE.users[currentUsername]?.blocked || {}; if(myBlocked[dName]) info.lastMsg = "<span style='color:#E91E63;'>🚫 Blocked User</span>"; }
-            let myPinned = APP_STATE.users[currentUsername]?.pinned || {}; let isPinned = myPinned[targetIdForPin]; let pinIconHtml = isPinned ? `<i class="material-icons" style="font-size:16px; color:#FFC107; margin-right:5px;">star</i>` : "";
-            let avatarHtml = dAv ? `<img src="${dAv}">` : (info.isGroup ? "G" : dName.charAt(0).toUpperCase());
-            html += `<div class="list-item" onclick="openChat('${info.email}', ${info.isGroup}, '${dName}')"><div class="avatar">${avatarHtml}</div><div class="list-info"><div class="list-title">${dName}</div><div class="list-subtitle">${pinIconHtml}<i class="material-icons" style="font-size:14px; color:var(--primary); margin-right:2px;">lock</i> ${info.lastMsg}</div></div><div class="list-time">${info.timeStr.split(',')[1] || info.timeStr}</div></div>`;
-        });
-        
-        if (APP_STATE.msgs.length === 0) { 
-            // Silent loader
-            document.getElementById("chatsList").innerHTML = `<div style="text-align:center; padding:50px 20px; color:var(--text-muted);"><i class="material-icons animate-spin" style="font-size:40px; color:var(--primary);">sync</i><div style="margin-top:10px; font-weight:800; font-size:15px;">Syncing...</div></div>`; 
-        } 
-        else { document.getElementById("chatsList").innerHTML = html; }
-        filterChats();
-    }
-
-    function openChat(id, isGroup, chatName = null) {
-        currentChatContact = id; isGroupChat = isGroup; document.getElementById('chatTitle').innerText = chatName ? chatName : id; let dAv = null;
-        if(!isGroup) { let uInfo = getUserInfoByEmail(id); dAv = uInfo.avatar; currentChatTargetUname = uInfo.username; } else { currentChatTargetUname = null; }
-        document.getElementById('chatAvatar').innerHTML = dAv ? `<img src="${dAv}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">` : (isGroup ? "G" : chatName.charAt(0).toUpperCase());
-        
-        document.getElementById('btnAudioCall').style.display = isGroup ? 'none' : 'block'; 
-        document.getElementById('btnVideoCall').style.display = isGroup ? 'none' : 'block';
-        
-        let targetIdForPin = isGroup ? id : currentChatTargetUname; let myPinned = APP_STATE.users[currentUsername]?.pinned || {};
-        document.getElementById('pinChatMenuText').innerHTML = myPinned[targetIdForPin] ? `<i class="material-icons" style="color:#FFC107;">star</i> <span>Unpin Chat</span>` : `<i class="material-icons">star_border</i> <span>Pin Chat</span>`;
-        
-        let stBox = document.getElementById('chatUserStatus');
-        if(activeChatPresenceListener && currentChatTargetUname) { database.ref('users/'+currentChatTargetUname).off('value', activeChatPresenceListener); }
-        if(!isGroup && currentChatTargetUname) {
-            stBox.innerText = "Connecting..."; stBox.style.height = "15px";
-            activeChatPresenceListener = database.ref('users/'+currentChatTargetUname).on('value', snap => {
-                let u = snap.val();
-                if(u && !u.hideStatus) { if(u.isOnline) { stBox.innerText = "Online"; stBox.style.color = "#25D366"; } else if(u.lastSeen) { let t = new Date(u.lastSeen); let now = new Date(); let timeStr = t.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); let dateStr = (t.toDateString() === now.toDateString()) ? "today" : t.toLocaleDateString(); stBox.innerText = "last seen " + dateStr + " at " + timeStr; stBox.style.color = "var(--text-muted)"; } else { stBox.innerText = ""; stBox.style.height = "0"; } } else { stBox.innerText = ""; stBox.style.height = "0"; }
-            });
-        } else { stBox.innerText = ""; stBox.style.height = "0"; }
-        document.getElementById('chatMenuDropdown').style.display = 'none'; document.getElementById('chatWindow').style.display = 'flex'; cancelSelectedFile(); document.getElementById('chatInputMsg').value = ""; document.getElementById('chatInputMsg').disabled = false; renderChatMessages();
-    }
-    
-    function closeChat() { if(activeChatPresenceListener && currentChatTargetUname) { database.ref('users/'+currentChatTargetUname).off('value', activeChatPresenceListener); } document.getElementById('chatWindow').style.display = 'none'; currentChatContact = null; isGroupChat = false; cancelSelectedFile(); loadChatsList(); }
-    function renderChatMessages() { let box = document.getElementById('chatMessagesBox'); box.innerHTML = ""; let chatHistory = APP_STATE.msgs.filter(m => { return isGroupChat ? m.isGroup && m.to === currentChatContact : !m.isGroup && ((m.from === currentUserEmail && m.to === currentChatContact) || (m.from === currentChatContact && m.to === currentUserEmail)); }); chatHistory.forEach(m => { appendSingleMessage(m); }); setTimeout(() => box.scrollTop = box.scrollHeight, 100); }
-
-    async function appendSingleMessage(m) {
-        let box = document.getElementById('chatMessagesBox'); if(document.getElementById(`msg_${m.id}`)) return; let isSentByMe = (m.from === currentUserEmail), cls = isSentByMe ? "sent" : "received", timeStr = m.time.split(',')[1] || m.time; let bubble = document.createElement('div'); bubble.className = `bubble ${cls}`; bubble.id = `msg_${m.id}`; let uInfo = getUserInfoByEmail(m.from); let senderHtml = (!isSentByMe && m.isGroup) ? `<span style="font-size:11px; font-weight:bold; color:var(--primary); margin-bottom:4px; display:block;">${uInfo.username}</span>` : ""; bubble.innerHTML = `${senderHtml}<span style="font-size:12px;"><i class="material-icons animate-spin" style="font-size:12px; vertical-align:middle;">sync</i> Decrypting...</span> <span class="bubble-time">${timeStr}</span>`; box.appendChild(bubble); box.scrollTop = box.scrollHeight;
-        let pwd = isGroupChat ? m.to : m.from; 
-        try {
-            let decrypted = m.decryptedFullText || await runISBText(m.payload, pwd, false); m.decryptedFullText = decrypted; 
-            if(decrypted.startsWith("ISB_FILE|||")) { 
-                let parts = decrypted.split("|||"); m.decryptedName = parts[1]; m.decryptedData = parts[2]; let isImg = m.decryptedData.startsWith("data:image/"); let isVid = m.decryptedData.startsWith("data:video/"); let content = ""; 
-                if(isImg || isVid) { if(isImg) { content = `<img src="${m.decryptedData}" style="max-width:100%; max-height:250px; border-radius:8px; display:block; object-fit:contain;">`; } else { content = `<div style="position:relative;"><div style="width:200px; height:150px; background:#000; border-radius:8px; display:flex; align-items:center; justify-content:center;"><i class="material-icons" style="font-size:50px; color:white;">play_circle_outline</i></div><div style="font-size:11px; margin-top:5px; color:gray;">${m.decryptedName}</div></div>`; } } 
-                else { let iconType = m.decryptedData.startsWith("data:application/pdf") ? "picture_as_pdf" : "insert_drive_file"; content = `<div style="display:flex; gap:10px; align-items:center; background:rgba(0,0,0,0.03); padding:10px; border-radius:8px;"><i class="material-icons" style="font-size:30px; color:var(--primary);">${iconType}</i><div><div style="font-weight:bold; font-size:14px; max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${m.decryptedName}</div></div></div>`; } 
-                document.getElementById(`msg_${m.id}`).innerHTML = `${senderHtml}${content}<span class="bubble-time">${timeStr}</span>`; 
-            } else { document.getElementById(`msg_${m.id}`).innerHTML = `${senderHtml}${decrypted} <span class="bubble-time">${timeStr}</span>`; }
-        } catch(e) { document.getElementById(`msg_${m.id}`).innerHTML = `${senderHtml}<span style="color:#E91E63; font-size:13px;">Corrupted</span>`; }
-        bubble.onclick = () => { if(m.decryptedData) openMediaViewer(m.id, 'msg'); }; let pressTimer; let startPress = (e) => { pressTimer = setTimeout(() => { activeActionMsg = m; document.getElementById('msgOptionsModal').style.display='flex'; }, 600); }; let endPress = () => { clearTimeout(pressTimer); }; bubble.addEventListener('touchstart', startPress); bubble.addEventListener('touchend', endPress); bubble.addEventListener('touchmove', endPress); bubble.addEventListener('mousedown', startPress); bubble.addEventListener('mouseup', endPress); bubble.addEventListener('mousemove', endPress); bubble.oncontextmenu = (e) => { e.preventDefault(); activeActionMsg = m; document.getElementById('msgOptionsModal').style.display='flex'; }; filterChatMessages(); 
-    }
-
-    async function sendChatMessage() {
-        if(!isGroupChat) { let targetUname = getUserInfoByEmail(currentChatContact).username; let myBlocked = APP_STATE.users[currentUsername]?.blocked || {}; let targetBlocked = APP_STATE.users[targetUname]?.blocked || {}; if(myBlocked[targetUname]) return alert("🚫 You have blocked this user. Unblock them from settings to send a message."); if(targetBlocked[currentUsername]) return alert("🚫 Message not sent. You have been blocked by this user."); }
-        let input = document.getElementById('chatInputMsg'), msg = input.value.trim(), payloadToEncrypt = ""; if(selectedFileData) { payloadToEncrypt = `ISB_FILE|||${selectedFileName}|||${selectedFileData}`; } else { if(!msg) return; payloadToEncrypt = msg; }
-        let sendBtn = document.querySelector('.btn-send'); sendBtn.disabled = true; input.disabled = true;
-        try { let encryptionPwd = isGroupChat ? currentChatContact : currentUserEmail; let encryptedPayload = await runISBText(payloadToEncrypt, encryptionPwd, true); await database.ref('messages').push({ id: Date.now() + Math.random().toString().substring(2,8), from: currentUserEmail, to: currentChatContact, payload: encryptedPayload, time: new Date().toLocaleString(), timestamp: Date.now(), isGroup: isGroupChat }); input.value = ""; cancelSelectedFile(); sendBtn.disabled = false; input.disabled = false; input.focus(); setTimeout(() => { document.getElementById('chatMessagesBox').scrollTop = document.getElementById('chatMessagesBox').scrollHeight; }, 100); } catch(e) { alert("Encryption Error"); sendBtn.disabled = false; input.disabled = false; }
-    }
-
-    async function shareSelectedMsg() { document.getElementById('msgOptionsModal').style.display='none'; if(!activeActionMsg) return; try { if(activeActionMsg.decryptedData && activeActionMsg.decryptedData.startsWith("data:")) { let blob = dataURItoBlob(activeActionMsg.decryptedData); let file = new File([blob], activeActionMsg.decryptedName || "ISB_Media", {type: blob.type}); if (navigator.share) { if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: activeActionMsg.decryptedName }); } else { await navigator.share({ title: 'ISB File', text: 'File Attached: ' + activeActionMsg.decryptedName }); } } else { let a = document.createElement('a'); a.href = activeActionMsg.decryptedData; a.download = activeActionMsg.decryptedName || "download"; a.click(); } } else { if(navigator.share) { await navigator.share({ title: 'ISB Message', text: activeActionMsg.decryptedFullText }); } else { navigator.clipboard.writeText(activeActionMsg.decryptedFullText); alert("Message copied to clipboard!"); } } } catch(e) {} }
-    function deleteSelectedMsg() { document.getElementById('msgOptionsModal').style.display='none'; if(!activeActionMsg) return; if(!confirm("Delete this message?")) return; database.ref('messages').orderByChild('id').equalTo(activeActionMsg.id).once('value', snapshot => { snapshot.forEach(child => child.ref.remove()); }); activeActionMsg = null; }
-    function closeStatusModal() { document.getElementById('imageStatusModal').style.display = 'none'; document.getElementById('textStatusModal').style.display = 'none'; document.getElementById('statusUploadArea').style.display = 'block'; document.getElementById('statusVidPreview').style.display = 'none'; document.getElementById('statusImgPreview').style.display = 'none'; document.getElementById('statusCaption').value = ""; statusFileData = null; document.getElementById('statusFile').value = ""; }
-    function openTextStatusModal() { closeStatusModal(); document.getElementById('textStatusModal').style.display = 'flex'; document.getElementById('statusTextOnly').value = ""; }
-    function openImageStatusModal() { closeStatusModal(); document.getElementById('imageStatusModal').style.display = 'flex'; }
-    function handleStatusFile(event) { let file = event.target.files[0]; if(!file) return; if(file.size > 5 * 1024 * 1024) return alert("⚠️ Max File Size 5MB."); let reader = new FileReader(); reader.onload = function(e) { statusFileData = e.target.result; document.getElementById('statusUploadArea').style.display = 'none'; if(file.type.startsWith('video/')) { let v = document.getElementById('statusVidPreview'); v.style.display = 'block'; document.getElementById('statusImgPreview').style.display = 'none'; v.src = e.target.result; } else { let i = document.getElementById('statusImgPreview'); i.style.display = 'block'; document.getElementById('statusVidPreview').style.display = 'none'; i.src = e.target.result; } }; reader.readAsDataURL(file); }
-    async function postStatus(type) { let myActive = APP_STATE.statuses.filter(s => s.from === currentUserEmail && (Date.now() - s.timestamp < 24*60*60*1000)); if(myActive.length >= 5) { alert("Limit Reached! You can only keep 5 active statuses. Please delete an old status first."); return; } let payloadToEncrypt = ""; if(type === 'text') { let txt = document.getElementById('statusTextOnly').value.trim(); if(!txt) return; payloadToEncrypt = `ISB_TXT_STATUS|||${txt}`; } else { if(!statusFileData) return; let cap = document.getElementById('statusCaption').value.trim(); payloadToEncrypt = `ISB_IMG_STATUS|||${statusFileData}|||${cap}`; } closeStatusModal(); let encrypted = await runISBText(payloadToEncrypt, currentUserEmail, true); await database.ref('statuses').push({ id: 'sts_' + Date.now(), from: currentUserEmail, payload: encrypted, timestamp: Date.now(), timeStr: new Date().toLocaleTimeString() }); }
-    
-    async function loadStatusList() { let myContacts = new Set(); APP_STATE.msgs.forEach(m => { if(!m.isGroup) myContacts.add(m.from === currentUserEmail ? m.to : m.from); }); myContacts.add(currentUserEmail); let now = Date.now(), validStatuses = APP_STATE.statuses.filter(s => myContacts.has(s.from) && (now - s.timestamp < 24 * 60 * 60 * 1000)); window.statusPlaylist = []; for(let s of validStatuses) { if(!s.decryptedFullText) { try { s.decryptedFullText = await runISBText(s.payload, s.from, false); } catch(e){} } if(s.decryptedFullText) { if(s.decryptedFullText.startsWith("ISB_IMG_STATUS|||")) { let parts = s.decryptedFullText.split("|||"); s.decryptedData = parts[1]; s.decryptedName = parts[2]; } else if(s.decryptedFullText.startsWith("ISB_TXT_STATUS|||")) { s.decryptedData = "txt"; s.decryptedName = s.decryptedFullText.split("|||")[1]; } window.statusPlaylist.push(s); } } window.statusPlaylist.sort((a,b) => a.timestamp - b.timestamp); let userGroups = {}; window.statusPlaylist.forEach(s => { if(!userGroups[s.from]) userGroups[s.from] = []; userGroups[s.from].push(s); }); let trayHtml = `<div class="status-card" onclick="openImageStatusModal()"><div class="status-card-avatar" style="border:none;"><div style="background:var(--bg); width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative;">${currentAvatar ? `<img src="${currentAvatar}">` : (currentUserEmail?currentUserEmail.charAt(0).toUpperCase():'U')}<div class="status-card-add-icon" style="color: white; font-weight: bold; background: var(--primary); border-radius: 50%; width: 16px; height: 16px; font-size: 14px; display:flex; align-items:center; justify-content:center; position: absolute; bottom:-2px; right:-2px;">+</div></div></div><div style="background:var(--surface); display:flex; justify-content:center; align-items:center; height:100%;"></div><div class="status-card-name" style="color:var(--text); text-shadow:none; text-align:center;">Add Status</div></div>`; for(let user in userGroups) { let userSts = userGroups[user]; let lastSt = userSts[userSts.length - 1]; let uInfo = getUserInfoByEmail(user); let bgStyle = `background-color: var(--primary);`; if (lastSt.decryptedData.startsWith("data:image/")) { bgStyle = `background-image: url('${lastSt.decryptedData}');`; } else if (lastSt.decryptedData.startsWith("data:video/")) { bgStyle = `background-color: #000;`; } let dName = (user === currentUserEmail) ? "My Status" : uInfo.username; let avatarHtml = uInfo.avatar ? `<img src="${uInfo.avatar}">` : user.charAt(0).toUpperCase(); trayHtml += `<div class="status-card" style="${bgStyle}" onclick="viewUserStatus('${user}')"><div class="status-card-overlay"></div><div class="status-card-avatar">${avatarHtml}</div><div class="status-card-name">${dName}</div></div>`; } document.getElementById('statusTray').innerHTML = trayHtml; let listHtml = ""; for(let user in userGroups) { if(user === currentUserEmail) continue; let st = userGroups[user][userGroups[user].length - 1]; let uInfo = getUserInfoByEmail(user); let avatarHtml = uInfo.avatar ? `<img src="${uInfo.avatar}">` : user.charAt(0).toUpperCase(); listHtml += `<div class="list-item" onclick="viewUserStatus('${user}')"><div class="avatar status-ring">${avatarHtml}</div><div class="list-info"><div class="list-title">${uInfo.username}</div><div class="list-subtitle">${st.timeStr}</div></div></div>`; } document.getElementById('statusList').innerHTML = listHtml || `<div style="text-align:center; padding:20px; color:gray;">No Updates Yet</div>`; }
-
-    let currentPdf = null; let currentPdfPage = 1; async function renderPdfPage(num) { if(!currentPdf) return; let canvas = document.getElementById('pdfCanvas'); let ctx = canvas.getContext('2d'); let page = await currentPdf.getPage(num); let viewport = page.getViewport({scale: window.innerWidth > 600 ? 1.5 : 1.0}); canvas.height = viewport.height; canvas.width = viewport.width; await page.render({ canvasContext: ctx, viewport: viewport }).promise; document.getElementById('pdfPageNum').innerText = num; } function changePdfPage(offset) { if(!currentPdf) return; let newPage = currentPdfPage + offset; if(newPage >= 1 && newPage <= currentPdf.numPages) { currentPdfPage = newPage; renderPdfPage(currentPdfPage); } }
-    async function openMediaViewer(msgId, source) { waIsChatMedia = (source === 'msg'); document.getElementById('waStatusViewer').style.display = 'flex'; document.getElementById('waProgressBarContainer').innerHTML = ''; let m = waIsChatMedia ? APP_STATE.msgs.find(x => x.id === msgId) : window.statusPlaylist.find(x => x.id === msgId); let fData = m.decryptedData, fName = m.decryptedName; let uInfo = getUserInfoByEmail(m.from); document.getElementById('waStatusName').innerText = waIsChatMedia ? "Media" : uInfo.username; document.getElementById('waStatusTime').innerText = waIsChatMedia ? m.time : m.timeStr; document.getElementById('waStatusAvatar').innerHTML = uInfo.avatar ? `<img src="${uInfo.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : uInfo.username.charAt(0).toUpperCase(); let dBtn = document.getElementById('waStatusDownloadBtn'); let tapLeft = document.getElementById('waTapLeft'); let tapRight = document.getElementById('waTapRight'); let delBtn = document.getElementById('waStatusDeleteBtn'); if(waIsChatMedia) { dBtn.style.display = 'block'; dBtn.href = fData; dBtn.download = fName; delBtn.style.display = 'none'; tapLeft.style.display = 'none'; tapRight.style.display = 'none'; } else { dBtn.style.display = 'none'; tapLeft.style.display = 'block'; tapRight.style.display = 'block'; if(m.from === currentUserEmail) { delBtn.style.display = 'block'; } else { delBtn.style.display = 'none'; } } let contentBox = document.getElementById('waStatusContent'); contentBox.innerHTML = `<i class="material-icons animate-spin" style="font-size:50px;">sync</i>`; if (fData.startsWith("data:application/pdf")) { contentBox.innerHTML = `<div style="position:absolute; top:80px; background:var(--surface); width:90%; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.2); display:flex; justify-content:space-between; align-items:center; padding:10px 20px; z-index:4005; border:1px solid var(--border);"><i class="material-icons" onclick="changePdfPage(-1)" style="color:var(--primary); font-size:30px; cursor:pointer;">navigate_before</i><span style="color:var(--text); font-weight:bold; font-size:16px;">Page <span id="pdfPageNum">1</span> / <span id="pdfPageCount">-</span></span><i class="material-icons" onclick="changePdfPage(1)" style="color:var(--primary); font-size:30px; cursor:pointer;">navigate_next</i></div><div style="width:100%; height:100%; overflow:auto; display:flex; justify-content:center; align-items:flex-start; padding-top:150px; padding-bottom:50px; background:var(--bg);"><canvas id="pdfCanvas" style="max-width:95%; background:white; box-shadow:0 5px 15px rgba(0,0,0,0.2); border-radius:8px;"></canvas></div>`; try { let pdfBase64 = fData.split(',')[1]; let pdfBinaryString = atob(pdfBase64); let pdfBytes = new Uint8Array(pdfBinaryString.length); for (let i = 0; i < pdfBinaryString.length; i++) { pdfBytes[i] = pdfBinaryString.charCodeAt(i); } let loadingTask = pdfjsLib.getDocument({data: pdfBytes}); currentPdf = await loadingTask.promise; document.getElementById('pdfPageCount').innerText = currentPdf.numPages; currentPdfPage = 1; renderPdfPage(currentPdfPage); } catch (error) { contentBox.innerHTML = `<div style="text-align:center; color:#E91E63; margin-top:50px;"><h2>⚠️ PDF Error</h2><p>File might be corrupted.</p></div>`; } return; } let bUrl = base64ToBlobUrl(fData); if(fData.startsWith("data:video/")) { let controlsAttr = waIsChatMedia ? "controls" : ""; let vidHtml = `<video id="activeVideoPlayer" src="${bUrl}" ${controlsAttr} playsinline style="width:100%; height:100%; object-fit:contain; background:#000; outline:none;"></video>`; if(fName && !waIsChatMedia) { vidHtml += `<div class="wa-status-caption">${fName}</div>`; } contentBox.innerHTML = vidHtml; let video = document.getElementById('activeVideoPlayer'); try { let playPromise = video.play(); if (playPromise !== undefined) { playPromise.catch(error => { if(!waIsChatMedia) video.muted = true; video.play().catch(e => { if(waIsChatMedia) video.controls = true; }); }); } } catch(e) { if(waIsChatMedia) video.controls = true; } if(!waIsChatMedia) { video.onended = () => { nextWaStatus(); }; video.onloadedmetadata = () => { clearTimeout(waTimer); let fillBar = document.getElementById(`waFill_${waActiveIndex}`); if(fillBar) { fillBar.style.transition = `width ${video.duration}s linear`; fillBar.classList.add('filling'); } waTimer = setTimeout(() => { nextWaStatus(); }, video.duration * 1000 + 500); }; } } else if (fData.startsWith("data:image/")) { contentBox.innerHTML = `<img src="${bUrl}" style="width:100%; height:100%; object-fit:contain;">`; if(fName && !waIsChatMedia) contentBox.innerHTML += `<div class="wa-status-caption">${fName}</div>`; } else { if(fData === "txt") { contentBox.innerHTML = `<div style="width:100%; height:100%; display:flex; justify-content:center; align-items:center; background:var(--primary); padding:30px; font-size:28px; text-align:center; word-wrap:break-word;">${fName}</div>`; } else { contentBox.innerHTML = `<div style="text-align:center;"><h2>📁 File</h2><p>${fName}</p></div>`; } } }
-    function deleteActiveStatus() { let st = waUserStatusGroup[waActiveIndex]; if(!st) return; if(confirm("Delete this status permanently?")) { database.ref('statuses').orderByChild('id').equalTo(st.id).once('value', snapshot => { snapshot.forEach(child => child.ref.remove()); }); closeWaStatus(); } }
-    function viewUserStatus(userEmail) { waActiveUser = userEmail; waUserStatusGroup = window.statusPlaylist.filter(s => s.from === userEmail); if(waUserStatusGroup.length === 0) return; waActiveIndex = 0; renderWaStatus(); }
-    function renderWaStatus() { clearTimeout(waTimer); let st = waUserStatusGroup[waActiveIndex]; let barContainer = document.getElementById('waProgressBarContainer'); barContainer.innerHTML = ''; for(let i=0; i<waUserStatusGroup.length; i++) { let fillWidth = (i < waActiveIndex) ? '100%' : '0%'; barContainer.innerHTML += `<div class="wa-progress-segment"><div class="wa-progress-fill" id="waFill_${i}" style="width:${fillWidth}"></div></div>`; } openMediaViewer(st.id, 'status'); if(st.decryptedData !== "txt" && !st.decryptedData.startsWith("data:video/") && !st.decryptedData.startsWith("data:application/pdf")) { let fillBar = document.getElementById(`waFill_${waActiveIndex}`); if(fillBar) { void fillBar.offsetWidth; fillBar.style.transition = "width 10s linear"; fillBar.classList.add('filling'); } waTimer = setTimeout(() => { nextWaStatus(); }, 10000); } else if (st.decryptedData === "txt" || st.decryptedData.startsWith("data:application/pdf")) { let fillBar = document.getElementById(`waFill_${waActiveIndex}`); if(fillBar) { void fillBar.offsetWidth; fillBar.style.transition = "width 5s linear"; fillBar.classList.add('filling'); } waTimer = setTimeout(() => { nextWaStatus(); }, 5000); } }
-    function nextWaStatus() { if(waActiveIndex < waUserStatusGroup.length - 1) { waActiveIndex++; renderWaStatus(); } else closeWaStatus(); } 
-    function prevWaStatus() { if(waActiveIndex > 0) { waActiveIndex--; renderWaStatus(); } else renderWaStatus(); } 
-    function closeWaStatus() { clearTimeout(waTimer); document.getElementById('waStatusViewer').style.display = 'none'; document.getElementById('waStatusContent').innerHTML = ""; currentPdf = null; }
 
     // ---------------------------------------------------------
     // 5. CALLING SYSTEM (Flawless Popups & Disconnects)
     // ---------------------------------------------------------
+    let peerConnection = null, localStream = null, remoteStream = null, isCallActive = false;
+    const rtcConfig = { iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }] };
+
     function initCallListener() {
         if(!currentUsername) return;
         
         database.ref('calls/' + currentUsername).on('value', async snapshot => {
             const data = snapshot.val();
             
-            // अगर कॉल कट जाए तो तुरंत स्क्रीन बंद करो
+            // Call Ended
             if(!data || data.type === 'end') { 
                 if(isCallActive || document.getElementById('callOverlay').style.display === 'flex') {
                     forceEndCall();
                 }
             } 
-            // अगर नई कॉल आये
+            // Incoming Call
             else if(data.type === 'offer' && !isCallActive) {
                 isCallActive = true;
                 currentCallDirection = 'incoming';
                 currentCallType = data.callType;
                 window.currentCallTarget = data.from;
                 
-                try { document.getElementById('incomingRing').play().catch(e => console.log("Ringtone waiting for touch...")); } catch(e){}
+                try { document.getElementById('incomingRing').play().catch(e => console.log("Ringtone blocked but UI will load")); } catch(e){}
                 
                 if ("Notification" in window && Notification.permission === "granted") {
                     new Notification("ISB Call", { body: `Incoming ${data.callType} call from @${data.from}` });
@@ -913,7 +561,7 @@
                 let uInfo = APP_STATE.users[data.from]; 
                 document.getElementById('callAvatarPreview').innerHTML = (uInfo && uInfo.avatar) ? `<img src="${uInfo.avatar}">` : data.from.charAt(0).toUpperCase();
                 
-                // 🔥 GUARANTEED POPUP ON ALL BROWSERS (Even Mobile) 🔥
+                // 🔥 THE POPUP OVERRIDE 🔥
                 document.getElementById('callControls').style.display = 'none'; 
                 document.getElementById('incomingCallActions').style.display = 'flex'; 
                 document.getElementById('remoteVideo').style.display = 'none'; 
@@ -921,33 +569,11 @@
                 
                 let overlay = document.getElementById('callOverlay');
                 overlay.style.display = 'flex';
-                overlay.style.zIndex = '999999'; 
+                overlay.style.zIndex = '999999'; // Highest priority guaranteed
                 
                 window.currentCallData = data;
             }
         });
-    }
-
-    function toggleMute() { 
-        if(localStream) { 
-            isMuted = !isMuted; 
-            localStream.getAudioTracks().forEach(t => t.enabled = !isMuted); 
-            document.getElementById('muteIcon').innerText = isMuted ? "mic_off" : "mic"; 
-            document.getElementById('btnMute').style.background = isMuted ? "rgba(233,30,99,0.8)" : "rgba(255,255,255,0.2)"; 
-        } 
-    }
-    
-    function toggleVideo() { 
-        if(localStream && localStream.getVideoTracks().length > 0) { 
-            isVideoEnabled = !isVideoEnabled; 
-            localStream.getVideoTracks().forEach(t => t.enabled = isVideoEnabled); 
-            document.getElementById('videoToggleIcon').innerText = isVideoEnabled ? "videocam" : "videocam_off"; 
-            document.getElementById('btnVideoToggle').style.background = isVideoEnabled ? "rgba(37,211,102,0.8)" : "rgba(255,255,255,0.2)"; 
-            document.getElementById('localVideo').style.display = isVideoEnabled ? 'block' : 'none'; 
-            document.getElementById('remoteVideo').style.display = isVideoEnabled ? 'block' : 'none'; 
-        } else { 
-            alert("Camera not accessible!"); 
-        } 
     }
 
     async function startCall(callType) {
@@ -961,18 +587,10 @@
         currentCallType = callType;
         window.currentCallTarget = targetUname;
 
-        let tUser = APP_STATE.users[targetUname];
-        if(tUser && tUser.fcmToken) { 
-            fetch('https://isbchatapi.great-site.net/send_call.php', { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ token: tUser.fcmToken, caller: currentUsername, callType: callType }) 
-            }).catch(e => {}); 
-        }
-
         try { document.getElementById('outgoingRing').play().catch(e=>{}); } catch(e){}
         
-        isMuted = false; document.getElementById('muteIcon').innerText = "mic"; document.getElementById('btnMute').style.background = "rgba(255,255,255,0.2)"; 
+        isMuted = false; 
+        document.getElementById('muteIcon').innerText = "mic"; 
         document.getElementById('incomingCallActions').style.display = 'none'; 
         document.getElementById('callControls').style.display = 'flex';
         document.getElementById('callStatusText').innerText = `Calling...`; 
@@ -984,28 +602,21 @@
         let overlay = document.getElementById('callOverlay');
         overlay.style.display = 'flex'; 
         overlay.style.zIndex = '999999';
-        document.getElementById('remoteVideo').style.display = 'none'; 
-        document.getElementById('localVideo').style.display = 'none'; 
 
         try {
             try { 
                 localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true }); 
             } catch(e) { 
-                // अगर वीडियो नहीं चला, तो बिना एरर दिए ऑडियो कॉल शुरू कर दो
+                // Downgrade to audio silently if video fails
                 console.log("Video Failed. Downgrading to Audio.");
                 localStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true }); 
-                callType = 'audio'; // Force downgrade
+                callType = 'audio'; 
             }
             
             isVideoEnabled = (callType === 'video'); 
             if(localStream.getVideoTracks().length > 0) { 
                 localStream.getVideoTracks().forEach(t => t.enabled = isVideoEnabled); 
-                document.getElementById('videoToggleIcon').innerText = isVideoEnabled ? "videocam" : "videocam_off"; 
-                document.getElementById('btnVideoToggle').style.background = isVideoEnabled ? "rgba(37,211,102,0.8)" : "rgba(255,255,255,0.2)"; 
-            } else { 
-                document.getElementById('btnVideoToggle').style.display = 'none'; 
-            } 
-            
+            }
             if(isVideoEnabled) { 
                 document.getElementById('localVideo').style.display = 'block'; 
                 document.getElementById('localVideo').srcObject = localStream; 
@@ -1017,8 +628,7 @@
             
             peerConnection.oniceconnectionstatechange = function() { 
                 if(peerConnection.iceConnectionState === 'disconnected' || peerConnection.iceConnectionState === 'failed') { 
-                    endCall(); 
-                    alert("Call Disconnected (Network Drop)"); 
+                    endCall(); alert("Call Disconnected (Network Drop)"); 
                 } 
             };
 
@@ -1035,8 +645,6 @@
                 
                 if(isVideoEnabled) { 
                     document.getElementById('callAvatarPreview').classList.add('call-avatar-small'); 
-                    document.getElementById('callStatusText').classList.add('hide-in-video'); 
-                    document.getElementById('callTypeText').classList.add('hide-in-video'); 
                 } 
             };
             
@@ -1073,14 +681,11 @@
         const data = window.currentCallData; 
         isCallActive = true; 
         isMuted = false; 
-        document.getElementById('muteIcon').innerText = "mic"; 
-        document.getElementById('btnMute').style.background = "rgba(255,255,255,0.2)"; 
         
         try {
             try { 
                 localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true }); 
             } catch(e) { 
-                // Downgrade to audio
                 localStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true }); 
                 data.callType = 'audio';
             }
@@ -1088,10 +693,6 @@
             isVideoEnabled = (data.callType === 'video'); 
             if(localStream.getVideoTracks().length > 0) { 
                 localStream.getVideoTracks().forEach(t => t.enabled = isVideoEnabled); 
-                document.getElementById('videoToggleIcon').innerText = isVideoEnabled ? "videocam" : "videocam_off"; 
-                document.getElementById('btnVideoToggle').style.background = isVideoEnabled ? "rgba(37,211,102,0.8)" : "rgba(255,255,255,0.2)"; 
-            } else { 
-                document.getElementById('btnVideoToggle').style.display = 'none'; 
             } 
             
             if(isVideoEnabled) { 
@@ -1103,12 +704,6 @@
             remoteStream = new MediaStream(); 
             localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
             
-            peerConnection.oniceconnectionstatechange = function() { 
-                if(peerConnection.iceConnectionState === 'disconnected' || peerConnection.iceConnectionState === 'failed') { 
-                    endCall(); alert("Call Disconnected (Network Drop)"); 
-                } 
-            };
-
             peerConnection.ontrack = event => { 
                 event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track)); 
                 let remoteVid = document.getElementById('remoteVideo'); 
@@ -1121,8 +716,6 @@
                 
                 if(isVideoEnabled) { 
                     document.getElementById('callAvatarPreview').classList.add('call-avatar-small'); 
-                    document.getElementById('callStatusText').classList.add('hide-in-video'); 
-                    document.getElementById('callTypeText').classList.add('hide-in-video'); 
                 } 
             };
             
@@ -1159,9 +752,6 @@
         try { document.getElementById('outgoingRing').pause(); document.getElementById('outgoingRing').currentTime = 0; }catch(e){}
         
         document.getElementById('callAvatarPreview').classList.remove('call-avatar-small'); 
-        document.getElementById('callStatusText').classList.remove('hide-in-video'); 
-        document.getElementById('callTypeText').classList.remove('hide-in-video'); 
-        document.getElementById('callAvatarPreview').removeAttribute('style'); 
         document.getElementById('callOverlay').style.display = 'none';
         
         if (window.currentCallTarget && currentCallDirection) { 
@@ -1191,29 +781,148 @@
         document.getElementById('remoteVideo').srcObject = null; 
     }
 
+    // ---------------------------------------------------------
+    // 6. CRYPTO ENGINE WORKERS & MISC UI
+    // ---------------------------------------------------------
+    const keyWorkerCode = `self.onmessage=function(e){let pwd=e.data.password;let salt=new Uint8Array(e.data.salt);let bigKey=new Uint8Array(128);for(let i=0;i<128;i++){bigKey[i]=pwd.charCodeAt(i%pwd.length)^salt[i%salt.length]^(i%256);}self.postMessage({bigKey:bigKey.buffer},[bigKey.buffer]);};`;
+    const mathWorkerCode = `self.onmessage=function(e){let buffer=new Uint8Array(e.data.buffer);let isEncrypt=e.data.action==='encrypt';let bigKey=new Uint8Array(e.data.bigKey);let chunkIdx=e.data.chunkIdx;let G1=0x12345678,G2=0x87654321,G3=0xDEADBEEF,G4=0xCAFEBABE;for(let i=0;i<128;i++){let c=bigKey[i];G1=(G1>>>1)^(c<<24);G2=(G2<<3)^c;G3^=(G1>>>5);G4=(G4<<1)^(G2>>>2);}G1^=chunkIdx;G2^=(Math.imul(chunkIdx,13)>>>0);G3^=(Math.imul(chunkIdx,17)>>>0);G4^=(Math.imul(chunkIdx,19)>>>0);let dv=new DataView(buffer.buffer,buffer.byteOffset,buffer.byteLength);let words=Math.floor(buffer.length/4);let baseWordIndex=chunkIdx*1048576;for(let i=0;i<words;i++){let sizeNum=baseWordIndex+i+1;let x=sizeNum;let x2=Math.imul(x,x)>>>0;let x3=Math.imul(x2,x)>>>0;let x4=Math.imul(x3,x)>>>0;let x5=Math.imul(x4,x)>>>0;let x6=Math.imul(x5,x)>>>0;let x7=Math.imul(x6,x)>>>0;let x8=Math.imul(x7,x)>>>0;let pMode=bigKey[sizeNum%128]%6;let powerVal=(x3&((pMode===0)?0xFFFFFFFF:0))|(x4&((pMode===1)?0xFFFFFFFF:0))|(x5&((pMode===2)?0xFFFFFFFF:0))|(x6&((pMode===3)?0xFFFFFFFF:0))|(x7&((pMode===4)?0xFFFFFFFF:0))|(x8&((pMode===5)?0xFFFFFFFF:0));let pVal=bigKey[(sizeNum+15)%128];let rotInner=(Math.imul(pVal,Math.imul(pVal,pVal))>>>0)%31+1;let rotOuter=(Math.imul(powerVal%1000,powerVal%1000)+rotInner)%31+1;G1=(G1+powerVal)>>>0;G2=(G2^G1)>>>0;G2=((G2<<rotInner)|(G2>>>(32-rotInner)))>>>0;G3=(G3+G2)>>>0;G4=(G4^G3)>>>0;G4=((G4<<rotOuter)|(G4>>>(32-rotOuter)))>>>0;let g32=(G1+G2+G3+G4)>>>0;let y=(g32%10000)+1;let y2=Math.imul(y,y)>>>0;let y3=Math.imul(y2,y)>>>0;let y4=Math.imul(y3,y)>>>0;let y5=Math.imul(y4,y)>>>0;let y6=Math.imul(y5,y)>>>0;let y7=Math.imul(y6,y)>>>0;let y8=Math.imul(y7,y)>>>0;let dpMode=bigKey[(sizeNum+64)%128]%6;let dPowerVal=(y3&((dpMode===0)?0xFFFFFFFF:0))|(y4&((dpMode===1)?0xFFFFFFFF:0))|(y5&((dpMode===2)?0xFFFFFFFF:0))|(y6&((dpMode===3)?0xFFFFFFFF:0))|(y7&((dpMode===4)?0xFFFFFFFF:0))|(y8&((dpMode===5)?0xFFFFFFFF:0));let dpVal=bigKey[(sizeNum+42)%128];let dRotInner=(Math.imul(dpVal,Math.imul(dpVal,dpVal))>>>0)%31+1;let dRotOuter=(Math.imul(dPowerVal%1000,dPowerVal%1000)+dRotInner)%31+1;g32=(g32+dPowerVal)>>>0;g32=(g32^(g32>>>15))>>>0;g32=((g32<<dRotInner)|(g32>>>(32-dRotInner)))>>>0;g32=((g32<<dRotOuter)|(g32>>>(32-dRotOuter)))>>>0;let pwdGarbage=(bigKey[(sizeNum*7)%128])|(bigKey[(sizeNum*11)%128]<<8)|(bigKey[(sizeNum*13)%128]<<16)|(bigKey[(sizeNum*17)%128]<<24);g32=(g32+pwdGarbage)>>>0;g32=(g32^(pwdGarbage>>>7))>>>0;let opMode=bigKey[(sizeNum+32)%128]%3;if(isEncrypt){let d32=dv.getUint32(i*4,true);let opA=(d32+g32)>>>0;let opS=(d32-g32)>>>0;let opX=(d32^g32)>>>0;d32=(opA&((opMode===0)?0xFFFFFFFF:0))|(opS&((opMode===1)?0xFFFFFFFF:0))|(opX&((opMode===2)?0xFFFFFFFF:0));dv.setUint32(i*4,d32,true);G3=(G3^d32)>>>0;}else{let c32=dv.getUint32(i*4,true);let opA=(c32-g32)>>>0;let opS=(c32+g32)>>>0;let opX=(c32^g32)>>>0;let p32=(opA&((opMode===0)?0xFFFFFFFF:0))|(opS&((opMode===1)?0xFFFFFFFF:0))|(opX&((opMode===2)?0xFFFFFFFF:0));dv.setUint32(i*4,p32,true);G3=(G3^c32)>>>0;}}let rem=buffer.length%4;if(rem>0){let off=buffer.length-rem;for(let i=0;i<rem;i++){let sizeNum=baseWordIndex+words+i+1;let x=sizeNum;let x2=Math.imul(x,x)>>>0;let x3=Math.imul(x2,x)>>>0;let x4=Math.imul(x3,x)>>>0;let x5=Math.imul(x4,x)>>>0;let x6=Math.imul(x5,x)>>>0;let x7=Math.imul(x6,x)>>>0;let x8=Math.imul(x7,x)>>>0;let pMode=bigKey[sizeNum%128]%6;let tVal=(pMode===0)?x3:(pMode===1)?x4:(pMode===2)?x5:(pMode===3)?x6:(pMode===4)?x7:x8;let pVal=bigKey[(sizeNum+5)%128];let rIn=(Math.imul(pVal,Math.imul(pVal,pVal))>>>0)%7+1;let rOut=(Math.imul(tVal%100,tVal%100)+rIn)%7+1;G1=(G1+tVal)>>>0;let gCombined=(G1^G2^G3^G4)>>>0;gCombined=((gCombined<<rIn)|(gCombined>>>(32-rIn)))>>>0;gCombined=((gCombined<<rOut)|(gCombined>>>(32-rOut)))>>>0;let pwdGarbageByte=bigKey[(sizeNum*7)%128];let gByte=((gCombined+pwdGarbageByte+(Math.imul(sizeNum%100,sizeNum%100)>>>0))&0xFF)^(pwdGarbageByte>>2);let opMode=bigKey[(sizeNum+32)%128]%3;if(isEncrypt){let dB=buffer[off+i];let oA=(dB+gByte)&0xFF;let oS=(dB-gByte+256)&0xFF;let oX=(dB^gByte)&0xFF;dB=(opMode===0)?oA:((opMode===1)?oS:oX);buffer[off+i]=dB;G3=(G3^dB)>>>0;}else{let cB=buffer[off+i];let oA=(cB-gByte+256)&0xFF;let oS=(cB+gByte)&0xFF;let oX=(cB^gByte)&0xFF;let pB=(opMode===0)?oA:((opMode===1)?oS:oX);buffer[off+i]=pB;G3=(G3^cB)>>>0;}}}self.postMessage({type:'chunk_done',buffer:buffer.buffer,chunkIdx:chunkIdx},[buffer.buffer]);};`;
+    const precompiledKeyWorkerURL = URL.createObjectURL(new Blob([keyWorkerCode], {type:'application/javascript'}));
+    const precompiledMathWorkerURL = URL.createObjectURL(new Blob([mathWorkerCode], {type:'application/javascript'}));
+
+    function base64ToUint8(base64) { let binary = atob(base64.replace(/\s+/g, '')); let len = binary.length; let bytes = new Uint8Array(len); for (let i = 0; i < len; i++) { bytes[i] = binary.charCodeAt(i); } return bytes; }
+    function uint8ToBase64(bytes) { let binary = ''; let len = bytes.byteLength; let chunkSize = 0x8000; for (let i = 0; i < len; i += chunkSize) { binary += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + chunkSize, len))); } return btoa(binary); }
+
+    async function runISBText(text, password, isEncrypt) {
+        return new Promise((resolve, reject) => {
+            let buffer, salt;
+            if (isEncrypt) { 
+                buffer = new TextEncoder().encode(text); salt = crypto.getRandomValues(new Uint8Array(32)); 
+            } else { 
+                try { buffer = base64ToUint8(text); } catch(e) { reject("Invalid Code"); return; } 
+                salt = buffer.slice(0, 32); buffer = buffer.slice(32); 
+            }
+            
+            try {
+                let kw = new Worker(precompiledKeyWorkerURL);
+                kw.onmessage = function(e) { 
+                    let bigKey = e.data.bigKey; kw.terminate(); 
+                    let mw = new Worker(precompiledMathWorkerURL); 
+                    mw.onmessage = function(e2) { 
+                        mw.terminate(); 
+                        let outBuf = new Uint8Array(e2.data.buffer); 
+                        if (isEncrypt) { 
+                            let finalArr = new Uint8Array(32 + outBuf.length); 
+                            finalArr.set(salt, 0); finalArr.set(outBuf, 32); 
+                            resolve(uint8ToBase64(finalArr)); 
+                        } else { resolve(new TextDecoder().decode(outBuf)); } 
+                    }; 
+                    mw.postMessage({buffer: buffer.buffer, action: isEncrypt ? 'encrypt' : 'bigKey', bigKey: bigKey, chunkIdx: 0}, [buffer.buffer, bigKey]); 
+                };
+                kw.postMessage({password: password, salt: salt.buffer});
+            } catch(e) { reject("Worker Error"); }
+        });
+    }
+
+    function switchNav(tabId, el) { 
+        document.querySelectorAll('.tab-content, .nav-item').forEach(t => t.classList.remove('active')); 
+        document.getElementById(tabId).classList.add('active'); el.classList.add('active'); 
+        if(tabId === 'chatsTab') loadChatsList(); 
+        if(tabId === 'callsTab') loadCallsList(); 
+    }
+
+    function loadChatsList() {
+        let contactsObj = {};
+        APP_STATE.msgs.forEach(m => {
+            let msgTimeMs = m.timestamp || parseInt(m.id.substring(0,13)); 
+            if(!m.isGroup && (m.from === currentUserEmail || m.to === currentUserEmail)) { 
+                let other = (m.from === currentUserEmail) ? m.to : m.from; 
+                if(!contactsObj[other]) { contactsObj[other] = { id: other, email: other, lastMsg: m.payload.length > 500 ? "📁 Media / File" : "🔒 Encrypted Message", timeStr: m.time, timestamp: msgTimeMs, isGroup: false }; } else { if(msgTimeMs > contactsObj[other].timestamp) { contactsObj[other].timestamp = msgTimeMs; contactsObj[other].timeStr = m.time; contactsObj[other].lastMsg = m.payload.length > 500 ? "📁 Media / File" : "🔒 Encrypted Message"; } } 
+            }
+        });
+        
+        let contactsArr = Object.values(contactsObj);
+        contactsArr.sort((a, b) => b.timestamp - a.timestamp);
+        
+        let html = "";
+        contactsArr.forEach(info => {
+            let dName = info.name; let dAv = null; let targetIdForPin = info.id;
+            if(!info.isGroup) { let uInfo = getUserInfoByEmail(info.email); dName = uInfo.username; dAv = uInfo.avatar; }
+            let avatarHtml = dAv ? `<img src="${dAv}">` : dName.charAt(0).toUpperCase();
+            html += `<div class="list-item" onclick="openChat('${info.email}', ${info.isGroup}, '${dName}')"><div class="avatar">${avatarHtml}</div><div class="list-info"><div class="list-title">${dName}</div><div class="list-subtitle"><i class="material-icons" style="font-size:14px; color:var(--primary); margin-right:2px;">lock</i> ${info.lastMsg}</div></div><div class="list-time">${info.timeStr.split(',')[1] || info.timeStr}</div></div>`;
+        });
+        
+        if (APP_STATE.msgs.length === 0) { 
+            document.getElementById("chatsList").innerHTML = `<div style="text-align:center; padding:50px 20px; color:var(--text-muted);"><div style="margin-top:10px; font-weight:800; font-size:15px;">No Messages Yet</div></div>`; 
+        } else { document.getElementById("chatsList").innerHTML = html; }
+    }
+
+    function openChat(id, isGroup, chatName = null) {
+        currentChatContact = id; isGroupChat = isGroup; document.getElementById('chatTitle').innerText = chatName ? chatName : id; let dAv = null;
+        if(!isGroup) { let uInfo = getUserInfoByEmail(id); dAv = uInfo.avatar; currentChatTargetUname = uInfo.username; } else { currentChatTargetUname = null; }
+        document.getElementById('chatAvatar').innerHTML = dAv ? `<img src="${dAv}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">` : chatName.charAt(0).toUpperCase();
+        
+        document.getElementById('btnAudioCall').style.display = isGroup ? 'none' : 'block'; 
+        document.getElementById('btnVideoCall').style.display = isGroup ? 'none' : 'block';
+        
+        document.getElementById('chatMenuDropdown').style.display = 'none'; 
+        document.getElementById('chatWindow').style.display = 'flex'; 
+        document.getElementById('chatInputMsg').value = ""; 
+        renderChatMessages();
+    }
+    
+    function closeChat() { document.getElementById('chatWindow').style.display = 'none'; currentChatContact = null; isGroupChat = false; loadChatsList(); }
+    
+    function renderChatMessages() { 
+        let box = document.getElementById('chatMessagesBox'); box.innerHTML = ""; 
+        let chatHistory = APP_STATE.msgs.filter(m => { return isGroupChat ? m.isGroup && m.to === currentChatContact : !m.isGroup && ((m.from === currentUserEmail && m.to === currentChatContact) || (m.from === currentChatContact && m.to === currentUserEmail)); }); 
+        chatHistory.forEach(m => { appendSingleMessage(m); }); 
+        setTimeout(() => box.scrollTop = box.scrollHeight, 100); 
+    }
+
+    async function appendSingleMessage(m) {
+        let box = document.getElementById('chatMessagesBox'); if(document.getElementById(`msg_${m.id}`)) return; 
+        let isSentByMe = (m.from === currentUserEmail), cls = isSentByMe ? "sent" : "received", timeStr = m.time.split(',')[1] || m.time; 
+        let bubble = document.createElement('div'); bubble.className = `bubble ${cls}`; bubble.id = `msg_${m.id}`; 
+        bubble.innerHTML = `<span style="font-size:12px;">Decrypting...</span> <span class="bubble-time">${timeStr}</span>`; 
+        box.appendChild(bubble); box.scrollTop = box.scrollHeight;
+        
+        let pwd = isGroupChat ? m.to : m.from; 
+        try {
+            let decrypted = m.decryptedFullText || await runISBText(m.payload, pwd, false); m.decryptedFullText = decrypted; 
+            if(decrypted.startsWith("ISB_FILE|||")) { 
+                let parts = decrypted.split("|||"); m.decryptedName = parts[1]; m.decryptedData = parts[2]; 
+                let isImg = m.decryptedData.startsWith("data:image/"); 
+                let content = isImg ? `<img src="${m.decryptedData}" style="max-width:100%; max-height:250px; border-radius:8px; display:block; object-fit:contain;">` : `📁 ${m.decryptedName}`;
+                document.getElementById(`msg_${m.id}`).innerHTML = `${content}<span class="bubble-time">${timeStr}</span>`; 
+            } else { document.getElementById(`msg_${m.id}`).innerHTML = `${decrypted} <span class="bubble-time">${timeStr}</span>`; }
+        } catch(e) { document.getElementById(`msg_${m.id}`).innerHTML = `<span style="color:#E91E63; font-size:13px;">Corrupted</span>`; }
+    }
+
+    async function sendChatMessage() {
+        let input = document.getElementById('chatInputMsg'), msg = input.value.trim(), payloadToEncrypt = ""; 
+        if(!msg) return; payloadToEncrypt = msg;
+        let sendBtn = document.querySelector('.btn-send'); sendBtn.disabled = true; input.disabled = true;
+        try { 
+            let encryptionPwd = isGroupChat ? currentChatContact : currentUserEmail; 
+            let encryptedPayload = await runISBText(payloadToEncrypt, encryptionPwd, true); 
+            await database.ref('messages').push({ id: Date.now() + Math.random().toString().substring(2,8), from: currentUserEmail, to: currentChatContact, payload: encryptedPayload, time: new Date().toLocaleString(), timestamp: Date.now(), isGroup: isGroupChat }); 
+            input.value = ""; sendBtn.disabled = false; input.disabled = false; input.focus(); 
+            setTimeout(() => { document.getElementById('chatMessagesBox').scrollTop = document.getElementById('chatMessagesBox').scrollHeight; }, 100); 
+        } catch(e) { alert("Encryption Error"); sendBtn.disabled = false; input.disabled = false; }
+    }
+
     function loadCallsList() { 
-        let html = ""; 
-        APP_STATE.callLogs.forEach(log => { 
-            let uInfo = APP_STATE.users[log.peer]; 
-            let dName = uInfo ? log.peer : log.peer; 
+        let html = ""; APP_STATE.callLogs.forEach(log => { 
+            let uInfo = APP_STATE.users[log.peer]; let dName = uInfo ? log.peer : log.peer; 
             let avatarHtml = (uInfo && uInfo.avatar) ? `<img src="${uInfo.avatar}">` : dName.charAt(0).toUpperCase(); 
             let dirIcon = log.direction === 'incoming' ? 'call_received' : 'call_made'; 
             let dirColor = log.duration === 'Missed' ? '#E91E63' : (log.direction === 'incoming' ? '#25D366' : '#2AABEE'); 
-            let typeIcon = log.type === 'video' ? 'videocam' : 'call'; 
-            html += `<div class="list-item"><div class="avatar">${avatarHtml}</div><div class="list-info" onclick="openChat('${uInfo ? uInfo.email : log.peer}', false, '${dName}')"><div class="list-title">@${dName}</div><div class="list-subtitle" style="display:flex; align-items:center;"><i class="material-icons" style="font-size:14px; color:${dirColor}; margin-right:4px;">${dirIcon}</i>${log.timeStr} &bull; ${log.duration}</div></div><i class="material-icons" style="color:var(--primary); font-size:22px; margin-right:15px;">${typeIcon}</i><i class="material-icons" style="color:var(--text-muted); cursor:pointer; font-size:22px;" onclick="deleteSingleCall('${log.key}')">delete_outline</i></div>`; 
+            html += `<div class="list-item"><div class="avatar">${avatarHtml}</div><div class="list-info"><div class="list-title">@${dName}</div><div class="list-subtitle"><i class="material-icons" style="font-size:14px; color:${dirColor}; margin-right:4px;">${dirIcon}</i>${log.timeStr} &bull; ${log.duration}</div></div></div>`; 
         }); 
-        document.getElementById('callsList').innerHTML = html || `<div style="text-align:center; padding:30px 20px; color:gray;"><i class="material-icons" style="font-size:50px; opacity:0.5;">phone_missed</i><p>No Recent Calls</p></div>`; 
+        document.getElementById('callsList').innerHTML = html || `<div style="text-align:center; padding:30px 20px; color:gray;">No Recent Calls</div>`; 
     }
     
-    function deleteSingleCall(key) { if(confirm("Delete this call log?")) { database.ref('callHistory/' + currentUsername + '/' + key).remove(); } }
     function clearAllCalls() { if(APP_STATE.callLogs.length === 0) return; if(confirm("Clear entire call history?")) database.ref('callHistory/' + currentUsername).remove(); }
-
-    let avatarEl = document.getElementById('callAvatarPreview'); let isAvatarDragging = false, avStartX, avStartY, avInitialX, avInitialY;
-    function startAvatarDrag(e) { if(!avatarEl.classList.contains('call-avatar-small')) return; isAvatarDragging = true; let clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX; let clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY; avStartX = clientX; avStartY = clientY; let rect = avatarEl.getBoundingClientRect(); avInitialX = rect.left; avInitialY = rect.top; }
-    function moveAvatarDrag(e) { if(!isAvatarDragging) return; e.preventDefault(); let clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX; let clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY; let dx = clientX - avStartX; let dy = clientY - avStartY; avatarEl.style.left = (avInitialX + dx) + 'px'; avatarEl.style.top = (avInitialY + dy) + 'px'; avatarEl.style.right = 'auto'; avatarEl.style.bottom = 'auto'; }
-    function endAvatarDrag() { isAvatarDragging = false; }
-    avatarEl.addEventListener('touchstart', startAvatarDrag, {passive: false}); avatarEl.addEventListener('mousedown', startAvatarDrag); document.addEventListener('touchmove', moveAvatarDrag, {passive: false}); document.addEventListener('mousemove', moveAvatarDrag); document.addEventListener('touchend', endAvatarDrag); document.addEventListener('mouseup', endAvatarDrag);
-
 </script>
 </body>
 </html>
