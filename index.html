@@ -160,8 +160,6 @@
         .btn-decline { background: #E91E63; }
         
         @keyframes bounceGlow { 0%, 100% { transform: translateY(0); box-shadow: 0 10px 25px rgba(37,211,102,0.4); } 50% { transform: translateY(-10px); box-shadow: 0 15px 35px rgba(37,211,102,0.6); } }
-
-        /* Google Login Custom Styling */
         .g_id_signin { display: flex; justify-content: center; width: 100%; margin-top: 15px;}
     </style>
 </head>
@@ -187,7 +185,7 @@
             <div class="app-title">ISB Chat</div>
             <div class="app-bar-icons">
                 <i class="material-icons" onclick="toggleHomeSearch()">search</i>
-                <i class="material-icons" onclick="syncDrive()" id="syncIcon">sync</i>
+                <i class="material-icons" onclick="requestWebPermissions()" id="syncIcon" title="Allow Notifications">notifications_active</i>
             </div>
         </div>
         
@@ -345,8 +343,16 @@
     let waActiveUser = null, waUserStatusGroup = [], waActiveIndex = 0, waTimer = null, waIsChatMedia = false; 
     let activeActionMsg = null;
 
-    if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
-        Notification.requestPermission();
+    // 🔥 Web Notification Request 🔥
+    function requestWebPermissions() {
+        if ("Notification" in window && Notification.permission !== "granted") {
+            Notification.requestPermission().then(permission => {
+                if(permission === "granted") {
+                    document.getElementById('syncIcon').style.color = "var(--primary)";
+                    alert("Web Notifications Enabled!");
+                }
+            });
+        }
     }
 
     window.updateMyFCMToken = function(token) {
@@ -365,11 +371,7 @@
         ] 
     };
 
-    let callStartTime = 0;
-    let currentCallDirection = '';
-    let currentCallType = '';
-    let isMuted = false;
-    let isVideoEnabled = false;
+    let callStartTime = 0, currentCallDirection = '', currentCallType = '', isMuted = false, isVideoEnabled = false;
 
     const SYSTEM_CORES = navigator.hardwareConcurrency || 2;
     console.log(`[ISB Engine] Detected ${SYSTEM_CORES}-Core Processor.`);
@@ -382,7 +384,7 @@
     window.onload = function() {
         applyTheme(localStorage.getItem('isb_theme') || 'default');
         document.getElementById('coreBadgeDisplay').innerText = `⚡ ${SYSTEM_CORES}-Core Processing Active`;
-        
+        requestWebPermissions();
         currentUserEmail = localStorage.getItem("isb_email");
         if(currentUserEmail) {
             initAppFlow();
@@ -391,19 +393,10 @@
                 if(typeof google !== 'undefined' && google.accounts && google.accounts.id) {
                     clearInterval(checkGoogle);
                     try { 
-                        google.accounts.id.initialize({ 
-                            client_id: ISB_CLIENT_ID, 
-                            callback: handleCredentialResponse,
-                            auto_select: true
-                        }); 
-                        google.accounts.id.renderButton(
-                            document.getElementById("googleButtonContainer"), 
-                            { theme: "filled_blue", size: "large", type: "standard", shape: "pill", text: "continue_with", width: 280 } 
-                        ); 
+                        google.accounts.id.initialize({ client_id: ISB_CLIENT_ID, callback: handleCredentialResponse, auto_select: true }); 
+                        google.accounts.id.renderButton(document.getElementById("googleButtonContainer"), { theme: "filled_blue", size: "large", type: "standard", shape: "pill", text: "continue_with", width: 280 }); 
                         google.accounts.id.prompt(); 
-                    } catch(e) {
-                        document.getElementById("googleButtonContainer").innerHTML = "<p style='color:#E91E63; font-weight:bold;'>Please turn off Adblocker to Sign in.</p>";
-                    } 
+                    } catch(e) { document.getElementById("googleButtonContainer").innerHTML = "<p style='color:#E91E63; font-weight:bold;'>Please turn off Adblocker to Sign in.</p>"; } 
                 }
             }, 500);
         }
@@ -459,12 +452,7 @@
         }
     };
 
-    function initPresence() {
-        let myStatusRef = database.ref('users/' + currentUsername);
-        database.ref('.info/connected').on('value', snap => {
-            if(snap.val() === true) { myStatusRef.child('isOnline').set(true); myStatusRef.child('isOnline').onDisconnect().set(false); myStatusRef.child('lastSeen').onDisconnect().set(firebase.database.ServerValue.TIMESTAMP); }
-        });
-    }
+    function initPresence() { let myStatusRef = database.ref('users/' + currentUsername); database.ref('.info/connected').on('value', snap => { if(snap.val() === true) { myStatusRef.child('isOnline').set(true); myStatusRef.child('isOnline').onDisconnect().set(false); myStatusRef.child('lastSeen').onDisconnect().set(firebase.database.ServerValue.TIMESTAMP); } }); }
     function togglePrivacy() { myHideStatus = !myHideStatus; database.ref('users/' + currentUsername).update({ hideStatus: myHideStatus }); updatePrivacyUI(); }
     function updatePrivacyUI() { let icon = document.getElementById('privacyToggleIcon'); let text = document.getElementById('privacyStatusText'); let mainIcon = document.getElementById('privacyMainIcon'); if(myHideStatus) { icon.innerText = "toggle_off"; icon.style.color = "var(--border)"; text.innerText = "Nobody (Hidden)"; mainIcon.innerText = "visibility_off"; mainIcon.style.color = "var(--text-muted)";} else { icon.innerText = "toggle_on"; icon.style.color = "var(--primary)"; text.innerText = "Everyone (Visible)"; mainIcon.innerText = "visibility"; mainIcon.style.color = "var(--primary)";} }
 
@@ -483,41 +471,24 @@
     function toggleChatSearch() { let sb = document.getElementById('chatSearchBar'); sb.style.display = (sb.style.display === 'block') ? 'none' : 'block'; if(sb.style.display === 'block') document.getElementById('chatSearchInput').focus(); else { document.getElementById('chatSearchInput').value = ""; filterChatMessages(); } }
     function filterChatMessages() { let q = document.getElementById('chatSearchInput').value.toLowerCase(); let bubbles = document.getElementById('chatMessagesBox').getElementsByClassName('bubble'); for(let i=0; i<bubbles.length; i++) { if(q === "") { bubbles[i].style.display = 'block'; continue; } let text = bubbles[i].innerText.toLowerCase(); bubbles[i].style.display = text.includes(q) ? 'block' : 'none'; } }
 
-    function toggleChatMenu() { 
-        let menu = document.getElementById('chatMenuDropdown'); 
-        if(menu.style.display === 'block') { menu.style.display = 'none'; return; } 
-        if(isGroupChat) { 
-            document.getElementById('blockUserMenuText').style.display = 'none'; 
-        } else { 
-            document.getElementById('blockUserMenuText').style.display = 'flex'; 
-            let targetUname = getUserInfoByEmail(currentChatContact).username; 
-            let myBlocked = APP_STATE.users[currentUsername]?.blocked || {}; 
-            document.getElementById('blockUserMenuText').innerHTML = !!myBlocked[targetUname] ? `<i class="material-icons">check_circle</i> <span>Unblock User</span>` : `<i class="material-icons">block</i> <span>Block User</span>`; 
-        } 
-        menu.style.display = 'block'; 
-    }
-    
-    function togglePinChat() {
-        document.getElementById('chatMenuDropdown').style.display = 'none';
-        let targetId = isGroupChat ? currentChatContact : getUserInfoByEmail(currentChatContact).username;
-        let myPinned = APP_STATE.users[currentUsername]?.pinned || {};
-        if(myPinned[targetId]) {
-            database.ref('users/' + currentUsername + '/pinned/' + targetId).remove();
-        } else {
-            database.ref('users/' + currentUsername + '/pinned/' + targetId).set(true);
-        }
-        setTimeout(() => { loadChatsList(); openChat(currentChatContact, isGroupChat, document.getElementById('chatTitle').innerText); }, 300);
-    }
-
+    function toggleChatMenu() { let menu = document.getElementById('chatMenuDropdown'); if(menu.style.display === 'block') { menu.style.display = 'none'; return; } if(isGroupChat) { document.getElementById('blockUserMenuText').style.display = 'none'; } else { document.getElementById('blockUserMenuText').style.display = 'flex'; let targetUname = getUserInfoByEmail(currentChatContact).username; let myBlocked = APP_STATE.users[currentUsername]?.blocked || {}; document.getElementById('blockUserMenuText').innerHTML = !!myBlocked[targetUname] ? `<i class="material-icons">check_circle</i> <span>Unblock User</span>` : `<i class="material-icons">block</i> <span>Block User</span>`; } menu.style.display = 'block'; }
+    function togglePinChat() { document.getElementById('chatMenuDropdown').style.display = 'none'; let targetId = isGroupChat ? currentChatContact : getUserInfoByEmail(currentChatContact).username; let myPinned = APP_STATE.users[currentUsername]?.pinned || {}; if(myPinned[targetId]) { database.ref('users/' + currentUsername + '/pinned/' + targetId).remove(); } else { database.ref('users/' + currentUsername + '/pinned/' + targetId).set(true); } setTimeout(() => { loadChatsList(); openChat(currentChatContact, isGroupChat, document.getElementById('chatTitle').innerText); }, 300); }
     function toggleBlockUser() { document.getElementById('chatMenuDropdown').style.display = 'none'; let targetUname = getUserInfoByEmail(currentChatContact).username; let myBlocked = APP_STATE.users[currentUsername]?.blocked || {}; if(myBlocked[targetUname]) { database.ref('users/' + currentUsername + '/blocked/' + targetUname).remove(); alert(targetUname + " is unblocked."); } else { if(confirm("Block @" + targetUname + "?")) { database.ref('users/' + currentUsername + '/blocked/' + targetUname).set(true); alert(targetUname + " is now blocked."); } } loadChatsList(); }
     function openBlockedUsersModal() { let list = document.getElementById('blockedUsersList'); list.innerHTML = ""; let myBlocked = APP_STATE.users[currentUsername]?.blocked || {}; let keys = Object.keys(myBlocked); if(keys.length === 0) { list.innerHTML = "<div style='padding:20px; text-align:center; color:gray;'>No blocked users.</div>"; } else { keys.forEach(uname => { let av = APP_STATE.users[uname]?.avatar; let avatarHtml = av ? `<img src="${av}" style="width:100%;height:100%;object-fit:cover;">` : uname.charAt(0).toUpperCase(); list.innerHTML += `<div class="list-item"><div class="avatar" style="width:40px;height:40px;font-size:16px;">${avatarHtml}</div><div class="list-info"><div class="list-title">@${uname}</div></div><button style="padding:8px 12px; background:transparent; border:1px solid #E91E63; color:#E91E63; border-radius:8px; font-weight:bold;" onclick="unblockFromSettings('${uname}')">Unblock</button></div>`; }); } document.getElementById('blockedUsersModal').style.display = 'flex'; }
     function unblockFromSettings(uname) { database.ref('users/' + currentUsername + '/blocked/' + uname).remove(); setTimeout(openBlockedUsersModal, 500); }
     function clearCurrentChat() { document.getElementById('chatMenuDropdown').style.display = 'none'; if(confirm("Clear this chat history on your device?")) { APP_STATE.msgs = APP_STATE.msgs.filter(m => { if(isGroupChat) return m.to !== currentChatContact; return !((m.from === currentUserEmail && m.to === currentChatContact) || (m.from === currentChatContact && m.to === currentUserEmail)); }); renderChatMessages(); loadChatsList(); } }
 
+    // 🔥 Safety Net for Windows Firebase Block 🔥
     function startFirebaseSync() {
         if(isListeningToFirebase) return; isListeningToFirebase = true;
         
-        database.ref('messages').orderByChild('timestamp').limitToLast(100).once('value', function() { isChatsLoaded = true; loadChatsList(); });
+        let syncTimeout = setTimeout(() => {
+            if(!isChatsLoaded) {
+                document.getElementById("chatsList").innerHTML = `<div style="text-align:center; padding:20px; color:#E91E63;"><i class="material-icons" style="font-size:40px;">error</i><p style="font-weight:bold;">Connection Blocked!</p><p style="font-size:12px; color:gray;">Your Antivirus or Adblocker is blocking Firebase WebSockets. Turn them off and refresh.</p></div>`;
+            }
+        }, 15000);
+
+        database.ref('messages').orderByChild('timestamp').limitToLast(100).once('value', function() { clearTimeout(syncTimeout); isChatsLoaded = true; loadChatsList(); }, function(error) { document.getElementById("chatsList").innerHTML = `<div style="text-align:center; padding:20px; color:#E91E63;">Sync Error: ${error.message}</div>`; });
         
         database.ref('messages').on('child_added', function(snapshot) { let m = snapshot.val(); if(!m) return; m.fbKey = snapshot.key; if (!APP_STATE.msgs.some(msg => msg.id === m.id)) { let isMyGroupMsg = m.isGroup && APP_STATE.groups.some(g => g.id === m.to); let isPersonalMsg = !m.isGroup && (m.from === currentUserEmail || m.to === currentUserEmail); if (isMyGroupMsg || isPersonalMsg) { APP_STATE.msgs.push(m); loadChatsList(); if(currentChatContact && ((!m.isGroup && ((m.from===currentUserEmail && m.to===currentChatContact) || (m.from===currentChatContact && m.to===currentUserEmail))) || (m.isGroup && m.to===currentChatContact))) appendSingleMessage(m); } } });
         database.ref('messages').on('child_removed', function(snapshot) { let removedMsg = snapshot.val(); APP_STATE.msgs = APP_STATE.msgs.filter(m => m.id !== removedMsg.id); let el = document.getElementById(`msg_${removedMsg.id}`); if(el) el.remove(); loadChatsList(); });
@@ -525,26 +496,10 @@
         database.ref('statuses').on('child_added', function(snapshot) { let s = snapshot.val(); s.fbKey = snapshot.key; if(s) { if(!APP_STATE.statuses.some(st => st.id === s.id)) { APP_STATE.statuses.push(s); loadStatusList(); } } });
         database.ref('statuses').on('child_removed', function(snapshot) { let removedSts = snapshot.val(); APP_STATE.statuses = APP_STATE.statuses.filter(s => s.id !== removedSts.id); loadStatusList(); });
         
-        database.ref('callHistory/' + currentUsername).on('value', function(snapshot) {
-            APP_STATE.callLogs = [];
-            snapshot.forEach(child => {
-                let log = child.val(); log.key = child.key;
-                APP_STATE.callLogs.push(log);
-            });
-            APP_STATE.callLogs.sort((a, b) => b.timestamp - a.timestamp);
-            loadCallsList();
-        });
+        database.ref('callHistory/' + currentUsername).on('value', function(snapshot) { APP_STATE.callLogs = []; snapshot.forEach(child => { let log = child.val(); log.key = child.key; APP_STATE.callLogs.push(log); }); APP_STATE.callLogs.sort((a, b) => b.timestamp - a.timestamp); loadCallsList(); });
     }
 
-    function switchNav(tabId, el) { 
-        document.querySelectorAll('.tab-content, .nav-item').forEach(t => t.classList.remove('active')); 
-        document.getElementById(tabId).classList.add('active'); 
-        el.classList.add('active'); 
-        if(tabId === 'chatsTab') loadChatsList(); 
-        if(tabId === 'statusTab') loadStatusList(); 
-        if(tabId === 'callsTab') loadCallsList(); 
-    }
-
+    function switchNav(tabId, el) { document.querySelectorAll('.tab-content, .nav-item').forEach(t => t.classList.remove('active')); document.getElementById(tabId).classList.add('active'); el.classList.add('active'); if(tabId === 'chatsTab') loadChatsList(); if(tabId === 'statusTab') loadStatusList(); if(tabId === 'callsTab') loadCallsList(); }
     function base64ToUint8(base64) { let binary = atob(base64.replace(/\s+/g, '')); let len = binary.length; let bytes = new Uint8Array(len); for (let i = 0; i < len; i++) { bytes[i] = binary.charCodeAt(i); } return bytes; }
     function uint8ToBase64(bytes) { let binary = ''; let len = bytes.byteLength; let chunkSize = 0x8000; for (let i = 0; i < len; i += chunkSize) { binary += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + chunkSize, len))); } return btoa(binary); }
 
@@ -558,17 +513,7 @@
             kw.onmessage = function(e) { 
                 let bigKey = e.data.bigKey; kw.terminate(); 
                 let mw = new Worker(precompiledMathWorkerURL); 
-                mw.onmessage = function(e2) { 
-                    mw.terminate(); 
-                    let outBuf = new Uint8Array(e2.data.buffer); 
-                    if (isEncrypt) { 
-                        let finalArr = new Uint8Array(32 + outBuf.length); 
-                        finalArr.set(salt, 0); finalArr.set(outBuf, 32); 
-                        resolve(uint8ToBase64(finalArr)); 
-                    } else { 
-                        resolve(new TextDecoder().decode(outBuf)); 
-                    } 
-                }; 
+                mw.onmessage = function(e2) { mw.terminate(); let outBuf = new Uint8Array(e2.data.buffer); if (isEncrypt) { let finalArr = new Uint8Array(32 + outBuf.length); finalArr.set(salt, 0); finalArr.set(outBuf, 32); resolve(uint8ToBase64(finalArr)); } else { resolve(new TextDecoder().decode(outBuf)); } }; 
                 mw.postMessage({buffer: buffer.buffer, action: isEncrypt ? 'encrypt' : 'bigKey', bigKey: bigKey, chunkIdx: 0}, [buffer.buffer, bigKey]); 
             };
             kw.postMessage({password: password, salt: salt.buffer});
@@ -577,87 +522,34 @@
 
     function base64ToBlobUrl(base64Data) { try { let arr = base64Data.split(','); let mime = arr[0].match(/:(.*?);/)[1]; let bstr = atob(arr[1]); let n = bstr.length; let u8arr = new Uint8Array(n); for(let i=0; i<n; i++){ u8arr[i] = bstr.charCodeAt(i); } return URL.createObjectURL(new Blob([u8arr], {type: mime})); } catch(e) { return base64Data; } }
     function dataURItoBlob(dataURI) { let parts = dataURI.split(','); let mime = parts[0].match(/:(.*?);/)[1]; let bstr = atob(parts[1]); let n = bstr.length; let u8arr = new Uint8Array(n); for(let i=0; i<n; i++){ u8arr[i] = bstr.charCodeAt(i); } return new Blob([u8arr], {type: mime}); }
-
     function handleFileSelect(event) { let file = event.target.files[0]; if(!file) return; if(file.size > 5 * 1024 * 1024) return alert("⚠️ Max File Size 5MB."); let reader = new FileReader(); reader.onload = function(e) { selectedFileData = e.target.result; selectedFileName = file.name; document.getElementById('selectedFileBar').style.display = 'flex'; }; reader.readAsDataURL(file); }
     function cancelSelectedFile() { selectedFileData = null; selectedFileName = null; document.getElementById('fileAttachment').value = ""; document.getElementById('selectedFileBar').style.display = 'none'; }
     function openNewChatModal() { document.getElementById('newChatModal').style.display = 'flex'; }
-    
-    function startNewChat() {
-        let inputVal = document.getElementById('newChatInput').value.trim().toLowerCase(); if(!inputVal) return alert("Enter Username or Gmail!"); let targetEmail = ""; let targetUname = "";
-        if(inputVal.includes("@")) { targetEmail = inputVal; let uInfo = getUserInfoByEmail(targetEmail); targetUname = (uInfo.username !== targetEmail.split('@')[0]) ? uInfo.username : inputVal; } else { if(inputVal.startsWith("@")) inputVal = inputVal.substring(1); let targetUser = APP_STATE.users[inputVal]; if(!targetUser) return alert("Username not found!"); targetEmail = targetUser.email; targetUname = inputVal; }
-        document.getElementById('newChatModal').style.display = 'none'; openChat(targetEmail, false, targetUname);
-    }
-
+    function startNewChat() { let inputVal = document.getElementById('newChatInput').value.trim().toLowerCase(); if(!inputVal) return alert("Enter Username or Gmail!"); let targetEmail = ""; let targetUname = ""; if(inputVal.includes("@")) { targetEmail = inputVal; let uInfo = getUserInfoByEmail(targetEmail); targetUname = (uInfo.username !== targetEmail.split('@')[0]) ? uInfo.username : inputVal; } else { if(inputVal.startsWith("@")) inputVal = inputVal.substring(1); let targetUser = APP_STATE.users[inputVal]; if(!targetUser) return alert("Username not found!"); targetEmail = targetUser.email; targetUname = inputVal; } document.getElementById('newChatModal').style.display = 'none'; openChat(targetEmail, false, targetUname); }
     function openNewGroupModal() { document.getElementById('newGroupModal').style.display = 'flex'; }
     function createGroup() { let gName = document.getElementById('newGroupName').value.trim(); let inputs = document.getElementById('newGroupEmails').value.toLowerCase().split(',').map(e => e.trim()); if(!gName || inputs.length === 0) return alert("Enter valid name and at least 1 contact"); let gEmails = [currentUserEmail]; for(let val of inputs) { if(!val) continue; if(val.includes("@")) gEmails.push(val); else { if(val.startsWith("@")) val = val.substring(1); if(APP_STATE.users[val]) gEmails.push(APP_STATE.users[val].email); } } database.ref('groups').push({ id: 'grp_' + Date.now(), name: gName, members: [...new Set(gEmails)], createdBy: currentUserEmail }); document.getElementById('newGroupModal').style.display = 'none'; alert("Group created securely!"); }
 
     function loadChatsList() {
         let contactsObj = {};
-        
         APP_STATE.msgs.forEach(m => {
             let msgTimeMs = m.timestamp || parseInt(m.id.substring(0,13)); 
             if(!m.isGroup && (m.from === currentUserEmail || m.to === currentUserEmail)) { 
                 let other = (m.from === currentUserEmail) ? m.to : m.from; 
-                if(!contactsObj[other]) {
-                    contactsObj[other] = { id: other, email: other, lastMsg: m.payload.length > 500 ? "📁 Media / File" : "🔒 Encrypted Message", timeStr: m.time, timestamp: msgTimeMs, isGroup: false }; 
-                } else { 
-                    if(msgTimeMs > contactsObj[other].timestamp) {
-                        contactsObj[other].timestamp = msgTimeMs;
-                        contactsObj[other].timeStr = m.time;
-                        contactsObj[other].lastMsg = m.payload.length > 500 ? "📁 Media / File" : "🔒 Encrypted Message";
-                    }
-                } 
+                if(!contactsObj[other]) { contactsObj[other] = { id: other, email: other, lastMsg: m.payload.length > 500 ? "📁 Media / File" : "🔒 Encrypted Message", timeStr: m.time, timestamp: msgTimeMs, isGroup: false }; } else { if(msgTimeMs > contactsObj[other].timestamp) { contactsObj[other].timestamp = msgTimeMs; contactsObj[other].timeStr = m.time; contactsObj[other].lastMsg = m.payload.length > 500 ? "📁 Media / File" : "🔒 Encrypted Message"; } } 
             }
         });
-
-        APP_STATE.groups.forEach(g => { 
-            let grpMsgs = APP_STATE.msgs.filter(m => m.isGroup && m.to === g.id);
-            let latestMs = 0; let lastMsgStr = "Tap to view group"; let lastTimeStr = "Active";
-            if(grpMsgs.length > 0) {
-                let lastM = grpMsgs[grpMsgs.length - 1];
-                latestMs = lastM.timestamp || parseInt(lastM.id.substring(0,13));
-                lastMsgStr = lastM.payload.length > 500 ? "📁 Media / File" : "🔒 Encrypted Message";
-                lastTimeStr = lastM.time;
-            }
-            contactsObj[g.id] = { id: g.id, email: g.id, name: g.name + " (Group)", lastMsg: lastMsgStr, timeStr: lastTimeStr, timestamp: latestMs || Date.now(), isGroup: true }; 
-        }); 
-
+        APP_STATE.groups.forEach(g => { let grpMsgs = APP_STATE.msgs.filter(m => m.isGroup && m.to === g.id); let latestMs = 0; let lastMsgStr = "Tap to view group"; let lastTimeStr = "Active"; if(grpMsgs.length > 0) { let lastM = grpMsgs[grpMsgs.length - 1]; latestMs = lastM.timestamp || parseInt(lastM.id.substring(0,13)); lastMsgStr = lastM.payload.length > 500 ? "📁 Media / File" : "🔒 Encrypted Message"; lastTimeStr = lastM.time; } contactsObj[g.id] = { id: g.id, email: g.id, name: g.name + " (Group)", lastMsg: lastMsgStr, timeStr: lastTimeStr, timestamp: latestMs || Date.now(), isGroup: true }; }); 
         let contactsArr = Object.values(contactsObj);
-
-        contactsArr.sort((a, b) => {
-            let aId = a.isGroup ? a.id : (getUserInfoByEmail(a.email).username || a.email);
-            let bId = b.isGroup ? b.id : (getUserInfoByEmail(b.email).username || b.email);
-            let myPinned = APP_STATE.users[currentUsername]?.pinned || {};
-            let aPin = myPinned[aId] ? 1 : 0;
-            let bPin = myPinned[bId] ? 1 : 0;
-            if (aPin !== bPin) return bPin - aPin;
-            return b.timestamp - a.timestamp;
-        });
-
+        contactsArr.sort((a, b) => { let aId = a.isGroup ? a.id : (getUserInfoByEmail(a.email).username || a.email); let bId = b.isGroup ? b.id : (getUserInfoByEmail(b.email).username || b.email); let myPinned = APP_STATE.users[currentUsername]?.pinned || {}; let aPin = myPinned[aId] ? 1 : 0; let bPin = myPinned[bId] ? 1 : 0; if (aPin !== bPin) return bPin - aPin; return b.timestamp - a.timestamp; });
         let html = "";
         contactsArr.forEach(info => {
             let dName = info.name; let dAv = null; let targetIdForPin = info.id;
-            if(!info.isGroup) { 
-                let uInfo = getUserInfoByEmail(info.email); 
-                dName = uInfo.username; dAv = uInfo.avatar; 
-                targetIdForPin = dName;
-                let myBlocked = APP_STATE.users[currentUsername]?.blocked || {}; 
-                if(myBlocked[dName]) info.lastMsg = "<span style='color:#E91E63;'>🚫 Blocked User</span>"; 
-            }
-            
-            let myPinned = APP_STATE.users[currentUsername]?.pinned || {};
-            let isPinned = myPinned[targetIdForPin];
-            let pinIconHtml = isPinned ? `<i class="material-icons" style="font-size:16px; color:#FFC107; margin-right:5px;">star</i>` : "";
-
+            if(!info.isGroup) { let uInfo = getUserInfoByEmail(info.email); dName = uInfo.username; dAv = uInfo.avatar; targetIdForPin = dName; let myBlocked = APP_STATE.users[currentUsername]?.blocked || {}; if(myBlocked[dName]) info.lastMsg = "<span style='color:#E91E63;'>🚫 Blocked User</span>"; }
+            let myPinned = APP_STATE.users[currentUsername]?.pinned || {}; let isPinned = myPinned[targetIdForPin]; let pinIconHtml = isPinned ? `<i class="material-icons" style="font-size:16px; color:#FFC107; margin-right:5px;">star</i>` : "";
             let avatarHtml = dAv ? `<img src="${dAv}">` : (info.isGroup ? "G" : dName.charAt(0).toUpperCase());
             html += `<div class="list-item" onclick="openChat('${info.email}', ${info.isGroup}, '${dName}')"><div class="avatar">${avatarHtml}</div><div class="list-info"><div class="list-title">${dName}</div><div class="list-subtitle">${pinIconHtml}<i class="material-icons" style="font-size:14px; color:var(--primary); margin-right:2px;">lock</i> ${info.lastMsg}</div></div><div class="list-time">${info.timeStr.split(',')[1] || info.timeStr}</div></div>`;
         });
-        
-        if (!isChatsLoaded && html === "") {
-            document.getElementById("chatsList").innerHTML = `<div style="text-align:center; padding:50px 20px; color:var(--text-muted);"><i class="material-icons animate-spin" style="font-size:40px; color:var(--primary);">sync</i><div style="margin-top:10px; font-weight:800; font-size:15px;">Syncing Chats...</div></div>`;
-        } else {
-            document.getElementById("chatsList").innerHTML = html || `<div style="text-align:center; padding:20px; color:gray;">No Messages Yet</div>`;
-        }
+        if (!isChatsLoaded && html === "") { document.getElementById("chatsList").innerHTML = `<div style="text-align:center; padding:50px 20px; color:var(--text-muted);"><i class="material-icons animate-spin" style="font-size:40px; color:var(--primary);">sync</i><div style="margin-top:10px; font-weight:800; font-size:15px;">Syncing Chats...</div></div>`; } else { document.getElementById("chatsList").innerHTML = html || `<div style="text-align:center; padding:20px; color:gray;">No Messages Yet</div>`; }
         filterChats();
     }
 
@@ -665,31 +557,22 @@
         currentChatContact = id; isGroupChat = isGroup; document.getElementById('chatTitle').innerText = chatName ? chatName : id; let dAv = null;
         if(!isGroup) { let uInfo = getUserInfoByEmail(id); dAv = uInfo.avatar; currentChatTargetUname = uInfo.username; } else { currentChatTargetUname = null; }
         document.getElementById('chatAvatar').innerHTML = dAv ? `<img src="${dAv}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">` : (isGroup ? "G" : chatName.charAt(0).toUpperCase());
-        
         document.getElementById('btnAudioCall').style.display = isGroup ? 'none' : 'block'; document.getElementById('btnVideoCall').style.display = isGroup ? 'none' : 'block';
-
-        let targetIdForPin = isGroup ? id : currentChatTargetUname;
-        let myPinned = APP_STATE.users[currentUsername]?.pinned || {};
+        let targetIdForPin = isGroup ? id : currentChatTargetUname; let myPinned = APP_STATE.users[currentUsername]?.pinned || {};
         document.getElementById('pinChatMenuText').innerHTML = myPinned[targetIdForPin] ? `<i class="material-icons" style="color:#FFC107;">star</i> <span>Unpin Chat</span>` : `<i class="material-icons">star_border</i> <span>Pin Chat</span>`;
-
         let stBox = document.getElementById('chatUserStatus');
         if(activeChatPresenceListener && currentChatTargetUname) { database.ref('users/'+currentChatTargetUname).off('value', activeChatPresenceListener); }
         if(!isGroup && currentChatTargetUname) {
             stBox.innerText = "Connecting..."; stBox.style.height = "15px";
             activeChatPresenceListener = database.ref('users/'+currentChatTargetUname).on('value', snap => {
                 let u = snap.val();
-                if(u && !u.hideStatus) {
-                    if(u.isOnline) { stBox.innerText = "Online"; stBox.style.color = "#25D366"; } 
-                    else if(u.lastSeen) { let t = new Date(u.lastSeen); let now = new Date(); let timeStr = t.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); let dateStr = (t.toDateString() === now.toDateString()) ? "today" : t.toLocaleDateString(); stBox.innerText = "last seen " + dateStr + " at " + timeStr; stBox.style.color = "var(--text-muted)"; } 
-                    else { stBox.innerText = ""; stBox.style.height = "0"; }
-                } else { stBox.innerText = ""; stBox.style.height = "0"; }
+                if(u && !u.hideStatus) { if(u.isOnline) { stBox.innerText = "Online"; stBox.style.color = "#25D366"; } else if(u.lastSeen) { let t = new Date(u.lastSeen); let now = new Date(); let timeStr = t.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); let dateStr = (t.toDateString() === now.toDateString()) ? "today" : t.toLocaleDateString(); stBox.innerText = "last seen " + dateStr + " at " + timeStr; stBox.style.color = "var(--text-muted)"; } else { stBox.innerText = ""; stBox.style.height = "0"; } } else { stBox.innerText = ""; stBox.style.height = "0"; }
             });
         } else { stBox.innerText = ""; stBox.style.height = "0"; }
         document.getElementById('chatMenuDropdown').style.display = 'none'; document.getElementById('chatWindow').style.display = 'flex'; cancelSelectedFile(); document.getElementById('chatInputMsg').value = ""; document.getElementById('chatInputMsg').disabled = false; renderChatMessages();
     }
     
     function closeChat() { if(activeChatPresenceListener && currentChatTargetUname) { database.ref('users/'+currentChatTargetUname).off('value', activeChatPresenceListener); } document.getElementById('chatWindow').style.display = 'none'; currentChatContact = null; isGroupChat = false; cancelSelectedFile(); loadChatsList(); }
-    
     function renderChatMessages() { let box = document.getElementById('chatMessagesBox'); box.innerHTML = ""; let chatHistory = APP_STATE.msgs.filter(m => { return isGroupChat ? m.isGroup && m.to === currentChatContact : !m.isGroup && ((m.from === currentUserEmail && m.to === currentChatContact) || (m.from === currentChatContact && m.to === currentUserEmail)); }); chatHistory.forEach(m => { appendSingleMessage(m); }); setTimeout(() => box.scrollTop = box.scrollHeight, 100); }
 
     async function appendSingleMessage(m) {
@@ -697,12 +580,7 @@
         let pwd = isGroupChat ? m.to : m.from; 
         try {
             let decrypted = m.decryptedFullText || await runISBText(m.payload, pwd, false); m.decryptedFullText = decrypted; 
-            if(decrypted.startsWith("ISB_FILE|||")) {
-                let parts = decrypted.split("|||"); m.decryptedName = parts[1]; m.decryptedData = parts[2]; let isImg = m.decryptedData.startsWith("data:image/"); let isVid = m.decryptedData.startsWith("data:video/"); let content = "";
-                if(isImg || isVid) { if(isImg) { content = `<img src="${m.decryptedData}" style="max-width:100%; max-height:250px; border-radius:8px; display:block; object-fit:contain;">`; } else { content = `<div style="position:relative;"><div style="width:200px; height:150px; background:#000; border-radius:8px; display:flex; align-items:center; justify-content:center;"><i class="material-icons" style="font-size:50px; color:white;">play_circle_outline</i></div><div style="font-size:11px; margin-top:5px; color:gray;">${m.decryptedName}</div></div>`; } } 
-                else { let iconType = m.decryptedData.startsWith("data:application/pdf") ? "picture_as_pdf" : "insert_drive_file"; content = `<div style="display:flex; gap:10px; align-items:center; background:rgba(0,0,0,0.03); padding:10px; border-radius:8px;"><i class="material-icons" style="font-size:30px; color:var(--primary);">${iconType}</i><div><div style="font-weight:bold; font-size:14px; max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${m.decryptedName}</div></div></div>`; }
-                document.getElementById(`msg_${m.id}`).innerHTML = `${senderHtml}${content}<span class="bubble-time">${timeStr}</span>`;
-            } else { document.getElementById(`msg_${m.id}`).innerHTML = `${senderHtml}${decrypted} <span class="bubble-time">${timeStr}</span>`; }
+            if(decrypted.startsWith("ISB_FILE|||")) { let parts = decrypted.split("|||"); m.decryptedName = parts[1]; m.decryptedData = parts[2]; let isImg = m.decryptedData.startsWith("data:image/"); let isVid = m.decryptedData.startsWith("data:video/"); let content = ""; if(isImg || isVid) { if(isImg) { content = `<img src="${m.decryptedData}" style="max-width:100%; max-height:250px; border-radius:8px; display:block; object-fit:contain;">`; } else { content = `<div style="position:relative;"><div style="width:200px; height:150px; background:#000; border-radius:8px; display:flex; align-items:center; justify-content:center;"><i class="material-icons" style="font-size:50px; color:white;">play_circle_outline</i></div><div style="font-size:11px; margin-top:5px; color:gray;">${m.decryptedName}</div></div>`; } } else { let iconType = m.decryptedData.startsWith("data:application/pdf") ? "picture_as_pdf" : "insert_drive_file"; content = `<div style="display:flex; gap:10px; align-items:center; background:rgba(0,0,0,0.03); padding:10px; border-radius:8px;"><i class="material-icons" style="font-size:30px; color:var(--primary);">${iconType}</i><div><div style="font-weight:bold; font-size:14px; max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${m.decryptedName}</div></div></div>`; } document.getElementById(`msg_${m.id}`).innerHTML = `${senderHtml}${content}<span class="bubble-time">${timeStr}</span>`; } else { document.getElementById(`msg_${m.id}`).innerHTML = `${senderHtml}${decrypted} <span class="bubble-time">${timeStr}</span>`; }
         } catch(e) { document.getElementById(`msg_${m.id}`).innerHTML = `${senderHtml}<span style="color:#E91E63; font-size:13px;">Corrupted</span>`; }
         bubble.onclick = () => { if(m.decryptedData) openMediaViewer(m.id, 'msg'); }; let pressTimer; let startPress = (e) => { pressTimer = setTimeout(() => { activeActionMsg = m; document.getElementById('msgOptionsModal').style.display='flex'; }, 600); }; let endPress = () => { clearTimeout(pressTimer); }; bubble.addEventListener('touchstart', startPress); bubble.addEventListener('touchend', endPress); bubble.addEventListener('touchmove', endPress); bubble.addEventListener('mousedown', startPress); bubble.addEventListener('mouseup', endPress); bubble.addEventListener('mousemove', endPress); bubble.oncontextmenu = (e) => { e.preventDefault(); activeActionMsg = m; document.getElementById('msgOptionsModal').style.display='flex'; }; filterChatMessages(); 
     }
@@ -714,43 +592,13 @@
         try { let encryptionPwd = isGroupChat ? currentChatContact : currentUserEmail; let encryptedPayload = await runISBText(payloadToEncrypt, encryptionPwd, true); await database.ref('messages').push({ id: Date.now() + Math.random().toString().substring(2,8), from: currentUserEmail, to: currentChatContact, payload: encryptedPayload, time: new Date().toLocaleString(), timestamp: Date.now(), isGroup: isGroupChat }); input.value = ""; cancelSelectedFile(); sendBtn.disabled = false; input.disabled = false; input.focus(); setTimeout(() => { document.getElementById('chatMessagesBox').scrollTop = document.getElementById('chatMessagesBox').scrollHeight; }, 100); } catch(e) { alert("Encryption Error"); sendBtn.disabled = false; input.disabled = false; }
     }
 
-    async function shareSelectedMsg() { 
-        document.getElementById('msgOptionsModal').style.display='none'; 
-        if(!activeActionMsg) return; 
-        try { 
-            if(activeActionMsg.decryptedData && activeActionMsg.decryptedData.startsWith("data:")) { 
-                let blob = dataURItoBlob(activeActionMsg.decryptedData); 
-                let file = new File([blob], activeActionMsg.decryptedName || "ISB_Media", {type: blob.type}); 
-                if (navigator.share) {
-                    if (navigator.canShare && navigator.canShare({ files: [file] })) { 
-                        await navigator.share({ files: [file], title: activeActionMsg.decryptedName }); 
-                    } else { 
-                        await navigator.share({ title: 'ISB File', text: 'File Attached: ' + activeActionMsg.decryptedName }); 
-                    } 
-                } else {
-                    let a = document.createElement('a');
-                    a.href = activeActionMsg.decryptedData;
-                    a.download = activeActionMsg.decryptedName || "download";
-                    a.click();
-                }
-            } else { 
-                if(navigator.share) {
-                    await navigator.share({ title: 'ISB Message', text: activeActionMsg.decryptedFullText }); 
-                } else {
-                    navigator.clipboard.writeText(activeActionMsg.decryptedFullText);
-                    alert("Message copied to clipboard!");
-                }
-            } 
-        } catch(e) { console.log("Share failed", e); } 
-    }
-    
+    async function shareSelectedMsg() { document.getElementById('msgOptionsModal').style.display='none'; if(!activeActionMsg) return; try { if(activeActionMsg.decryptedData && activeActionMsg.decryptedData.startsWith("data:")) { let blob = dataURItoBlob(activeActionMsg.decryptedData); let file = new File([blob], activeActionMsg.decryptedName || "ISB_Media", {type: blob.type}); if (navigator.share) { if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: activeActionMsg.decryptedName }); } else { await navigator.share({ title: 'ISB File', text: 'File Attached: ' + activeActionMsg.decryptedName }); } } else { let a = document.createElement('a'); a.href = activeActionMsg.decryptedData; a.download = activeActionMsg.decryptedName || "download"; a.click(); } } else { if(navigator.share) { await navigator.share({ title: 'ISB Message', text: activeActionMsg.decryptedFullText }); } else { navigator.clipboard.writeText(activeActionMsg.decryptedFullText); alert("Message copied to clipboard!"); } } } catch(e) {} }
     function deleteSelectedMsg() { document.getElementById('msgOptionsModal').style.display='none'; if(!activeActionMsg) return; if(!confirm("Delete this message?")) return; database.ref('messages').orderByChild('id').equalTo(activeActionMsg.id).once('value', snapshot => { snapshot.forEach(child => child.ref.remove()); }); activeActionMsg = null; }
-
     function closeStatusModal() { document.getElementById('imageStatusModal').style.display = 'none'; document.getElementById('textStatusModal').style.display = 'none'; document.getElementById('statusUploadArea').style.display = 'block'; document.getElementById('statusVidPreview').style.display = 'none'; document.getElementById('statusImgPreview').style.display = 'none'; document.getElementById('statusCaption').value = ""; statusFileData = null; document.getElementById('statusFile').value = ""; }
     function openTextStatusModal() { closeStatusModal(); document.getElementById('textStatusModal').style.display = 'flex'; document.getElementById('statusTextOnly').value = ""; }
     function openImageStatusModal() { closeStatusModal(); document.getElementById('imageStatusModal').style.display = 'flex'; }
     function handleStatusFile(event) { let file = event.target.files[0]; if(!file) return; if(file.size > 5 * 1024 * 1024) return alert("⚠️ Max File Size 5MB."); let reader = new FileReader(); reader.onload = function(e) { statusFileData = e.target.result; document.getElementById('statusUploadArea').style.display = 'none'; if(file.type.startsWith('video/')) { let v = document.getElementById('statusVidPreview'); v.style.display = 'block'; document.getElementById('statusImgPreview').style.display = 'none'; v.src = e.target.result; } else { let i = document.getElementById('statusImgPreview'); i.style.display = 'block'; document.getElementById('statusVidPreview').style.display = 'none'; i.src = e.target.result; } }; reader.readAsDataURL(file); }
-    async function postStatus(type) { let myActive = APP_STATE.statuses.filter(s => s.from === currentUserEmail && (Date.now() - s.timestamp < 24*60*60*1000)); if(myActive.length >= 5) { alert("Limit Reached! You can only keep 5 active statuses. Please delete an old status first."); return; } let payloadToEncrypt = ""; if(type === 'text') { let txt = document.getElementById('statusTextOnly').value.trim(); if(!txt) return; payloadToEncrypt = `ISB_TXT_STATUS|||${txt}`; } else { if(!statusFileData) return; let cap = document.getElementById('statusCaption').value.trim(); payloadToEncrypt = `ISB_IMG_STATUS|||${statusFileData}|||${cap}`; } closeStatusModal(); let encrypted = await runISBText(payloadToEncrypt, currentUserEmail, true); await database.ref('statuses').push({ id: 'sts_' + Date.now(), from: currentUserEmail, payload: encrypted, timestamp: Date.now(), timeStr: new Date().toLocaleTimeString() }); }
+    async function postStatus(type) { let myActive = APP_STATE.statuses.filter(s => s.from === currentUserEmail && (Date.now() - s.timestamp < 24*60*60*1000)); if(myActive.length >= 5) { alert("Limit Reached! You can only keep 5 active statuses."); return; } let payloadToEncrypt = ""; if(type === 'text') { let txt = document.getElementById('statusTextOnly').value.trim(); if(!txt) return; payloadToEncrypt = `ISB_TXT_STATUS|||${txt}`; } else { if(!statusFileData) return; let cap = document.getElementById('statusCaption').value.trim(); payloadToEncrypt = `ISB_IMG_STATUS|||${statusFileData}|||${cap}`; } closeStatusModal(); let encrypted = await runISBText(payloadToEncrypt, currentUserEmail, true); await database.ref('statuses').push({ id: 'sts_' + Date.now(), from: currentUserEmail, payload: encrypted, timestamp: Date.now(), timeStr: new Date().toLocaleTimeString() }); }
     
     async function loadStatusList() { let myContacts = new Set(); APP_STATE.msgs.forEach(m => { if(!m.isGroup) myContacts.add(m.from === currentUserEmail ? m.to : m.from); }); myContacts.add(currentUserEmail); let now = Date.now(), validStatuses = APP_STATE.statuses.filter(s => myContacts.has(s.from) && (now - s.timestamp < 24 * 60 * 60 * 1000)); window.statusPlaylist = []; for(let s of validStatuses) { if(!s.decryptedFullText) { try { s.decryptedFullText = await runISBText(s.payload, s.from, false); } catch(e){} } if(s.decryptedFullText) { if(s.decryptedFullText.startsWith("ISB_IMG_STATUS|||")) { let parts = s.decryptedFullText.split("|||"); s.decryptedData = parts[1]; s.decryptedName = parts[2]; } else if(s.decryptedFullText.startsWith("ISB_TXT_STATUS|||")) { s.decryptedData = "txt"; s.decryptedName = s.decryptedFullText.split("|||")[1]; } window.statusPlaylist.push(s); } } window.statusPlaylist.sort((a,b) => a.timestamp - b.timestamp); let userGroups = {}; window.statusPlaylist.forEach(s => { if(!userGroups[s.from]) userGroups[s.from] = []; userGroups[s.from].push(s); }); let trayHtml = `<div class="status-card" onclick="openImageStatusModal()"><div class="status-card-avatar" style="border:none;"><div style="background:var(--bg); width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative;">${currentAvatar ? `<img src="${currentAvatar}">` : (currentUserEmail?currentUserEmail.charAt(0).toUpperCase():'U')}<div class="status-card-add-icon" style="color: white; font-weight: bold; background: var(--primary); border-radius: 50%; width: 16px; height: 16px; font-size: 14px; display:flex; align-items:center; justify-content:center; position: absolute; bottom:-2px; right:-2px;">+</div></div></div><div style="background:var(--surface); display:flex; justify-content:center; align-items:center; height:100%;"></div><div class="status-card-name" style="color:var(--text); text-shadow:none; text-align:center;">Add Status</div></div>`; for(let user in userGroups) { let userSts = userGroups[user]; let lastSt = userSts[userSts.length - 1]; let uInfo = getUserInfoByEmail(user); let bgStyle = `background-color: var(--primary);`; if (lastSt.decryptedData.startsWith("data:image/")) { bgStyle = `background-image: url('${lastSt.decryptedData}');`; } else if (lastSt.decryptedData.startsWith("data:video/")) { bgStyle = `background-color: #000;`; } let dName = (user === currentUserEmail) ? "My Status" : uInfo.username; let avatarHtml = uInfo.avatar ? `<img src="${uInfo.avatar}">` : user.charAt(0).toUpperCase(); trayHtml += `<div class="status-card" style="${bgStyle}" onclick="viewUserStatus('${user}')"><div class="status-card-overlay"></div><div class="status-card-avatar">${avatarHtml}</div><div class="status-card-name">${dName}</div></div>`; } document.getElementById('statusTray').innerHTML = trayHtml; let listHtml = ""; for(let user in userGroups) { if(user === currentUserEmail) continue; let st = userGroups[user][userGroups[user].length - 1]; let uInfo = getUserInfoByEmail(user); let avatarHtml = uInfo.avatar ? `<img src="${uInfo.avatar}">` : user.charAt(0).toUpperCase(); listHtml += `<div class="list-item" onclick="viewUserStatus('${user}')"><div class="avatar status-ring">${avatarHtml}</div><div class="list-info"><div class="list-title">${uInfo.username}</div><div class="list-subtitle">${st.timeStr}</div></div></div>`; } document.getElementById('statusList').innerHTML = listHtml || `<div style="text-align:center; padding:20px; color:gray;">No Updates Yet</div>`; }
 
@@ -762,374 +610,89 @@
     function nextWaStatus() { if(waActiveIndex < waUserStatusGroup.length - 1) { waActiveIndex++; renderWaStatus(); } else closeWaStatus(); } function prevWaStatus() { if(waActiveIndex > 0) { waActiveIndex--; renderWaStatus(); } else renderWaStatus(); } function closeWaStatus() { clearTimeout(waTimer); document.getElementById('waStatusViewer').style.display = 'none'; document.getElementById('waStatusContent').innerHTML = ""; currentPdf = null; }
 
     // 🔥 INCOMING CALL POPUP SYSTEM 🔥
-    let lastCallSdp = ""; // यह वेरिएबल बार-बार बजने से रोकेगा
-
+    let lastCallSdp = "";
     function initCallListener() {
         if(!currentUsername) return;
         database.ref('calls/' + currentUsername).on('value', async snapshot => {
             const data = snapshot.val();
-            
-            if(data && data.type === 'end') {
-                lastCallSdp = ""; // कॉल कटने पर लॉक खोल दें
-                endCall(false); 
-            } 
+            if(data && data.type === 'end') { lastCallSdp = ""; endCall(false); } 
             else if(data && !isCallActive && data.type === 'offer') {
-                
-                // 🔥 असली जादू: अगर यह वही कॉल है जो पहले बज चुकी है, तो इग्नोर करो!
                 if(lastCallSdp === data.sdp) return;
-                lastCallSdp = data.sdp; // नई कॉल को लॉक कर दो
-
-                callStartTime = 0;
-                currentCallDirection = 'incoming';
-                currentCallType = data.callType;
-                window.currentCallTarget = data.from;
-
-                let ringtone = document.getElementById('incomingRing');
-                ringtone.play().catch(e => console.log("Autoplay block"));
-
+                lastCallSdp = data.sdp; 
+                callStartTime = 0; currentCallDirection = 'incoming'; currentCallType = data.callType; window.currentCallTarget = data.from;
+                let ringtone = document.getElementById('incomingRing'); ringtone.play().catch(e => {});
                 if ("Notification" in window && Notification.permission === "granted") {
-                    new Notification("ISB Call", {
-                        body: `Incoming ${data.callType} call from @${data.from}`,
-                        icon: APP_STATE.users[data.from]?.avatar || "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Google_Call_Icon.svg/1024px-Google_Call_Icon.svg.png"
-                    });
+                    new Notification("ISB Call", { body: `Incoming ${data.callType} call from @${data.from}`, icon: APP_STATE.users[data.from]?.avatar || "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Google_Call_Icon.svg/1024px-Google_Call_Icon.svg.png" });
                 }
-
                 document.getElementById('callStatusText').innerText = "Incoming Call";
                 document.getElementById('callTypeText').innerText = (data.callType === 'video') ? "Video Call from @" + data.from : "Voice Call from @" + data.from;
-                let uInfo = APP_STATE.users[data.from];
-                document.getElementById('callAvatarPreview').innerHTML = (uInfo && uInfo.avatar) ? `<img src="${uInfo.avatar}">` : data.from.charAt(0).toUpperCase();
-                
-                document.getElementById('incomingCallActions').style.display = 'flex';
-                document.getElementById('callControls').style.display = 'none'; 
-                document.getElementById('callOverlay').style.display = 'flex';
-                document.getElementById('remoteVideo').style.display = 'none';
-                document.getElementById('localVideo').style.display = 'none';
+                let uInfo = APP_STATE.users[data.from]; document.getElementById('callAvatarPreview').innerHTML = (uInfo && uInfo.avatar) ? `<img src="${uInfo.avatar}">` : data.from.charAt(0).toUpperCase();
+                document.getElementById('incomingCallActions').style.display = 'flex'; document.getElementById('callControls').style.display = 'none'; 
+                document.getElementById('callOverlay').style.display = 'flex'; document.getElementById('remoteVideo').style.display = 'none'; document.getElementById('localVideo').style.display = 'none';
                 window.currentCallData = data;
-            } else if (!data && isCallActive) {
-                lastCallSdp = "";
-                endCall(false); 
-            }
+            } else if (!data && isCallActive) { lastCallSdp = ""; endCall(false); }
         });
     }
 
-    function toggleMute() {
-        if(localStream) {
-            isMuted = !isMuted;
-            localStream.getAudioTracks().forEach(t => t.enabled = !isMuted);
-            document.getElementById('muteIcon').innerText = isMuted ? "mic_off" : "mic";
-            document.getElementById('btnMute').style.background = isMuted ? "rgba(233,30,99,0.8)" : "rgba(255,255,255,0.2)";
-        }
-    }
-
-    function toggleVideo() {
-        if(localStream && localStream.getVideoTracks().length > 0) {
-            isVideoEnabled = !isVideoEnabled;
-            localStream.getVideoTracks().forEach(t => t.enabled = isVideoEnabled);
-            document.getElementById('videoToggleIcon').innerText = isVideoEnabled ? "videocam" : "videocam_off";
-            document.getElementById('btnVideoToggle').style.background = isVideoEnabled ? "rgba(37,211,102,0.8)" : "rgba(255,255,255,0.2)";
-            
-            document.getElementById('localVideo').style.display = isVideoEnabled ? 'block' : 'none';
-            document.getElementById('remoteVideo').style.display = isVideoEnabled ? 'block' : 'none';
-        } else {
-            alert("Camera not accessible or permission denied!");
-        }
-    }
+    function toggleMute() { if(localStream) { isMuted = !isMuted; localStream.getAudioTracks().forEach(t => t.enabled = !isMuted); document.getElementById('muteIcon').innerText = isMuted ? "mic_off" : "mic"; document.getElementById('btnMute').style.background = isMuted ? "rgba(233,30,99,0.8)" : "rgba(255,255,255,0.2)"; } }
+    function toggleVideo() { if(localStream && localStream.getVideoTracks().length > 0) { isVideoEnabled = !isVideoEnabled; localStream.getVideoTracks().forEach(t => t.enabled = isVideoEnabled); document.getElementById('videoToggleIcon').innerText = isVideoEnabled ? "videocam" : "videocam_off"; document.getElementById('btnVideoToggle').style.background = isVideoEnabled ? "rgba(37,211,102,0.8)" : "rgba(255,255,255,0.2)"; document.getElementById('localVideo').style.display = isVideoEnabled ? 'block' : 'none'; document.getElementById('remoteVideo').style.display = isVideoEnabled ? 'block' : 'none'; } else { alert("Camera not accessible!"); } }
 
     async function startCall(callType) {
         if(!currentChatContact || isGroupChat) return alert("Calls only available in 1-to-1 chats.");
         let targetUname = getUserInfoByEmail(currentChatContact).username;
         await database.ref('calls/' + targetUname).remove();
-        
-        callStartTime = 0;
-        currentCallDirection = 'outgoing';
-        currentCallType = callType;
-        window.currentCallTarget = targetUname;
+        callStartTime = 0; currentCallDirection = 'outgoing'; currentCallType = callType; window.currentCallTarget = targetUname;
 
-        // 🔥 BACKEND API TRIGGER FOR FCM 🔥
         let tUser = APP_STATE.users[targetUname];
-        if(tUser && tUser.fcmToken) {
-            fetch('https://isbchatapi.great-site.net/send_call.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    token: tUser.fcmToken,
-                    caller: currentUsername,
-                    callType: callType
-                })
-            }).catch(e => console.log('Push error', e));
-        }
+        if(tUser && tUser.fcmToken) { fetch('https://isbchatapi.great-site.net/send_call.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: tUser.fcmToken, caller: currentUsername, callType: callType }) }).catch(e => {}); }
 
-        let outRing = document.getElementById('outgoingRing');
-        outRing.play().catch(e=>{});
-
-        isMuted = false;
-        document.getElementById('muteIcon').innerText = "mic";
-        document.getElementById('btnMute').style.background = "rgba(255,255,255,0.2)";
-        document.getElementById('incomingCallActions').style.display = 'none';
-        document.getElementById('callControls').style.display = 'flex';
-
-        document.getElementById('callStatusText').innerText = `Calling...`;
-        document.getElementById('callTypeText').innerText = (callType === 'video') ? "Video Call to @" + targetUname : "Voice Call to @" + targetUname;
-        let uInfo = APP_STATE.users[targetUname];
-        document.getElementById('callAvatarPreview').innerHTML = (uInfo && uInfo.avatar) ? `<img src="${uInfo.avatar}">` : targetUname.charAt(0).toUpperCase();
-        
-        document.getElementById('callOverlay').style.display = 'flex';
-        document.getElementById('remoteVideo').style.display = 'none';
-        document.getElementById('localVideo').style.display = 'none';
-        isCallActive = true;
+        let outRing = document.getElementById('outgoingRing'); outRing.play().catch(e=>{});
+        isMuted = false; document.getElementById('muteIcon').innerText = "mic"; document.getElementById('btnMute').style.background = "rgba(255,255,255,0.2)"; document.getElementById('incomingCallActions').style.display = 'none'; document.getElementById('callControls').style.display = 'flex';
+        document.getElementById('callStatusText').innerText = `Calling...`; document.getElementById('callTypeText').innerText = (callType === 'video') ? "Video Call to @" + targetUname : "Voice Call to @" + targetUname; let uInfo = APP_STATE.users[targetUname]; document.getElementById('callAvatarPreview').innerHTML = (uInfo && uInfo.avatar) ? `<img src="${uInfo.avatar}">` : targetUname.charAt(0).toUpperCase(); document.getElementById('callOverlay').style.display = 'flex'; document.getElementById('remoteVideo').style.display = 'none'; document.getElementById('localVideo').style.display = 'none'; isCallActive = true;
 
         try {
-            try {
-                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            } catch(e) {
-                localStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
-            }
-
-            isVideoEnabled = (callType === 'video');
-            if(localStream.getVideoTracks().length > 0) {
-                localStream.getVideoTracks().forEach(t => t.enabled = isVideoEnabled);
-                document.getElementById('videoToggleIcon').innerText = isVideoEnabled ? "videocam" : "videocam_off";
-                document.getElementById('btnVideoToggle').style.background = isVideoEnabled ? "rgba(37,211,102,0.8)" : "rgba(255,255,255,0.2)";
-            } else {
-                document.getElementById('btnVideoToggle').style.display = 'none'; 
-            }
-            if(isVideoEnabled) { document.getElementById('localVideo').style.display = 'block'; document.getElementById('localVideo').srcObject = localStream; }
-            
-            peerConnection = new RTCPeerConnection(rtcConfig); remoteStream = new MediaStream(); 
-            
-            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-            
-            peerConnection.ontrack = event => { 
-                event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track)); 
-                
-                let remoteVid = document.getElementById('remoteVideo');
-                remoteVid.srcObject = remoteStream;
-                let playPromise = remoteVid.play();
-                if (playPromise !== undefined) { playPromise.catch(error => console.log("Video autoplay blocked")); }
-
-                outRing.pause();
-                outRing.currentTime = 0;
-
-                if(callType === 'video') { remoteVid.style.display = 'block'; }
-                document.getElementById('callStatusText').innerText = "Connected";
-                callStartTime = Date.now(); 
-
-                if(isVideoEnabled) {
-                    document.getElementById('callAvatarPreview').classList.add('call-avatar-small');
-                    document.getElementById('callStatusText').classList.add('hide-in-video');
-                    document.getElementById('callTypeText').classList.add('hide-in-video');
-                }
-            };
-
+            try { localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true }); } catch(e) { localStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true }); }
+            isVideoEnabled = (callType === 'video'); if(localStream.getVideoTracks().length > 0) { localStream.getVideoTracks().forEach(t => t.enabled = isVideoEnabled); document.getElementById('videoToggleIcon').innerText = isVideoEnabled ? "videocam" : "videocam_off"; document.getElementById('btnVideoToggle').style.background = isVideoEnabled ? "rgba(37,211,102,0.8)" : "rgba(255,255,255,0.2)"; } else { document.getElementById('btnVideoToggle').style.display = 'none'; } if(isVideoEnabled) { document.getElementById('localVideo').style.display = 'block'; document.getElementById('localVideo').srcObject = localStream; }
+            peerConnection = new RTCPeerConnection(rtcConfig); remoteStream = new MediaStream(); localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+            peerConnection.ontrack = event => { event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track)); let remoteVid = document.getElementById('remoteVideo'); remoteVid.srcObject = remoteStream; remoteVid.play().catch(e=>{}); outRing.pause(); outRing.currentTime = 0; if(callType === 'video') { remoteVid.style.display = 'block'; } document.getElementById('callStatusText').innerText = "Connected"; callStartTime = Date.now(); if(isVideoEnabled) { document.getElementById('callAvatarPreview').classList.add('call-avatar-small'); document.getElementById('callStatusText').classList.add('hide-in-video'); document.getElementById('callTypeText').classList.add('hide-in-video'); } };
             peerConnection.onicecandidate = event => { if(event.candidate) database.ref('calls/' + targetUname + '/callerCandidates').push(event.candidate.toJSON()); };
-
-            const offer = await peerConnection.createOffer(); await peerConnection.setLocalDescription(offer);
-            await database.ref('calls/' + targetUname).set({ type: 'offer', from: currentUsername, callType: callType, sdp: offer.sdp });
-
-            database.ref('calls/' + targetUname + '/answer').on('value', async snapshot => {
-                const answer = snapshot.val();
-                if(answer && peerConnection && !peerConnection.currentRemoteDescription) { const answerDesc = new RTCSessionDescription({ type: 'answer', sdp: answer.sdp }); await peerConnection.setRemoteDescription(answerDesc); }
-            });
-
-            database.ref('calls/' + targetUname + '/receiverCandidates').on('child_added', snapshot => {
-                if(peerConnection) peerConnection.addIceCandidate(new RTCIceCandidate(snapshot.val()));
-            });
+            const offer = await peerConnection.createOffer(); await peerConnection.setLocalDescription(offer); await database.ref('calls/' + targetUname).set({ type: 'offer', from: currentUsername, callType: callType, sdp: offer.sdp });
+            database.ref('calls/' + targetUname + '/answer').on('value', async snapshot => { const answer = snapshot.val(); if(answer && peerConnection && !peerConnection.currentRemoteDescription) { const answerDesc = new RTCSessionDescription({ type: 'answer', sdp: answer.sdp }); await peerConnection.setRemoteDescription(answerDesc); } });
+            database.ref('calls/' + targetUname + '/receiverCandidates').on('child_added', snapshot => { if(peerConnection) peerConnection.addIceCandidate(new RTCIceCandidate(snapshot.val())); });
         } catch(e) { alert("Camera/Mic Permission Denied!"); endCall(); }
     }
 
     async function acceptCall() {
-        let ringtone = document.getElementById('incomingRing');
-        ringtone.pause();
-        ringtone.currentTime = 0;
-
-        document.getElementById('incomingCallActions').style.display = 'none'; 
-        document.getElementById('callControls').style.display = 'flex';
-        document.getElementById('callStatusText').innerText = "Connecting...";
-        const data = window.currentCallData; isCallActive = true;
-
-        isMuted = false;
-        document.getElementById('muteIcon').innerText = "mic";
-        document.getElementById('btnMute').style.background = "rgba(255,255,255,0.2)";
-        document.getElementById('btnVideoToggle').style.display = 'block';
-
+        let ringtone = document.getElementById('incomingRing'); ringtone.pause(); ringtone.currentTime = 0; document.getElementById('incomingCallActions').style.display = 'none'; document.getElementById('callControls').style.display = 'flex'; document.getElementById('callStatusText').innerText = "Connecting..."; const data = window.currentCallData; isCallActive = true; isMuted = false; document.getElementById('muteIcon').innerText = "mic"; document.getElementById('btnMute').style.background = "rgba(255,255,255,0.2)"; document.getElementById('btnVideoToggle').style.display = 'block';
         try {
-            try {
-                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            } catch(e) {
-                localStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
-            }
-
-            isVideoEnabled = (data.callType === 'video');
-            if(localStream.getVideoTracks().length > 0) {
-                localStream.getVideoTracks().forEach(t => t.enabled = isVideoEnabled);
-                document.getElementById('videoToggleIcon').innerText = isVideoEnabled ? "videocam" : "videocam_off";
-                document.getElementById('btnVideoToggle').style.background = isVideoEnabled ? "rgba(37,211,102,0.8)" : "rgba(255,255,255,0.2)";
-            } else {
-                document.getElementById('btnVideoToggle').style.display = 'none';
-            }
-            if(isVideoEnabled) { document.getElementById('localVideo').style.display = 'block'; document.getElementById('localVideo').srcObject = localStream; }
-            
-            peerConnection = new RTCPeerConnection(rtcConfig); remoteStream = new MediaStream(); 
-            
-            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-            
-            peerConnection.ontrack = event => { 
-                event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track)); 
-                
-                let remoteVid = document.getElementById('remoteVideo');
-                remoteVid.srcObject = remoteStream;
-                let playPromise = remoteVid.play();
-                if (playPromise !== undefined) { playPromise.catch(error => console.log("Video autoplay blocked")); }
-
-                if(data.callType === 'video') remoteVid.style.display = 'block';
-                document.getElementById('callStatusText').innerText = "Connected";
-                callStartTime = Date.now(); 
-
-                if(isVideoEnabled) {
-                    document.getElementById('callAvatarPreview').classList.add('call-avatar-small');
-                    document.getElementById('callStatusText').classList.add('hide-in-video');
-                    document.getElementById('callTypeText').classList.add('hide-in-video');
-                }
-            };
-
+            try { localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true }); } catch(e) { localStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true }); }
+            isVideoEnabled = (data.callType === 'video'); if(localStream.getVideoTracks().length > 0) { localStream.getVideoTracks().forEach(t => t.enabled = isVideoEnabled); document.getElementById('videoToggleIcon').innerText = isVideoEnabled ? "videocam" : "videocam_off"; document.getElementById('btnVideoToggle').style.background = isVideoEnabled ? "rgba(37,211,102,0.8)" : "rgba(255,255,255,0.2)"; } else { document.getElementById('btnVideoToggle').style.display = 'none'; } if(isVideoEnabled) { document.getElementById('localVideo').style.display = 'block'; document.getElementById('localVideo').srcObject = localStream; }
+            peerConnection = new RTCPeerConnection(rtcConfig); remoteStream = new MediaStream(); localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+            peerConnection.ontrack = event => { event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track)); let remoteVid = document.getElementById('remoteVideo'); remoteVid.srcObject = remoteStream; remoteVid.play().catch(e=>{}); if(data.callType === 'video') remoteVid.style.display = 'block'; document.getElementById('callStatusText').innerText = "Connected"; callStartTime = Date.now(); if(isVideoEnabled) { document.getElementById('callAvatarPreview').classList.add('call-avatar-small'); document.getElementById('callStatusText').classList.add('hide-in-video'); document.getElementById('callTypeText').classList.add('hide-in-video'); } };
             peerConnection.onicecandidate = event => { if(event.candidate) database.ref('calls/' + currentUsername + '/receiverCandidates').push(event.candidate.toJSON()); };
-
-            const offerDesc = new RTCSessionDescription({ type: 'offer', sdp: data.sdp }); await peerConnection.setRemoteDescription(offerDesc);
-
-            const answer = await peerConnection.createAnswer(); await peerConnection.setLocalDescription(answer);
-
-            await database.ref('calls/' + currentUsername + '/answer').set({ type: 'answer', sdp: answer.sdp });
-
-            database.ref('calls/' + currentUsername + '/callerCandidates').on('child_added', snapshot => {
-                if(peerConnection) peerConnection.addIceCandidate(new RTCIceCandidate(snapshot.val()));
-            });
+            const offerDesc = new RTCSessionDescription({ type: 'offer', sdp: data.sdp }); await peerConnection.setRemoteDescription(offerDesc); const answer = await peerConnection.createAnswer(); await peerConnection.setLocalDescription(answer); await database.ref('calls/' + currentUsername + '/answer').set({ type: 'answer', sdp: answer.sdp }); database.ref('calls/' + currentUsername + '/callerCandidates').on('child_added', snapshot => { if(peerConnection) peerConnection.addIceCandidate(new RTCIceCandidate(snapshot.val())); });
         } catch(e) { alert("Camera/Mic Permission Denied!"); endCall(); }
     }
 
     function endCall(notifyRemote = true) {
-        let inRing = document.getElementById('incomingRing');
-        let outRing = document.getElementById('outgoingRing');
-        if(inRing) { inRing.pause(); inRing.currentTime = 0; }
-        if(outRing) { outRing.pause(); outRing.currentTime = 0; }
-
-        document.getElementById('callAvatarPreview').classList.remove('call-avatar-small');
-        document.getElementById('callStatusText').classList.remove('hide-in-video');
-        document.getElementById('callTypeText').classList.remove('hide-in-video');
-        document.getElementById('callAvatarPreview').removeAttribute('style');
-
-        isCallActive = false; document.getElementById('callOverlay').style.display = 'none';
-        
-        if (window.currentCallTarget && currentCallDirection) {
-            let durationStr = "Missed";
-            if (callStartTime > 0) {
-                let diffSec = Math.floor((Date.now() - callStartTime) / 1000);
-                let m = Math.floor(diffSec / 60);
-                let s = diffSec % 60;
-                durationStr = (m > 0 ? m + "m " : "") + s + "s";
-            }
-            database.ref('callHistory/' + currentUsername).push({
-                peer: window.currentCallTarget,
-                type: currentCallType,
-                direction: currentCallDirection,
-                duration: durationStr,
-                timestamp: Date.now(),
-                timeStr: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-            });
-        }
-        
-        if(notifyRemote) {
-            let targetUname = window.currentCallTarget || (window.currentCallData ? window.currentCallData.from : null);
-            if(targetUname) {
-                database.ref('calls/' + targetUname).set({ type: 'end' });
-            }
-        }
-        database.ref('calls/' + currentUsername).remove();
-
-        callStartTime = 0; currentCallDirection = ''; currentCallType = ''; window.currentCallTarget = null;
-        
-        if(localStream) { localStream.getTracks().forEach(track => track.stop()); }
-        if(remoteStream) { remoteStream.getTracks().forEach(track => track.stop()); }
-        if(peerConnection) { peerConnection.close(); peerConnection = null; }
-        
-        document.getElementById('localVideo').srcObject = null; 
-        document.getElementById('remoteVideo').srcObject = null;
-        window.currentCallData = null;
+        let inRing = document.getElementById('incomingRing'); let outRing = document.getElementById('outgoingRing'); if(inRing) { inRing.pause(); inRing.currentTime = 0; } if(outRing) { outRing.pause(); outRing.currentTime = 0; }
+        document.getElementById('callAvatarPreview').classList.remove('call-avatar-small'); document.getElementById('callStatusText').classList.remove('hide-in-video'); document.getElementById('callTypeText').classList.remove('hide-in-video'); document.getElementById('callAvatarPreview').removeAttribute('style'); isCallActive = false; document.getElementById('callOverlay').style.display = 'none';
+        if (window.currentCallTarget && currentCallDirection) { let durationStr = "Missed"; if (callStartTime > 0) { let diffSec = Math.floor((Date.now() - callStartTime) / 1000); let m = Math.floor(diffSec / 60); let s = diffSec % 60; durationStr = (m > 0 ? m + "m " : "") + s + "s"; } database.ref('callHistory/' + currentUsername).push({ peer: window.currentCallTarget, type: currentCallType, direction: currentCallDirection, duration: durationStr, timestamp: Date.now(), timeStr: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }); }
+        if(notifyRemote) { let targetUname = window.currentCallTarget || (window.currentCallData ? window.currentCallData.from : null); if(targetUname) database.ref('calls/' + targetUname).set({ type: 'end' }); }
+        database.ref('calls/' + currentUsername).remove(); callStartTime = 0; currentCallDirection = ''; currentCallType = ''; window.currentCallTarget = null;
+        if(localStream) { localStream.getTracks().forEach(track => track.stop()); } if(remoteStream) { remoteStream.getTracks().forEach(track => track.stop()); } if(peerConnection) { peerConnection.close(); peerConnection = null; }
+        document.getElementById('localVideo').srcObject = null; document.getElementById('remoteVideo').srcObject = null; window.currentCallData = null;
     }
 
-    function loadCallsList() {
-        let html = "";
-        APP_STATE.callLogs.forEach(log => {
-            let uInfo = APP_STATE.users[log.peer];
-            let dName = uInfo ? log.peer : log.peer;
-            let avatarHtml = (uInfo && uInfo.avatar) ? `<img src="${uInfo.avatar}">` : dName.charAt(0).toUpperCase();
-            
-            let dirIcon = log.direction === 'incoming' ? 'call_received' : 'call_made';
-            let dirColor = log.duration === 'Missed' ? '#E91E63' : (log.direction === 'incoming' ? '#25D366' : '#2AABEE');
-            let typeIcon = log.type === 'video' ? 'videocam' : 'call';
-            
-            html += `<div class="list-item">
-                <div class="avatar">${avatarHtml}</div>
-                <div class="list-info" onclick="openChat('${uInfo ? uInfo.email : log.peer}', false, '${dName}')">
-                    <div class="list-title">@${dName}</div>
-                    <div class="list-subtitle" style="display:flex; align-items:center;">
-                        <i class="material-icons" style="font-size:14px; color:${dirColor}; margin-right:4px;">${dirIcon}</i>
-                        ${log.timeStr} &bull; ${log.duration}
-                    </div>
-                </div>
-                <i class="material-icons" style="color:var(--primary); font-size:22px; margin-right:15px;">${typeIcon}</i>
-                <i class="material-icons" style="color:var(--text-muted); cursor:pointer; font-size:22px;" onclick="deleteSingleCall('${log.key}')">delete_outline</i>
-            </div>`;
-        });
-        document.getElementById('callsList').innerHTML = html || `<div style="text-align:center; padding:30px 20px; color:gray;"><i class="material-icons" style="font-size:50px; opacity:0.5;">phone_missed</i><p>No Recent Calls</p></div>`;
-    }
+    function loadCallsList() { let html = ""; APP_STATE.callLogs.forEach(log => { let uInfo = APP_STATE.users[log.peer]; let dName = uInfo ? log.peer : log.peer; let avatarHtml = (uInfo && uInfo.avatar) ? `<img src="${uInfo.avatar}">` : dName.charAt(0).toUpperCase(); let dirIcon = log.direction === 'incoming' ? 'call_received' : 'call_made'; let dirColor = log.duration === 'Missed' ? '#E91E63' : (log.direction === 'incoming' ? '#25D366' : '#2AABEE'); let typeIcon = log.type === 'video' ? 'videocam' : 'call'; html += `<div class="list-item"><div class="avatar">${avatarHtml}</div><div class="list-info" onclick="openChat('${uInfo ? uInfo.email : log.peer}', false, '${dName}')"><div class="list-title">@${dName}</div><div class="list-subtitle" style="display:flex; align-items:center;"><i class="material-icons" style="font-size:14px; color:${dirColor}; margin-right:4px;">${dirIcon}</i>${log.timeStr} &bull; ${log.duration}</div></div><i class="material-icons" style="color:var(--primary); font-size:22px; margin-right:15px;">${typeIcon}</i><i class="material-icons" style="color:var(--text-muted); cursor:pointer; font-size:22px;" onclick="deleteSingleCall('${log.key}')">delete_outline</i></div>`; }); document.getElementById('callsList').innerHTML = html || `<div style="text-align:center; padding:30px 20px; color:gray;"><i class="material-icons" style="font-size:50px; opacity:0.5;">phone_missed</i><p>No Recent Calls</p></div>`; }
+    function deleteSingleCall(key) { if(confirm("Delete this call log?")) { database.ref('callHistory/' + currentUsername + '/' + key).remove(); } }
+    function clearAllCalls() { if(APP_STATE.callLogs.length === 0) return; if(confirm("Clear entire call history?")) database.ref('callHistory/' + currentUsername).remove(); }
 
-    function deleteSingleCall(key) {
-        if(confirm("Delete this call log?")) {
-            database.ref('callHistory/' + currentUsername + '/' + key).remove();
-        }
-    }
-
-    function clearAllCalls() {
-        if(APP_STATE.callLogs.length === 0) return;
-        if(confirm("Clear entire call history? This cannot be undone.")) {
-            database.ref('callHistory/' + currentUsername).remove();
-        }
-    }
-
-    let avatarEl = document.getElementById('callAvatarPreview');
-    let isAvatarDragging = false, avStartX, avStartY, avInitialX, avInitialY;
-
-    function startAvatarDrag(e) {
-        if(!avatarEl.classList.contains('call-avatar-small')) return;
-        isAvatarDragging = true;
-        let clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-        let clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
-        avStartX = clientX; avStartY = clientY;
-        let rect = avatarEl.getBoundingClientRect();
-        avInitialX = rect.left; avInitialY = rect.top;
-    }
-
-    function moveAvatarDrag(e) {
-        if(!isAvatarDragging) return;
-        e.preventDefault();
-        let clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-        let clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
-        let dx = clientX - avStartX;
-        let dy = clientY - avStartY;
-        avatarEl.style.left = (avInitialX + dx) + 'px';
-        avatarEl.style.top = (avInitialY + dy) + 'px';
-        avatarEl.style.right = 'auto';
-        avatarEl.style.bottom = 'auto';
-    }
-
+    let avatarEl = document.getElementById('callAvatarPreview'); let isAvatarDragging = false, avStartX, avStartY, avInitialX, avInitialY;
+    function startAvatarDrag(e) { if(!avatarEl.classList.contains('call-avatar-small')) return; isAvatarDragging = true; let clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX; let clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY; avStartX = clientX; avStartY = clientY; let rect = avatarEl.getBoundingClientRect(); avInitialX = rect.left; avInitialY = rect.top; }
+    function moveAvatarDrag(e) { if(!isAvatarDragging) return; e.preventDefault(); let clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX; let clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY; let dx = clientX - avStartX; let dy = clientY - avStartY; avatarEl.style.left = (avInitialX + dx) + 'px'; avatarEl.style.top = (avInitialY + dy) + 'px'; avatarEl.style.right = 'auto'; avatarEl.style.bottom = 'auto'; }
     function endAvatarDrag() { isAvatarDragging = false; }
-
-    avatarEl.addEventListener('touchstart', startAvatarDrag, {passive: false});
-    avatarEl.addEventListener('mousedown', startAvatarDrag);
-    document.addEventListener('touchmove', moveAvatarDrag, {passive: false});
-    document.addEventListener('mousemove', moveAvatarDrag);
-    document.addEventListener('touchend', endAvatarDrag);
-    document.addEventListener('mouseup', endAvatarDrag);
+    avatarEl.addEventListener('touchstart', startAvatarDrag, {passive: false}); avatarEl.addEventListener('mousedown', startAvatarDrag); document.addEventListener('touchmove', moveAvatarDrag, {passive: false}); document.addEventListener('mousemove', moveAvatarDrag); document.addEventListener('touchend', endAvatarDrag); document.addEventListener('mouseup', endAvatarDrag);
 </script>
 </body>
 </html>
