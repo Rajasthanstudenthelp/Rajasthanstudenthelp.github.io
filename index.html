@@ -167,7 +167,6 @@
 </head>
 <body data-theme="default">
 
-    <!-- Incoming Call Ringtone Audio Element -->
     <audio id="incomingRing" loop src="https://actions.google.com/sounds/v1/alarms/phone_ringing.ogg"></audio>
     <audio id="outgoingRing" loop src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
 
@@ -840,7 +839,7 @@
         // 🔥 BACKEND API TRIGGER FOR FCM 🔥
         let tUser = APP_STATE.users[targetUname];
         if(tUser && tUser.fcmToken) {
-            fetch('http://isbchatapi.great-site.net/send_call.php', {
+            fetch('https://isbchatapi.great-site.net/send_call.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
