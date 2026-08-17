@@ -6,14 +6,14 @@
     <title>ISB-24 Premium Web3</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <!-- Firebase Compat Libraries (Auth Added) -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
 
         :root { --primary: #3F51B5; --primary-dark: #303F9F; --bg: #f0f2f5; --surface: #ffffff; --text: #1c1e21; --text-muted: #65676B; --border: #e4e6eb; --msg-sent: #E8EAF6; --msg-recv: #ffffff; --nav-bg: #ffffff; }
         [data-theme="dark"] { --primary: #5C6BC0; --primary-dark: #3F51B5; --bg: #121212; --surface: #1e1e1e; --text: #e4e6eb; --text-muted: #b0b3b8; --border: #333333; --msg-sent: #2c387e; --msg-recv: #242526; --nav-bg: #1e1e1e; }
@@ -25,63 +25,67 @@
         [data-theme="amoled"] { --primary: #ffffff; --bg: #000000; --surface: #0a0a0a; --text: #ffffff; --border: #222222; }
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body, html { height: 100%; height: 100dvh; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0;}
+        body, html { height: 100%; height: 100dvh; overflow: hidden; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0;}
         
-        #authScreen { height: 100%; height: 100dvh; display:flex; align-items:center; justify-content:center; }
+        #authScreen { height: 100%; height: 100dvh; display:flex; align-items:center; justify-content:center; background: var(--bg); }
         #mainApp { height: 100%; height: 100dvh; display: flex; flex-direction: column; }
         
-        .app-bar { flex-shrink: 0; background-color: var(--surface); color: var(--primary); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 100; border-bottom: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.05);}
-        .app-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+        .app-bar { flex-shrink: 0; background-color: var(--surface); color: var(--primary); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 100; border-bottom: 1px solid var(--border); box-shadow: 0 2px 10px rgba(0,0,0,0.05);}
+        .app-title { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
         .app-bar-icons { display: flex; gap: 15px; align-items: center; }
-        .app-bar i { font-size: 24px; cursor: pointer; color: var(--text-muted); transition: color 0.2s; }
+        .app-bar i { font-size: 26px; cursor: pointer; color: var(--text-muted); transition: color 0.2s; }
         
         .search-bar-container { display: none; padding: 10px 15px; background: var(--surface); border-bottom: 1px solid var(--border); animation: fadeIn 0.2s ease-out;}
         .search-bar-container input { width: 100%; padding: 12px 20px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg); color: var(--text); outline: none; font-size: 14px;}
         
-        .container { flex: 1; overflow-y: auto; padding-bottom: 70px; }
+        .container { flex: 1; overflow-y: auto; padding-bottom: 70px; scroll-behavior: smooth; }
         .tab-content { display: none; animation: fadeIn 0.3s ease-out; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes spin { 100% { transform: rotate(360deg); } }
         .animate-spin { animation: spin 1s linear infinite; }
 
-        .list-item { display: flex; align-items: center; padding: 15px 20px; cursor: pointer; background: var(--surface); transition: 0.2s; margin: 5px 10px; border-radius: 12px; border: 1px solid transparent;}
+        .list-item { display: flex; align-items: center; padding: 15px 20px; cursor: pointer; background: var(--surface); transition: background 0.2s; margin: 5px 10px; border-radius: 16px; border: 1px solid transparent;}
+        .list-item:active { background: var(--bg); transform: scale(0.98); }
         .avatar { width: 54px; height: 54px; background: var(--primary); color: var(--surface); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 22px; font-weight: bold; margin-right: 15px; flex-shrink: 0; overflow:hidden;}
         .avatar img { width: 100%; height: 100%; object-fit: cover; }
         .status-ring { outline: 3px solid #25D366; outline-offset: 2px; }
         .list-info { flex: 1; overflow: hidden; }
-        .list-title { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-        .list-subtitle { font-size: 14px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center;}
-        .list-time { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+        .list-title { font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .list-subtitle { font-size: 14px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; font-weight: 500;}
+        .list-time { font-size: 12px; color: var(--text-muted); font-weight: 600; }
 
-        .fab { position: fixed; bottom: 85px; right: 20px; width: 60px; height: 60px; background: #25D366; color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 10px 20px rgba(0,0,0,0.15); cursor: pointer; z-index: 90;}
-        .fab-secondary { bottom: 160px; background: var(--surface); color: var(--primary); border: 1px solid var(--border); }
-        .fab-pencil { position: fixed; bottom: 160px; right: 28px; width: 45px; height: 45px; background: var(--surface); color: var(--text-muted); border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.15); cursor: pointer; z-index: 90; border: 1px solid var(--border);}
+        .fab { position: fixed; bottom: 85px; right: 20px; width: 60px; height: 60px; background: #25D366; color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 10px 20px rgba(37,211,102,0.3); cursor: pointer; z-index: 90; transition: transform 0.2s;}
+        .fab:active { transform: scale(0.9); }
+        .fab-secondary { bottom: 160px; background: var(--surface); color: var(--primary); border: 1px solid var(--border); box-shadow: 0 5px 15px rgba(0,0,0,0.1);}
+        .fab-pencil { position: fixed; bottom: 160px; right: 28px; width: 45px; height: 45px; background: var(--surface); color: var(--text-muted); border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); cursor: pointer; z-index: 90; border: 1px solid var(--border);}
 
-        .bottom-nav { flex-shrink: 0; background: var(--nav-bg); display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid var(--border); z-index: 100;}
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); cursor: pointer; width: 25%;}
-        .nav-item span { font-size: 11px; font-weight: 600; }
+        .bottom-nav { flex-shrink: 0; background: var(--nav-bg); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid var(--border); z-index: 100;}
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); cursor: pointer; width: 25%; transition: color 0.2s;}
+        .nav-item span { font-size: 12px; font-weight: 800; }
         .nav-item.active { color: var(--primary); }
+        .nav-item.active i { transform: scale(1.1); transition: transform 0.2s; }
 
         .chat-window { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg); z-index: 200; flex-direction: column; }
-        .chat-header { flex-shrink: 0; background: var(--surface); padding: 10px 15px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid var(--border); position: relative;}
+        .chat-header { flex-shrink: 0; background: var(--surface); padding: 12px 15px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid var(--border); position: relative; box-shadow: 0 2px 10px rgba(0,0,0,0.05);}
         .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; scroll-behavior: smooth; }
         .chat-input-area { flex-shrink: 0; background: var(--surface); padding: 10px 15px; display: flex; gap: 12px; align-items: center; border-top: 1px solid var(--border);}
-        .chat-input-area input[type="text"] { flex: 1; padding: 15px 20px; border-radius: 30px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 15px; outline: none;}
-        .btn-send { width: 50px; height: 50px; background: var(--primary); color: var(--surface); border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; flex-shrink: 0;}
+        .chat-input-area input[type="text"] { flex: 1; padding: 15px 20px; border-radius: 30px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 15px; outline: none; font-weight: 500;}
+        .btn-send { width: 50px; height: 50px; background: var(--primary); color: var(--surface); border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; flex-shrink: 0; transition: transform 0.2s;}
+        .btn-send:active { transform: scale(0.9); }
         
-        .chat-menu-dropdown { display: none; position: absolute; right: 15px; top: 60px; background: var(--surface); box-shadow: 0 10px 30px rgba(0,0,0,0.2); border-radius: 12px; overflow: hidden; z-index: 300; border: 1px solid var(--border); min-width: 160px;}
-        .chat-menu-item { padding: 15px 20px; display: flex; align-items: center; gap: 10px; cursor: pointer; color: var(--text); font-weight: bold; font-size: 14px; border-bottom: 1px solid var(--border);}
+        .chat-menu-dropdown { display: none; position: absolute; right: 15px; top: 60px; background: var(--surface); box-shadow: 0 10px 30px rgba(0,0,0,0.2); border-radius: 12px; overflow: hidden; z-index: 300; border: 1px solid var(--border); min-width: 180px;}
+        .chat-menu-item { padding: 15px 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; color: var(--text); font-weight: 800; font-size: 14px; border-bottom: 1px solid var(--border);}
         .chat-menu-item:hover { background: var(--bg); }
         .chat-menu-item.danger { color: #E91E63; border-bottom: none;}
 
-        .bubble { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 15px; line-height: 1.5; position: relative; word-wrap: break-word; cursor: pointer; user-select: none;}
-        .bubble.sent { align-self: flex-end; background: var(--msg-sent); color: var(--text); border-bottom-right-radius: 4px;}
-        .bubble.received { align-self: flex-start; background: var(--msg-recv); color: var(--text); border-bottom-left-radius: 4px; border: 1px solid var(--border);}
-        .bubble-time { font-size: 11px; color: var(--text-muted); text-align: right; margin-top: 5px; display: block; opacity: 0.8;}
+        .bubble { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 15px; line-height: 1.5; position: relative; word-wrap: break-word; cursor: pointer; user-select: none; font-weight: 500;}
+        .bubble.sent { align-self: flex-end; background: var(--msg-sent); color: var(--text); border-bottom-right-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);}
+        .bubble.received { align-self: flex-start; background: var(--msg-recv); color: var(--text); border-bottom-left-radius: 4px; border: 1px solid var(--border); box-shadow: 0 2px 5px rgba(0,0,0,0.05);}
+        .bubble-time { font-size: 10px; color: var(--text-muted); text-align: right; margin-top: 5px; display: block; font-weight: 600;}
 
-        .auth-container { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        .auth-box { background: var(--surface); padding: 40px 30px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); width: 100%; max-width: 380px; text-align: center;}
+        .auth-container { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; width: 100%;}
+        .auth-box { background: var(--surface); padding: 40px 30px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); width: 100%; max-width: 400px; text-align: center; border: 1px solid var(--border);}
         
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; right:0; bottom:0; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px);}
         .modal-content { background: var(--surface); width: 92%; max-width: 400px; border-radius: 24px; padding: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); position: relative;}
@@ -91,39 +95,41 @@
         
         .upload-area { border: 2px dashed var(--primary); border-radius: 16px; padding: 40px 20px; text-align: center; cursor: pointer; margin-bottom: 20px; background: rgba(63, 81, 181, 0.05); transition: 0.3s; position: relative;}
         .upload-icon { font-size: 48px; color: var(--primary); margin-bottom: 10px; }
-        .upload-text { font-size: 16px; color: var(--text); font-weight: 700; margin-bottom: 5px;}
+        .upload-text { font-size: 16px; color: var(--text); font-weight: 800; margin-bottom: 5px;}
         .status-preview-box { display:none; width:100%; height:180px; border-radius:12px; margin-bottom:20px; object-fit:contain; background:#000; border: 1px solid var(--border); box-shadow: 0 5px 15px rgba(0,0,0,0.1);}
 
-        .profile-pic-upload { width: 100px; height: 100px; border-radius: 50%; background: var(--bg); border: 2px dashed var(--primary); display: flex; justify-content: center; align-items: center; margin: 0 auto 20px auto; cursor: pointer; overflow: hidden; position: relative;}
+        .profile-pic-upload { width: 110px; height: 110px; border-radius: 50%; background: var(--bg); border: 3px dashed var(--primary); display: flex; justify-content: center; align-items: center; margin: 0 auto 20px auto; cursor: pointer; overflow: hidden; position: relative;}
         .profile-pic-upload img { width: 100%; height: 100%; object-fit: cover; }
         
-        .settings-section { background: var(--surface); border-radius: 16px; border: 1px solid var(--border); margin: 0 15px 20px 15px; overflow: hidden; }
+        .settings-section { background: var(--surface); border-radius: 16px; border: 1px solid var(--border); margin: 0 15px 20px 15px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
         .settings-row { display: flex; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--border); cursor: pointer; transition: 0.2s;}
         .settings-row:hover { background: var(--bg); }
         .settings-row:last-child { border-bottom: none; }
-        .settings-row-icon { color: var(--primary); margin-right: 15px; font-size: 24px; }
-        .settings-row-text { flex: 1; font-weight: bold; color: var(--text); font-size: 15px;}
-        .settings-subtext { font-size: 11px; color: var(--text-muted); font-weight: normal; margin-top:2px;}
+        .settings-row-icon { color: var(--primary); margin-right: 15px; font-size: 26px; }
+        .settings-row-text { flex: 1; font-weight: 800; color: var(--text); font-size: 15px;}
+        .settings-subtext { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-top:2px;}
         
-        .made-in-india { text-align: center; padding: 20px; color: var(--text-muted); font-size: 14px; font-weight: 800; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0.7; letter-spacing: 0.5px;}
-        .made-in-india span { font-size: 22px; margin-top: 5px;}
-        .copyright-line { font-size: 10px; margin-top: 15px; font-weight: normal; opacity: 0.8; letter-spacing: 0; }
-        .core-badge { font-size: 11px; color: #25D366; border: 1px solid #25D366; padding: 2px 6px; border-radius: 10px; margin-top: 8px; font-weight: bold; letter-spacing: 0px; }
+        .made-in-india { text-align: center; padding: 20px; color: var(--text-muted); font-size: 14px; font-weight: 800; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0.8; letter-spacing: 0.5px;}
+        .made-in-india span { font-size: 24px; margin-top: 5px;}
+        .copyright-line { font-size: 11px; margin-top: 15px; font-weight: 600; opacity: 0.8; letter-spacing: 0; }
+        .core-badge { font-size: 11px; color: #25D366; border: 1px solid #25D366; background: rgba(37,211,102,0.1); padding: 4px 10px; border-radius: 12px; margin-top: 8px; font-weight: 800; letter-spacing: 0.5px; }
 
         .input-wrapper { position: relative; width: 100%; margin-bottom: 20px; }
-        .input-wrapper input { width: 100%; padding: 15px 45px 15px 15px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-weight: bold; font-size: 16px; outline: none; text-align: left; }
+        .input-wrapper input { width: 100%; padding: 15px 45px 15px 15px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-weight: 800; font-size: 16px; outline: none; text-align: left; transition: border-color 0.2s;}
+        .input-wrapper input:focus { border-color: var(--primary); }
         .input-icon-right { position: absolute; right: 15px; top: 15px; font-size: 24px; transition: 0.2s;}
 
         .theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 10px 20px; }
-        .theme-circle { width: 50px; height: 50px; border-radius: 50%; cursor: pointer; border: 3px solid transparent;}
-        .theme-circle.active { border-color: var(--text); transform: scale(1.1); }
+        .theme-circle { width: 50px; height: 50px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: transform 0.2s;}
+        .theme-circle.active { border-color: var(--text); transform: scale(1.15); box-shadow: 0 4px 10px rgba(0,0,0,0.2);}
 
-        .status-tray { display: flex; overflow-x: auto; gap: 12px; padding: 10px 20px; scroll-snap-type: x mandatory; }
+        .status-tray { display: flex; overflow-x: auto; gap: 12px; padding: 15px 20px; scroll-snap-type: x mandatory; }
         .status-tray::-webkit-scrollbar { display: none; }
-        .status-card { width: 105px; height: 150px; border-radius: 16px; background: var(--surface); position: relative; flex-shrink: 0; border: 1px solid var(--border); overflow: hidden; background-size: cover; background-position: center; cursor: pointer;}
+        .status-card { width: 105px; height: 150px; border-radius: 16px; background: var(--surface); position: relative; flex-shrink: 0; border: 1px solid var(--border); overflow: hidden; background-size: cover; background-position: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: transform 0.2s;}
+        .status-card:active { transform: scale(0.95); }
         .status-card-avatar { position: absolute; top: 10px; left: 10px; width: 36px; height: 36px; border-radius: 50%; border: 2px solid #25D366; background: var(--surface); display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--text); z-index: 2; overflow:hidden;}
         .status-card-avatar img { width: 100%; height: 100%; object-fit: cover;}
-        .status-card-name { position: absolute; bottom: 10px; left: 10px; right: 10px; font-size: 12px; font-weight: 700; color: white; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 2;}
+        .status-card-name { position: absolute; bottom: 10px; left: 10px; right: 10px; font-size: 12px; font-weight: 800; color: white; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 2;}
         .status-card-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.8)); z-index: 1;}
 
         .wa-status-viewer { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: #000; z-index: 4000; flex-direction: column; color: white;}
@@ -132,39 +138,48 @@
         .wa-progress-fill { height: 100%; background: white; width: 0%; }
         .wa-header { display:flex; justify-content:space-between; align-items:center; padding:20px 15px; position:absolute; top:5px; width:100%; z-index:4002; background:linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);}
         .wa-content { flex: 1; position: relative; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; overflow: hidden; background: #000;}
-        .wa-status-caption { position: absolute; bottom: 40px; width: 100%; text-align: center; padding: 10px 20px; background: rgba(0,0,0,0.6); font-size: 15px; word-wrap: break-word; z-index:4002;}
+        .wa-status-caption { position: absolute; bottom: 40px; width: 100%; text-align: center; padding: 10px 20px; background: rgba(0,0,0,0.6); font-size: 15px; font-weight: 600; word-wrap: break-word; z-index:4002;}
         .wa-tap-left { position: absolute; top:0; left:0; width: 35%; height: 100%; z-index: 4001; cursor: pointer;}
         .wa-tap-right { position: absolute; top:0; right:0; width: 65%; height: 100%; z-index: 4001; cursor: pointer;}
         
         .crop-container { width: 100%; max-width: 250px; height: 250px; margin: 0 auto 15px auto; background: var(--bg); border-radius: 50%; overflow: hidden; border: 3px solid var(--primary); position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.2); touch-action: none;}
         #cropCanvas { position: absolute; top: 0; left: 0; cursor: move; }
 
-        #callOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:9000; flex-direction:column; align-items:center; justify-content:center; backdrop-filter:blur(10px); }
-        .call-avatar-glow { width:120px; height:120px; border-radius:50%; font-size:50px; display:flex; justify-content:center; align-items:center; background:var(--primary); color:white; margin-bottom:20px; box-shadow:0 0 30px var(--primary); animation: pulse 1.5s infinite; overflow:hidden;}
+        /* 🔥 NATIVE ANDROID CALL UI STYLES 🔥 */
+        #callOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: #1a1a1a; z-index:9000; flex-direction:column; align-items:center; justify-content:flex-start; padding-top: 80px;}
+        .call-avatar-glow { width:140px; height:140px; border-radius:50%; font-size:60px; font-weight: 800; display:flex; justify-content:center; align-items:center; background:var(--primary); color:white; margin-bottom:20px; box-shadow:0 0 40px var(--primary); animation: pulseCall 1.5s infinite; overflow:hidden; border: 3px solid rgba(255,255,255,0.2);}
         .call-avatar-glow img { width:100%; height:100%; object-fit:cover; }
-        @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(63,81,181,0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 30px rgba(63,81,181,0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(63,81,181,0); } }
+        @keyframes pulseCall { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(63,81,181,0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 40px rgba(63,81,181,0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(63,81,181,0); } }
 
         .call-avatar-small { position: absolute !important; top: 20px !important; left: 20px !important; width: 60px !important; height: 60px !important; font-size: 24px !important; margin: 0 !important; box-shadow: 0 5px 15px rgba(0,0,0,0.5) !important; animation: none !important; z-index: 9500 !important; cursor: grab; touch-action: none; border: 2px solid white; }
         .hide-in-video { display: none !important; }
+
+        .call-action-btn { width: 75px; height: 75px; border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; color: white; cursor: pointer; transition: transform 0.2s; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .call-action-btn:active { transform: scale(0.9); }
+        .btn-accept { background: #25D366; animation: bounceGlow 2s infinite; }
+        .btn-decline { background: #E91E63; }
+        
+        @keyframes bounceGlow { 0%, 100% { transform: translateY(0); box-shadow: 0 10px 25px rgba(37,211,102,0.4); } 50% { transform: translateY(-10px); box-shadow: 0 15px 35px rgba(37,211,102,0.6); } }
+
+        /* Google Login Custom Styling */
+        .g_id_signin { display: flex; justify-content: center; width: 100%; margin-top: 15px;}
     </style>
 </head>
 <body data-theme="default">
 
     <!-- Incoming Call Ringtone Audio Element -->
     <audio id="incomingRing" loop src="https://actions.google.com/sounds/v1/alarms/phone_ringing.ogg"></audio>
+    <audio id="outgoingRing" loop src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
 
     <div id="authScreen" class="auth-container">
         <div class="auth-box">
-            <i class="material-icons shield-icon" style="font-size:70px; color:var(--primary);">fingerprint</i>
-            <h2 style="font-weight:800;">ISB Premium</h2>
-            <p style="color:var(--text-muted); font-size:14px; margin-bottom:30px;">End-to-End Encrypted Web3 Network.</p>
+            <i class="material-icons shield-icon" style="font-size:70px; color:var(--primary); margin-bottom: 10px;">fingerprint</i>
+            <h2 style="font-weight:900; font-size: 28px; margin: 0;">ISB Premium</h2>
+            <p style="color:var(--text-muted); font-size:14px; margin-bottom:30px; font-weight: 600;">End-to-End Encrypted Web3 Network.</p>
             
-            <!-- Firebase Custom Login Button (No 400 Error, No White Screen) -->
-            <div id="googleButtonContainer" style="display: flex; justify-content: center; min-height:50px;">
-                <button onclick="signInWithGoogle()" style="background: #4285F4; color: white; border: none; padding: 12px 24px; border-radius: 5px; font-size: 16px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: bold; width: 100%; justify-content: center; box-shadow: 0 4px 10px rgba(66, 133, 244, 0.3);">
-                    <span style="background: white; color: #4285F4; padding: 2px 6px; border-radius: 3px;">G</span> Continue with Google
-                </button>
-            </div>
+            <!-- Superfast Google Login Container -->
+            <div id="googleButtonContainer" class="g_id_signin"></div>
+            <div id="loginStatus" style="font-size: 12px; color: var(--primary); margin-top: 15px; font-weight: 600; display: none;">Securely connecting...</div>
         </div>
     </div>
 
@@ -199,7 +214,7 @@
             <!-- CALLS TAB -->
             <div id="callsTab" class="tab-content">
                 <div style="display:flex; justify-content:space-between; align-items:center; padding:15px 20px; border-bottom:1px solid var(--border);">
-                    <h3 style="margin:0; font-size:18px; color:var(--text);">Recent Calls</h3>
+                    <h3 style="margin:0; font-size:18px; color:var(--text); font-weight: 800;">Recent Calls</h3>
                     <i class="material-icons" style="color:#E91E63; cursor:pointer;" onclick="clearAllCalls()" title="Clear Call History">delete_sweep</i>
                 </div>
                 <div id="callsList"></div>
@@ -220,7 +235,7 @@
                     <div class="settings-row" onclick="openBlockedUsersModal()"><i class="material-icons settings-row-icon" style="color:#E91E63;">block</i><div class="settings-row-text">Blocked Contacts</div><i class="material-icons" style="color:var(--border);">chevron_right</i></div>
                 </div>
 
-                <div style="padding: 10px 20px 5px; font-weight: bold; color: var(--text-muted); font-size:12px; letter-spacing: 1px;">THEMES</div>
+                <div style="padding: 10px 20px 5px; font-weight: 800; color: var(--text-muted); font-size:12px; letter-spacing: 1px;">THEMES</div>
                 <div class="settings-section" style="padding: 10px 0;"><div class="theme-grid" id="themeGrid"></div></div>
 
                 <div class="settings-section"><div class="settings-row" onclick="logoutUser()"><i class="material-icons settings-row-icon" style="color:#E91E63;">logout</i><div class="settings-row-text" style="color:#E91E63;">Log Out securely</div></div></div>
@@ -247,15 +262,15 @@
             <i class="material-icons" onclick="closeChat()">arrow_back_ios_new</i>
             <div class="avatar" id="chatAvatar" style="width:42px; height:42px;">U</div>
             <div style="flex:1; overflow:hidden;">
-                <div style="font-size:17px; font-weight:700; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;" id="chatTitle">User</div>
+                <div style="font-size:18px; font-weight:800; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;" id="chatTitle">User</div>
                 <div style="font-size:12px; color:var(--text-muted); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; height:15px; transition:0.3s;" id="chatUserStatus"></div>
             </div>
             
-            <i class="material-icons" id="btnAudioCall" onclick="startCall('audio')" style="color:var(--primary); display:none;">call</i>
-            <i class="material-icons" id="btnVideoCall" onclick="startCall('video')" style="color:var(--primary); display:none; margin-right:5px;">videocam</i>
+            <i class="material-icons" id="btnAudioCall" onclick="startCall('audio')" style="color:var(--primary); display:none; padding: 5px;">call</i>
+            <i class="material-icons" id="btnVideoCall" onclick="startCall('video')" style="color:var(--primary); display:none; padding: 5px; margin-right:5px;">videocam</i>
             
-            <i class="material-icons" onclick="toggleChatSearch()">search</i>
-            <i class="material-icons" onclick="toggleChatMenu()">more_vert</i>
+            <i class="material-icons" onclick="toggleChatSearch()" style="padding: 5px;">search</i>
+            <i class="material-icons" onclick="toggleChatMenu()" style="padding: 5px;">more_vert</i>
             
             <div class="chat-menu-dropdown" id="chatMenuDropdown">
                 <div class="chat-menu-item" onclick="togglePinChat()" id="pinChatMenuText"><i class="material-icons">star_border</i> <span>Pin Chat</span></div>
@@ -265,7 +280,7 @@
         </div>
         
         <div class="search-bar-container" id="chatSearchBar" style="display:none; padding:10px 15px; background:var(--bg); border-bottom:1px solid var(--border);">
-            <input type="text" id="chatSearchInput" placeholder="Search in chat..." onkeyup="filterChatMessages()" style="border:1px solid var(--border);">
+            <input type="text" id="chatSearchInput" placeholder="Search in chat..." onkeyup="filterChatMessages()" style="border:1px solid var(--border); font-weight: 500;">
         </div>
 
         <div class="chat-messages" id="chatMessagesBox"></div>
@@ -279,59 +294,53 @@
         </div>
     </div>
 
-    <!-- CALL OVERLAY -->
+    <!-- 🔥 NATIVE CALL OVERLAY 🔥 -->
     <div id="callOverlay">
         <div class="call-avatar-glow" id="callAvatarPreview">U</div>
-        <h2 id="callStatusText" style="color:white; margin:0 0 5px 0; font-size:24px;">Calling...</h2>
-        <p id="callTypeText" style="color:#ddd; font-size:16px; margin-bottom:30px;">ISB Secure Call</p>
+        <h2 id="callStatusText" style="color:white; margin:0 0 8px 0; font-size:28px; font-weight: 800; letter-spacing: 1px;">Calling...</h2>
+        <p id="callTypeText" style="color:#ddd; font-size:16px; margin-bottom:40px; font-weight: 600;">ISB Secure Call</p>
         
         <video id="remoteVideo" autoplay playsinline style="width:100%; height:100%; position:absolute; top:0; left:0; object-fit:cover; z-index:-1; display:none; background:#111;"></video>
-        <video id="localVideo" autoplay playsinline muted style="width:110px; height:150px; position:absolute; bottom:130px; right:20px; border-radius:12px; border:2px solid white; object-fit:cover; box-shadow:0 10px 20px rgba(0,0,0,0.5); display:none; background:#333; z-index: 10;"></video>
+        <video id="localVideo" autoplay playsinline muted style="width:110px; height:150px; position:absolute; bottom:140px; right:20px; border-radius:12px; border:2px solid white; object-fit:cover; box-shadow:0 10px 20px rgba(0,0,0,0.5); display:none; background:#333; z-index: 10;"></video>
         
-        <div style="position:absolute; bottom:40px; display:flex; gap:20px; align-items:center; z-index: 20;">
-            <button id="btnAcceptCall" onclick="acceptCall()" style="display:none; background:#25D366; border:none; border-radius:50%; width:65px; height:65px; color:white; box-shadow:0 10px 20px rgba(37,211,102,0.4); cursor:pointer;"><i class="material-icons" style="font-size:30px;">call</i></button>
+        <!-- Action Buttons Layout (Native Style) -->
+        <div style="position:absolute; bottom:50px; width: 100%; display:flex; justify-content:center; align-items:center; z-index: 20;">
             
-            <div id="callControls" style="display:none; gap:15px;">
-                <button id="btnMute" onclick="toggleMute()" style="background:rgba(255,255,255,0.2); border:none; border-radius:50%; width:55px; height:55px; color:white; cursor:pointer; backdrop-filter:blur(5px);"><i class="material-icons" id="muteIcon">mic</i></button>
-                <button id="btnVideoToggle" onclick="toggleVideo()" style="background:rgba(255,255,255,0.2); border:none; border-radius:50%; width:55px; height:55px; color:white; cursor:pointer; backdrop-filter:blur(5px);"><i class="material-icons" id="videoToggleIcon">videocam_off</i></button>
+            <!-- Incoming Call Buttons -->
+            <div id="incomingCallActions" style="display:none; width: 80%; justify-content: space-between; padding: 0 30px;">
+                <button class="call-action-btn btn-decline" onclick="endCall()"><i class="material-icons" style="font-size:36px;">call_end</i></button>
+                <button class="call-action-btn btn-accept" onclick="acceptCall()"><i class="material-icons" style="font-size:36px;">call</i></button>
             </div>
 
-            <button onclick="endCall()" style="background:#E91E63; border:none; border-radius:50%; width:65px; height:65px; color:white; box-shadow:0 10px 20px rgba(233,30,99,0.4); cursor:pointer;"><i class="material-icons" style="font-size:30px;">call_end</i></button>
+            <!-- Active Call Controls -->
+            <div id="callControls" style="display:none; gap:25px; align-items: center;">
+                <button id="btnMute" onclick="toggleMute()" style="background:rgba(255,255,255,0.2); border:none; border-radius:50%; width:60px; height:60px; color:white; cursor:pointer; backdrop-filter:blur(5px);"><i class="material-icons" id="muteIcon" style="font-size:28px;">mic</i></button>
+                <button class="call-action-btn btn-decline" onclick="endCall()" style="width: 75px; height: 75px;"><i class="material-icons" style="font-size:36px;">call_end</i></button>
+                <button id="btnVideoToggle" onclick="toggleVideo()" style="background:rgba(255,255,255,0.2); border:none; border-radius:50%; width:60px; height:60px; color:white; cursor:pointer; backdrop-filter:blur(5px);"><i class="material-icons" id="videoToggleIcon" style="font-size:28px;">videocam_off</i></button>
+            </div>
+
         </div>
     </div>
 
-    <!-- MEDIA VIEWER -->
+    <!-- MEDIA VIEWER & MODALS (Kept exact same functionality, optimized UI) -->
     <div id="waStatusViewer" class="wa-status-viewer"><div class="wa-progress-container" id="waProgressBarContainer"></div><div class="wa-header"><div style="display:flex; align-items:center; gap:12px; cursor:pointer; z-index:4005;" onclick="closeWaStatus()"><i class="material-icons">arrow_back</i><div class="avatar" id="waStatusAvatar" style="width:40px; height:40px;">U</div><div style="display:flex; flex-direction:column;"><span id="waStatusName" style="font-weight:700;">Name</span><span id="waStatusTime" style="font-size:12px; opacity:0.8;">Time</span></div></div><div style="display:flex; align-items:center; gap:15px; z-index:4005;"><a id="waStatusDownloadBtn" style="color:white; display:none;"><i class="material-icons">download</i></a><i class="material-icons" id="waStatusDeleteBtn" style="color:#E91E63; display:none; cursor:pointer;" onclick="deleteActiveStatus()">delete</i></div></div><div class="wa-content" id="waStatusContent"></div><div class="wa-tap-left" id="waTapLeft" onclick="prevWaStatus()" style="display:none;"></div><div class="wa-tap-right" id="waTapRight" onclick="nextWaStatus()" style="display:none;"></div></div>
     
-    <!-- MODALS -->
-    <div id="setupProfileModal" class="modal-overlay">
-        <div class="modal-content" style="text-align:center;">
-            <h3 style="margin-top:0; color:var(--text);">Create Your Profile</h3>
-            <p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">Choose a unique username and photo</p>
-            <div class="profile-pic-upload" onclick="document.getElementById('setupAvatarFile').click()"><img id="setupAvatarPreview" style="display:none;"><i class="material-icons" id="setupAvatarIcon" style="font-size:40px; color:var(--primary);">camera_alt</i></div>
-            <input type="file" id="setupAvatarFile" accept="image/*" style="display:none;" onchange="handleImageSelection(event, 'setup')">
-            <div class="input-wrapper"><input type="text" id="setupUsernameInput" placeholder="@username" oninput="validateUsernameInput()"><i class="material-icons input-icon-right" id="usernameStatusIcon" style="color:var(--text-muted);">info</i></div>
-            <button id="saveProfileBtn" disabled style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:bold; font-size:16px; box-shadow:0 4px 10px rgba(0,0,0,0.15); cursor:pointer; opacity:0.5; transition:0.3s;" onclick="saveProfileSetup()">SAVE PROFILE</button>
-            <button id="cancelSetupBtn" style="width:100%; padding:15px; background:transparent; color:#E91E63; border:none; margin-top:10px; cursor:pointer; display:none; font-weight:bold;" onclick="logoutUser()">LOGOUT & GO BACK</button>
-        </div>
-    </div>
-    
+    <div id="setupProfileModal" class="modal-overlay"><div class="modal-content" style="text-align:center;"><h3 style="margin-top:0; color:var(--text);">Create Your Profile</h3><p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">Choose a unique username and photo</p><div class="profile-pic-upload" onclick="document.getElementById('setupAvatarFile').click()"><img id="setupAvatarPreview" style="display:none;"><i class="material-icons" id="setupAvatarIcon" style="font-size:40px; color:var(--primary);">camera_alt</i></div><input type="file" id="setupAvatarFile" accept="image/*" style="display:none;" onchange="handleImageSelection(event, 'setup')"><div class="input-wrapper"><input type="text" id="setupUsernameInput" placeholder="@username" oninput="validateUsernameInput()"><i class="material-icons input-icon-right" id="usernameStatusIcon" style="color:var(--text-muted);">info</i></div><button id="saveProfileBtn" disabled style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:16px; font-weight:800; font-size:16px; box-shadow:0 4px 10px rgba(0,0,0,0.15); cursor:pointer; opacity:0.5; transition:0.3s;" onclick="saveProfileSetup()">SAVE PROFILE</button><button id="cancelSetupBtn" style="width:100%; padding:15px; background:transparent; color:#E91E63; border:none; margin-top:10px; cursor:pointer; display:none; font-weight:800;" onclick="logoutUser()">LOGOUT & GO BACK</button></div></div>
     <div id="cropperModal" class="modal-overlay" style="z-index: 3000;"><div class="modal-content" style="text-align:center;"><h3 style="margin-top:0; color:var(--text);">Crop Photo</h3><p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;">Drag to adjust and use slider to zoom</p><div class="crop-container" id="cropBox"><canvas id="cropCanvas" width="250" height="250"></canvas></div><input type="range" id="cropZoomSlider" min="1" max="3" step="0.05" value="1" style="width:100%; margin-bottom:20px; accent-color:var(--primary);" oninput="drawCrop()"><div style="display:flex; gap:10px;"><button style="flex:1; padding:12px; background:transparent; border:2px solid var(--border); border-radius:12px; color:var(--text); font-weight:bold; cursor:pointer;" onclick="document.getElementById('cropperModal').style.display='none'">CANCEL</button><button style="flex:1; padding:12px; background:var(--primary); border:none; border-radius:12px; color:white; font-weight:bold; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.15);" onclick="applyCrop()">CROP & SAVE</button></div></div></div>
     <div id="blockedUsersModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h3>Blocked Contacts</h3><button class="close-btn" onclick="document.getElementById('blockedUsersModal').style.display='none'"><i class="material-icons">cancel</i></button></div><div id="blockedUsersList" style="max-height:300px; overflow-y:auto;"></div></div></div>
-    <div id="newChatModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h3>New Chat</h3><button class="close-btn" onclick="document.getElementById('newChatModal').style.display='none'"><i class="material-icons">cancel</i></button></div><input type="text" id="newChatInput" placeholder="Enter Gmail OR Username..." style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:15px; font-weight:bold;"><button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px;" onclick="startNewChat()">START CHAT</button></div></div>
-    <div id="newGroupModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h3>New Group</h3><button class="close-btn" onclick="document.getElementById('newGroupModal').style.display='none'"><i class="material-icons">cancel</i></button></div><input type="text" id="newGroupName" placeholder="Group Name" style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:15px;"><textarea id="newGroupEmails" placeholder="Usernames OR Gmails (comma separated)" style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:15px;"></textarea><button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px;" onclick="createGroup()">CREATE GROUP</button></div></div>
-    <div id="textStatusModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h3>Type Status</h3><button class="close-btn" onclick="closeStatusModal()"><i class="material-icons">cancel</i></button></div><textarea id="statusTextOnly" rows="4" placeholder="What's on your mind?" style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:15px; font-weight:bold; font-size:18px; outline:none; resize:none;"></textarea><button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:bold; font-size:16px; box-shadow:0 4px 10px rgba(0,0,0,0.15); cursor:pointer;" onclick="postStatus('text')">POST STATUS</button></div></div>
-    <div id="imageStatusModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h3>Upload Media</h3><button class="close-btn" onclick="closeStatusModal()"><i class="material-icons">cancel</i></button></div><div class="upload-area" id="statusUploadArea" onclick="document.getElementById('statusFile').click()"><i class="material-icons upload-icon">cloud_upload</i><div class="upload-text">Tap to select Image or Video</div><div style="font-size:12px; color:var(--text-muted); margin-top:5px;">Max size 5MB (MP4, JPG, PNG)</div></div><img id="statusImgPreview" class="status-preview-box" /><video id="statusVidPreview" class="status-preview-box" muted autoplay playsinline loop></video><input type="file" id="statusFile" accept="image/*,video/mp4" style="display:none;" onchange="handleStatusFile(event)"><input type="text" id="statusCaption" placeholder="Add a caption..." style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:15px; font-weight:bold; font-size:15px; outline:none;"><button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:bold; font-size:16px; box-shadow:0 4px 10px rgba(0,0,0,0.15); cursor:pointer;" onclick="postStatus('image')">POST STATUS</button></div></div>
-    <div id="msgOptionsModal" class="modal-overlay"><div class="modal-content" style="text-align:center;"><h3 style="margin-top:0;">Message Options</h3><button onclick="shareSelectedMsg()" style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px; margin-bottom:10px; font-weight:bold;">SHARE FILE / MESSAGE</button><button onclick="deleteSelectedMsg()" style="width:100%; padding:15px; background:#E91E63; color:white; border:none; border-radius:12px; margin-bottom:10px; font-weight:bold;">DELETE FOR ALL</button><button onclick="document.getElementById('msgOptionsModal').style.display='none'" style="width:100%; padding:15px; background:transparent; border:2px solid var(--border); color:var(--text); border-radius:12px; font-weight:bold;">CANCEL</button></div></div>
+    <div id="newChatModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h3>New Chat</h3><button class="close-btn" onclick="document.getElementById('newChatModal').style.display='none'"><i class="material-icons">cancel</i></button></div><input type="text" id="newChatInput" placeholder="Enter Gmail OR Username..." style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:15px; font-weight:bold;"><button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:16px; font-weight:800;" onclick="startNewChat()">START CHAT</button></div></div>
+    <div id="newGroupModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h3>New Group</h3><button class="close-btn" onclick="document.getElementById('newGroupModal').style.display='none'"><i class="material-icons">cancel</i></button></div><input type="text" id="newGroupName" placeholder="Group Name" style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:15px; font-weight:bold;"><textarea id="newGroupEmails" placeholder="Usernames OR Gmails (comma separated)" style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:15px; font-weight:bold; font-family: 'Inter';"></textarea><button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:16px; font-weight:800;" onclick="createGroup()">CREATE GROUP</button></div></div>
+    <div id="textStatusModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h3>Type Status</h3><button class="close-btn" onclick="closeStatusModal()"><i class="material-icons">cancel</i></button></div><textarea id="statusTextOnly" rows="4" placeholder="What's on your mind?" style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:15px; font-weight:bold; font-size:18px; outline:none; resize:none; font-family: 'Inter';"></textarea><button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:16px; font-weight:800; font-size:16px; box-shadow:0 4px 10px rgba(0,0,0,0.15); cursor:pointer;" onclick="postStatus('text')">POST STATUS</button></div></div>
+    <div id="imageStatusModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h3>Upload Media</h3><button class="close-btn" onclick="closeStatusModal()"><i class="material-icons">cancel</i></button></div><div class="upload-area" id="statusUploadArea" onclick="document.getElementById('statusFile').click()"><i class="material-icons upload-icon">cloud_upload</i><div class="upload-text">Tap to select Image or Video</div><div style="font-size:12px; color:var(--text-muted); margin-top:5px; font-weight:500;">Max size 5MB (MP4, JPG, PNG)</div></div><img id="statusImgPreview" class="status-preview-box" /><video id="statusVidPreview" class="status-preview-box" muted autoplay playsinline loop></video><input type="file" id="statusFile" accept="image/*,video/mp4" style="display:none;" onchange="handleStatusFile(event)"><input type="text" id="statusCaption" placeholder="Add a caption..." style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:15px; font-weight:bold; font-size:15px; outline:none;"><button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:16px; font-weight:800; font-size:16px; box-shadow:0 4px 10px rgba(0,0,0,0.15); cursor:pointer;" onclick="postStatus('image')">POST STATUS</button></div></div>
+    <div id="msgOptionsModal" class="modal-overlay"><div class="modal-content" style="text-align:center;"><h3 style="margin-top:0;">Message Options</h3><button onclick="shareSelectedMsg()" style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:16px; margin-bottom:10px; font-weight:800;">SHARE FILE / MESSAGE</button><button onclick="deleteSelectedMsg()" style="width:100%; padding:15px; background:#E91E63; color:white; border:none; border-radius:16px; margin-bottom:10px; font-weight:800;">DELETE FOR ALL</button><button onclick="document.getElementById('msgOptionsModal').style.display='none'" style="width:100%; padding:15px; background:transparent; border:2px solid var(--border); color:var(--text); border-radius:16px; font-weight:800;">CANCEL</button></div></div>
 
 <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-    // Firebase Initialization
+    // FIREBASE INITIALIZATION
+    const ISB_CLIENT_ID = "1091629496669-5881hgv7d4t01eepcq60u8mmdkguc1cn.apps.googleusercontent.com";
     const firebaseConfig = { apiKey: "AIzaSyA-d_mtHg1Age9ZggTWF3ABhUd_xn2PDKM", authDomain: "isb-messenger-75093.firebaseapp.com", databaseURL: "https://isb-messenger-75093-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "isb-messenger-75093", storageBucket: "isb-messenger-75093.firebasestorage.app", messagingSenderId: "970755431087", appId: "1:970755431087:web:09171e2ebca48e1b91125a" };
-    firebase.initializeApp(firebaseConfig); 
-    const database = firebase.database();
-    const auth = firebase.auth();
+    firebase.initializeApp(firebaseConfig); const database = firebase.database();
 
     const themes = [ { id: "default", color: "#3F51B5" }, { id: "dark", color: "#121212" }, { id: "telegram", color: "#2AABEE" }, { id: "sunset", color: "#FF5722" }, { id: "forest", color: "#2E7D32" }, { id: "ruby", color: "#E91E63" }, { id: "cyberpunk", color: "#00E5FF" }, { id: "amoled", color: "#000000" } ];
 
@@ -345,7 +354,12 @@
     let waActiveUser = null, waUserStatusGroup = [], waActiveIndex = 0, waTimer = null, waIsChatMedia = false; 
     let activeActionMsg = null;
 
-    // यह फंक्शन Android के बैकग्राउंड से टोकन लाकर सेव करेगा
+    // 🔥 Web Notification Request for Desktop/Browser Native Popups
+    if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
+        Notification.requestPermission();
+    }
+
+    // 🔥 Native Token Interface
     window.updateMyFCMToken = function(token) {
         if(currentUsername && token) {
             database.ref('users/' + currentUsername).update({ fcmToken: token });
@@ -368,65 +382,61 @@
     let isMuted = false;
     let isVideoEnabled = false;
 
-    // OCTA-CORE ENGINE SETUP
+    // 🔥 FAST OCTA-CORE ENGINE SETUP 🔥
     const SYSTEM_CORES = navigator.hardwareConcurrency || 2;
-    console.log(`[ISB Engine] Detected ${SYSTEM_CORES}-Core Processor. Activating Multi-Core Web Workers...`);
+    console.log(`[ISB Engine] Detected ${SYSTEM_CORES}-Core Processor.`);
     
     const keyWorkerCode = `self.onmessage=function(e){let pwd=e.data.password;let salt=new Uint8Array(e.data.salt);let bigKey=new Uint8Array(128);for(let i=0;i<128;i++){bigKey[i]=pwd.charCodeAt(i%pwd.length)^salt[i%salt.length]^(i%256);}self.postMessage({bigKey:bigKey.buffer},[bigKey.buffer]);};`;
     const mathWorkerCode = `self.onmessage=function(e){let buffer=new Uint8Array(e.data.buffer);let isEncrypt=e.data.action==='encrypt';let bigKey=new Uint8Array(e.data.bigKey);let chunkIdx=e.data.chunkIdx;let G1=0x12345678,G2=0x87654321,G3=0xDEADBEEF,G4=0xCAFEBABE;for(let i=0;i<128;i++){let c=bigKey[i];G1=(G1>>>1)^(c<<24);G2=(G2<<3)^c;G3^=(G1>>>5);G4=(G4<<1)^(G2>>>2);}G1^=chunkIdx;G2^=(Math.imul(chunkIdx,13)>>>0);G3^=(Math.imul(chunkIdx,17)>>>0);G4^=(Math.imul(chunkIdx,19)>>>0);let dv=new DataView(buffer.buffer,buffer.byteOffset,buffer.byteLength);let words=Math.floor(buffer.length/4);let baseWordIndex=chunkIdx*1048576;for(let i=0;i<words;i++){let sizeNum=baseWordIndex+i+1;let x=sizeNum;let x2=Math.imul(x,x)>>>0;let x3=Math.imul(x2,x)>>>0;let x4=Math.imul(x3,x)>>>0;let x5=Math.imul(x4,x)>>>0;let x6=Math.imul(x5,x)>>>0;let x7=Math.imul(x6,x)>>>0;let x8=Math.imul(x7,x)>>>0;let pMode=bigKey[sizeNum%128]%6;let powerVal=(x3&((pMode===0)?0xFFFFFFFF:0))|(x4&((pMode===1)?0xFFFFFFFF:0))|(x5&((pMode===2)?0xFFFFFFFF:0))|(x6&((pMode===3)?0xFFFFFFFF:0))|(x7&((pMode===4)?0xFFFFFFFF:0))|(x8&((pMode===5)?0xFFFFFFFF:0));let pVal=bigKey[(sizeNum+15)%128];let rotInner=(Math.imul(pVal,Math.imul(pVal,pVal))>>>0)%31+1;let rotOuter=(Math.imul(powerVal%1000,powerVal%1000)+rotInner)%31+1;G1=(G1+powerVal)>>>0;G2=(G2^G1)>>>0;G2=((G2<<rotInner)|(G2>>>(32-rotInner)))>>>0;G3=(G3+G2)>>>0;G4=(G4^G3)>>>0;G4=((G4<<rotOuter)|(G4>>>(32-rotOuter)))>>>0;let g32=(G1+G2+G3+G4)>>>0;let y=(g32%10000)+1;let y2=Math.imul(y,y)>>>0;let y3=Math.imul(y2,y)>>>0;let y4=Math.imul(y3,y)>>>0;let y5=Math.imul(y4,y)>>>0;let y6=Math.imul(y5,y)>>>0;let y7=Math.imul(y6,y)>>>0;let y8=Math.imul(y7,y)>>>0;let dpMode=bigKey[(sizeNum+64)%128]%6;let dPowerVal=(y3&((dpMode===0)?0xFFFFFFFF:0))|(y4&((dpMode===1)?0xFFFFFFFF:0))|(y5&((dpMode===2)?0xFFFFFFFF:0))|(y6&((dpMode===3)?0xFFFFFFFF:0))|(y7&((dpMode===4)?0xFFFFFFFF:0))|(y8&((dpMode===5)?0xFFFFFFFF:0));let dpVal=bigKey[(sizeNum+42)%128];let dRotInner=(Math.imul(dpVal,Math.imul(dpVal,dpVal))>>>0)%31+1;let dRotOuter=(Math.imul(dPowerVal%1000,dPowerVal%1000)+dRotInner)%31+1;g32=(g32+dPowerVal)>>>0;g32=(g32^(g32>>>15))>>>0;g32=((g32<<dRotInner)|(g32>>>(32-dRotInner)))>>>0;g32=((g32<<dRotOuter)|(g32>>>(32-dRotOuter)))>>>0;let pwdGarbage=(bigKey[(sizeNum*7)%128])|(bigKey[(sizeNum*11)%128]<<8)|(bigKey[(sizeNum*13)%128]<<16)|(bigKey[(sizeNum*17)%128]<<24);g32=(g32+pwdGarbage)>>>0;g32=(g32^(pwdGarbage>>>7))>>>0;let opMode=bigKey[(sizeNum+32)%128]%3;if(isEncrypt){let d32=dv.getUint32(i*4,true);let opA=(d32+g32)>>>0;let opS=(d32-g32)>>>0;let opX=(d32^g32)>>>0;d32=(opA&((opMode===0)?0xFFFFFFFF:0))|(opS&((opMode===1)?0xFFFFFFFF:0))|(opX&((opMode===2)?0xFFFFFFFF:0));dv.setUint32(i*4,d32,true);G3=(G3^d32)>>>0;}else{let c32=dv.getUint32(i*4,true);let opA=(c32-g32)>>>0;let opS=(c32+g32)>>>0;let opX=(c32^g32)>>>0;let p32=(opA&((opMode===0)?0xFFFFFFFF:0))|(opS&((opMode===1)?0xFFFFFFFF:0))|(opX&((opMode===2)?0xFFFFFFFF:0));dv.setUint32(i*4,p32,true);G3=(G3^c32)>>>0;}}let rem=buffer.length%4;if(rem>0){let off=buffer.length-rem;for(let i=0;i<rem;i++){let sizeNum=baseWordIndex+words+i+1;let x=sizeNum;let x2=Math.imul(x,x)>>>0;let x3=Math.imul(x2,x)>>>0;let x4=Math.imul(x3,x)>>>0;let x5=Math.imul(x4,x)>>>0;let x6=Math.imul(x5,x)>>>0;let x7=Math.imul(x6,x)>>>0;let x8=Math.imul(x7,x)>>>0;let pMode=bigKey[sizeNum%128]%6;let tVal=(pMode===0)?x3:(pMode===1)?x4:(pMode===2)?x5:(pMode===3)?x6:(pMode===4)?x7:x8;let pVal=bigKey[(sizeNum+5)%128];let rIn=(Math.imul(pVal,Math.imul(pVal,pVal))>>>0)%7+1;let rOut=(Math.imul(tVal%100,tVal%100)+rIn)%7+1;G1=(G1+tVal)>>>0;let gCombined=(G1^G2^G3^G4)>>>0;gCombined=((gCombined<<rIn)|(gCombined>>>(32-rIn)))>>>0;gCombined=((gCombined<<rOut)|(gCombined>>>(32-rOut)))>>>0;let pwdGarbageByte=bigKey[(sizeNum*7)%128];let gByte=((gCombined+pwdGarbageByte+(Math.imul(sizeNum%100,sizeNum%100)>>>0))&0xFF)^(pwdGarbageByte>>2);let opMode=bigKey[(sizeNum+32)%128]%3;if(isEncrypt){let dB=buffer[off+i];let oA=(dB+gByte)&0xFF;let oS=(dB-gByte+256)&0xFF;let oX=(dB^gByte)&0xFF;dB=(opMode===0)?oA:((opMode===1)?oS:oX);buffer[off+i]=dB;G3=(G3^dB)>>>0;}else{let cB=buffer[off+i];let oA=(cB-gByte+256)&0xFF;let oS=(cB+gByte)&0xFF;let oX=(cB^gByte)&0xFF;let pB=(opMode===0)?oA:((opMode===1)?oS:oX);buffer[off+i]=pB;G3=(G3^cB)>>>0;}}}self.postMessage({type:'chunk_done',buffer:buffer.buffer,chunkIdx:chunkIdx},[buffer.buffer]);};`;
     const precompiledKeyWorkerURL = URL.createObjectURL(new Blob([keyWorkerCode], {type:'application/javascript'}));
     const precompiledMathWorkerURL = URL.createObjectURL(new Blob([mathWorkerCode], {type:'application/javascript'}));
 
+    // 🔥 GOOGLE LOGIN START 🔥
     window.onload = function() {
         applyTheme(localStorage.getItem('isb_theme') || 'default');
         document.getElementById('coreBadgeDisplay').innerText = `⚡ ${SYSTEM_CORES}-Core Processing Active`;
         
-        // 1. Check Auth State directly with Firebase
-        auth.onAuthStateChanged(function(user) {
-            if (user) {
-                currentUserEmail = user.email;
-                localStorage.setItem("isb_email", currentUserEmail);
-                initAppFlow();
-            } else {
-                document.getElementById('mainApp').style.display = 'none';
-                document.getElementById('authScreen').style.display = 'flex';
-            }
-        });
-
-        // 2. Catch the Redirect Result from Firebase Login
-        auth.getRedirectResult().then(function(result) {
-            if (result && result.user) {
-                currentUserEmail = result.user.email;
-                localStorage.setItem("isb_email", currentUserEmail);
-                initAppFlow();
-            }
-        }).catch(function(error) {
-            console.error("Auth Error:", error);
-            document.getElementById("googleButtonContainer").innerHTML = `
-                <button onclick="signInWithGoogle()" style="background: #4285F4; color: white; border: none; padding: 12px 24px; border-radius: 5px; font-size: 16px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: bold; width: 100%; justify-content: center; box-shadow: 0 4px 10px rgba(66, 133, 244, 0.3);">
-                    <span style="background: white; color: #4285F4; padding: 2px 6px; border-radius: 3px;">G</span> Retry Login
-                </button>
-            `;
-        });
+        currentUserEmail = localStorage.getItem("isb_email");
+        if(currentUserEmail) {
+            initAppFlow();
+        } else { 
+            // Better Google Identity Initialization (Fast & Reliable)
+            let checkGoogle = setInterval(function() {
+                if(typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+                    clearInterval(checkGoogle);
+                    try { 
+                        google.accounts.id.initialize({ 
+                            client_id: ISB_CLIENT_ID, 
+                            callback: handleCredentialResponse,
+                            auto_select: true // Tries to auto-login if previously logged in
+                        }); 
+                        // Visual Button (Always works)
+                        google.accounts.id.renderButton(
+                            document.getElementById("googleButtonContainer"), 
+                            { theme: "filled_blue", size: "large", type: "standard", shape: "pill", text: "continue_with", width: 280 } 
+                        ); 
+                        // One-Tap Prompt (Fast popup)
+                        google.accounts.id.prompt(); 
+                    } catch(e) {
+                        document.getElementById("googleButtonContainer").innerHTML = "<p style='color:#E91E63; font-weight:bold;'>Please turn off Adblocker to Sign in.</p>";
+                    } 
+                }
+            }, 500);
+        }
     };
-
-    // Firebase Auth Login Function (Fixes White Screen & 400 Error)
-    function signInWithGoogle() {
-        document.getElementById("googleButtonContainer").innerHTML = "<p style='color:var(--primary); font-weight:bold; font-size:16px;'>Connecting to Google...</p>";
-        var provider = new firebase.auth.GoogleAuthProvider();
-        auth.signInWithRedirect(provider);
-    }
-
-    // Secure Logout
-    function logoutUser() { 
-        auth.signOut().then(() => {
-            localStorage.removeItem("isb_email"); 
-            location.reload(); 
-        });
-    }
 
     function applyTheme(themeId) { document.body.setAttribute('data-theme', themeId); localStorage.setItem('isb_theme', themeId); document.getElementById('themeGrid').innerHTML = themes.map(t => `<div class="theme-circle ${t.id === themeId ? 'active' : ''}" style="background-color: ${t.color};" onclick="applyTheme('${t.id}')"></div>`).join(''); }
 
+    function handleCredentialResponse(response) {
+        try {
+            document.getElementById('loginStatus').style.display = 'block';
+            let base64 = response.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+            let jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+            currentUserEmail = JSON.parse(jsonPayload).email; localStorage.setItem("isb_email", currentUserEmail); initAppFlow();
+        } catch(e) { alert("Login Failed. Please try again."); document.getElementById('loginStatus').style.display = 'none'; }
+    }
+    function logoutUser() { localStorage.removeItem("isb_email"); location.reload(); }
+    
     function initAppFlow() {
         document.getElementById('authScreen').style.display = 'none';
         database.ref('users').on('value', snapshot => {
@@ -436,6 +446,7 @@
                 currentUsername = foundUname; currentAvatar = APP_STATE.users[foundUname].avatar;
                 myHideStatus = APP_STATE.users[foundUname].hideStatus || false; updatePrivacyUI();
                 
+                // Signal Sketchware Android to save FCM token
                 if(typeof ISBAndroid !== 'undefined') { ISBAndroid.saveFCMToken(currentUsername); }
 
                 document.getElementById('profileUsernameDisplay').innerText = "@" + currentUsername;
@@ -453,6 +464,7 @@
         });
     }
 
+    // Modal closers
     window.onclick = function(event) {
         if (event.target.classList.contains('modal-overlay')) {
             if(event.target.id === 'setupProfileModal' && !currentUsername) return; 
@@ -474,16 +486,18 @@
     function togglePrivacy() { myHideStatus = !myHideStatus; database.ref('users/' + currentUsername).update({ hideStatus: myHideStatus }); updatePrivacyUI(); }
     function updatePrivacyUI() { let icon = document.getElementById('privacyToggleIcon'); let text = document.getElementById('privacyStatusText'); let mainIcon = document.getElementById('privacyMainIcon'); if(myHideStatus) { icon.innerText = "toggle_off"; icon.style.color = "var(--border)"; text.innerText = "Nobody (Hidden)"; mainIcon.innerText = "visibility_off"; mainIcon.style.color = "var(--text-muted)";} else { icon.innerText = "toggle_on"; icon.style.color = "var(--primary)"; text.innerText = "Everyone (Visible)"; mainIcon.innerText = "visibility"; mainIcon.style.color = "var(--primary)";} }
 
+    // Image Cropper Logic
     let cropImgObj = null, cropX = 0, cropY = 0, cropZoom = 1, baseScale = 1, isDragging = false, startX, startY, cropDest = '';
     function handleImageSelection(e, dest) { let file = e.target.files[0]; if(!file) return; cropDest = dest; let reader = new FileReader(); reader.onload = function(evt) { cropImgObj = new Image(); cropImgObj.onload = function() { baseScale = Math.max(250 / cropImgObj.width, 250 / cropImgObj.height); cropZoom = 1; document.getElementById('cropZoomSlider').value = 1; cropX = (250 - (cropImgObj.width * baseScale)) / 2; cropY = (250 - (cropImgObj.height * baseScale)) / 2; document.getElementById('cropperModal').style.display = 'flex'; drawCrop(); }; cropImgObj.src = evt.target.result; }; reader.readAsDataURL(file); }
     function drawCrop() { if(!cropImgObj) return; cropZoom = parseFloat(document.getElementById('cropZoomSlider').value); let canvas = document.getElementById('cropCanvas'); let ctx = canvas.getContext('2d'); ctx.clearRect(0,0,250,250); let w = cropImgObj.width * baseScale * cropZoom; let h = cropImgObj.height * baseScale * cropZoom; ctx.drawImage(cropImgObj, cropX, cropY, w, h); }
-    let cCanvas = document.getElementById('cropCanvas'); cCanvas.addEventListener('touchstart', e => { isDragging=true; startX=e.touches[0].clientX - cropX; startY=e.touches[0].clientY - cropY; }); cCanvas.addEventListener('touchmove', e => { if(!isDragging)return; e.preventDefault(); cropX=e.touches[0].clientX - startX; cropY=e.touches[0].clientY - startY; drawCrop(); }); cCanvas.addEventListener('touchend', e => { isDragging=false; }); cCanvas.addEventListener('mousedown', e => { isDragging=true; startX=e.clientX - cropX; startY=e.clientY - cropY; }); cCanvas.addEventListener('mousemove', e => { if(!isDragging)return; cropX=e.clientX - startX; cropY=e.clientY - startY; drawCrop(); }); cCanvas.addEventListener('mouseup', e => { isDragging=false; }); cCanvas.addEventListener('mouseleave', e => { isDragging=false; });
+    let cCanvas = document.getElementById('cropCanvas'); cCanvas.addEventListener('touchstart', e => { isDragging=true; startX=e.touches[0].clientX - cropX; startY=e.touches[0].clientY - cropY; }, {passive: false}); cCanvas.addEventListener('touchmove', e => { if(!isDragging)return; e.preventDefault(); cropX=e.touches[0].clientX - startX; cropY=e.touches[0].clientY - startY; drawCrop(); }, {passive: false}); cCanvas.addEventListener('touchend', e => { isDragging=false; }); cCanvas.addEventListener('mousedown', e => { isDragging=true; startX=e.clientX - cropX; startY=e.clientY - cropY; }); cCanvas.addEventListener('mousemove', e => { if(!isDragging)return; cropX=e.clientX - startX; cropY=e.clientY - startY; drawCrop(); }); cCanvas.addEventListener('mouseup', e => { isDragging=false; }); cCanvas.addEventListener('mouseleave', e => { isDragging=false; });
     function applyCrop() { let canvas = document.createElement('canvas'); canvas.width = 250; canvas.height = 250; canvas.getContext('2d').drawImage(document.getElementById('cropCanvas'), 0, 0); let base64 = canvas.toDataURL("image/jpeg", 0.8); if(cropDest === 'setup') { tempSetupAvatarData = base64; document.getElementById('setupAvatarIcon').style.display = 'none'; document.getElementById('setupAvatarPreview').style.display = 'block'; document.getElementById('setupAvatarPreview').src = base64; } else if (cropDest === 'settings') { database.ref('users/' + currentUsername).update({ avatar: base64 }); } document.getElementById('cropperModal').style.display = 'none'; }
     function validateUsernameInput() { let val = document.getElementById('setupUsernameInput').value.trim().toLowerCase(); let icon = document.getElementById('usernameStatusIcon'); let btn = document.getElementById('saveProfileBtn'); if(val.length < 3 || val.includes(" ")) { icon.innerText = "cancel"; icon.style.color = "#E91E63"; btn.disabled = true; btn.style.opacity = "0.5"; return; } if(APP_STATE.users[val] && APP_STATE.users[val].email !== currentUserEmail) { icon.innerText = "cancel"; icon.style.color = "#E91E63"; btn.disabled = true; btn.style.opacity = "0.5"; return; } icon.innerText = "check_circle"; icon.style.color = "#25D366"; btn.disabled = false; btn.style.opacity = "1"; }
     async function saveProfileSetup() { let uNameInput = document.getElementById('setupUsernameInput').value.trim().toLowerCase(); if(currentUsername && currentUsername !== uNameInput) { await database.ref('users/' + currentUsername).remove(); } let finalAvatar = tempSetupAvatarData || currentAvatar || ""; let oldBlocked = (currentUsername && APP_STATE.users[currentUsername]) ? APP_STATE.users[currentUsername].blocked : null; let newData = { email: currentUserEmail, avatar: finalAvatar, hideStatus: myHideStatus }; if(oldBlocked) newData.blocked = oldBlocked; await database.ref('users/' + uNameInput).set(newData); document.getElementById('setupProfileModal').style.display = 'none'; }
     function editUsernameModal() { tempSetupAvatarData = null; document.getElementById('setupUsernameInput').value = currentUsername; validateUsernameInput(); if(currentAvatar) { document.getElementById('setupAvatarIcon').style.display = 'none'; document.getElementById('setupAvatarPreview').style.display = 'block'; document.getElementById('setupAvatarPreview').src = currentAvatar; } document.getElementById('cancelSetupBtn').style.display = 'block'; document.getElementById('setupProfileModal').style.display = 'flex'; }
     function getUserInfoByEmail(email) { let found = Object.entries(APP_STATE.users).find(([k, v]) => v.email === email); if(found) return { username: found[0], avatar: found[1].avatar }; return { username: email.split('@')[0], avatar: null }; }
 
+    // Search and Chats
     function toggleHomeSearch() { let sb = document.getElementById('homeSearchBar'); sb.style.display = (sb.style.display === 'block') ? 'none' : 'block'; if(sb.style.display === 'block') document.getElementById('homeSearchInput').focus(); else { document.getElementById('homeSearchInput').value = ""; filterChats(); } }
     function filterChats() { let q = document.getElementById('homeSearchInput').value.toLowerCase(); let items = document.getElementById('chatsList').getElementsByClassName('list-item'); for(let i=0; i<items.length; i++) { let title = items[i].querySelector('.list-title').innerText.toLowerCase(); items[i].style.display = title.includes(q) ? 'flex' : 'none'; } }
     function toggleChatSearch() { let sb = document.getElementById('chatSearchBar'); sb.style.display = (sb.style.display === 'block') ? 'none' : 'block'; if(sb.style.display === 'block') document.getElementById('chatSearchInput').focus(); else { document.getElementById('chatSearchInput').value = ""; filterChatMessages(); } }
@@ -522,7 +536,10 @@
 
     function startFirebaseSync() {
         if(isListeningToFirebase) return; isListeningToFirebase = true;
-        database.ref('messages').once('value', function() { isChatsLoaded = true; loadChatsList(); });
+        
+        // Fast Initial Load
+        database.ref('messages').orderByChild('timestamp').limitToLast(100).once('value', function() { isChatsLoaded = true; loadChatsList(); });
+        
         database.ref('messages').on('child_added', function(snapshot) { let m = snapshot.val(); if(!m) return; m.fbKey = snapshot.key; if (!APP_STATE.msgs.some(msg => msg.id === m.id)) { let isMyGroupMsg = m.isGroup && APP_STATE.groups.some(g => g.id === m.to); let isPersonalMsg = !m.isGroup && (m.from === currentUserEmail || m.to === currentUserEmail); if (isMyGroupMsg || isPersonalMsg) { APP_STATE.msgs.push(m); loadChatsList(); if(currentChatContact && ((!m.isGroup && ((m.from===currentUserEmail && m.to===currentChatContact) || (m.from===currentChatContact && m.to===currentUserEmail))) || (m.isGroup && m.to===currentChatContact))) appendSingleMessage(m); } } });
         database.ref('messages').on('child_removed', function(snapshot) { let removedMsg = snapshot.val(); APP_STATE.msgs = APP_STATE.msgs.filter(m => m.id !== removedMsg.id); let el = document.getElementById(`msg_${removedMsg.id}`); if(el) el.remove(); loadChatsList(); });
         database.ref('groups').on('child_added', function(snapshot) { let g = snapshot.val(); if(g && g.members.includes(currentUserEmail)) { if(!APP_STATE.groups.some(grp => grp.id === g.id)) { APP_STATE.groups.push(g); loadChatsList(); } } });
@@ -552,6 +569,7 @@
     function base64ToUint8(base64) { let binary = atob(base64.replace(/\s+/g, '')); let len = binary.length; let bytes = new Uint8Array(len); for (let i = 0; i < len; i++) { bytes[i] = binary.charCodeAt(i); } return bytes; }
     function uint8ToBase64(bytes) { let binary = ''; let len = bytes.byteLength; let chunkSize = 0x8000; for (let i = 0; i < len; i += chunkSize) { binary += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + chunkSize, len))); } return btoa(binary); }
 
+    // 🔥 FAST OCTA-CORE ENCRYPTION 🔥
     async function runISBText(text, password, isEncrypt) {
         return new Promise((resolve, reject) => {
             let buffer, salt;
@@ -658,7 +676,7 @@
         });
         
         if (!isChatsLoaded && html === "") {
-            document.getElementById("chatsList").innerHTML = `<div style="text-align:center; padding:50px 20px; color:var(--text-muted);"><i class="material-icons animate-spin" style="font-size:40px; color:var(--primary);">sync</i><div style="margin-top:10px; font-weight:bold; font-size:15px;">Syncing Chats...</div></div>`;
+            document.getElementById("chatsList").innerHTML = `<div style="text-align:center; padding:50px 20px; color:var(--text-muted);"><i class="material-icons animate-spin" style="font-size:40px; color:var(--primary);">sync</i><div style="margin-top:10px; font-weight:800; font-size:15px;">Syncing Chats...</div></div>`;
         } else {
             document.getElementById("chatsList").innerHTML = html || `<div style="text-align:center; padding:20px; color:gray;">No Messages Yet</div>`;
         }
@@ -756,7 +774,7 @@
     function handleStatusFile(event) { let file = event.target.files[0]; if(!file) return; if(file.size > 5 * 1024 * 1024) return alert("⚠️ Max File Size 5MB."); let reader = new FileReader(); reader.onload = function(e) { statusFileData = e.target.result; document.getElementById('statusUploadArea').style.display = 'none'; if(file.type.startsWith('video/')) { let v = document.getElementById('statusVidPreview'); v.style.display = 'block'; document.getElementById('statusImgPreview').style.display = 'none'; v.src = e.target.result; } else { let i = document.getElementById('statusImgPreview'); i.style.display = 'block'; document.getElementById('statusVidPreview').style.display = 'none'; i.src = e.target.result; } }; reader.readAsDataURL(file); }
     async function postStatus(type) { let myActive = APP_STATE.statuses.filter(s => s.from === currentUserEmail && (Date.now() - s.timestamp < 24*60*60*1000)); if(myActive.length >= 5) { alert("Limit Reached! You can only keep 5 active statuses. Please delete an old status first."); return; } let payloadToEncrypt = ""; if(type === 'text') { let txt = document.getElementById('statusTextOnly').value.trim(); if(!txt) return; payloadToEncrypt = `ISB_TXT_STATUS|||${txt}`; } else { if(!statusFileData) return; let cap = document.getElementById('statusCaption').value.trim(); payloadToEncrypt = `ISB_IMG_STATUS|||${statusFileData}|||${cap}`; } closeStatusModal(); let encrypted = await runISBText(payloadToEncrypt, currentUserEmail, true); await database.ref('statuses').push({ id: 'sts_' + Date.now(), from: currentUserEmail, payload: encrypted, timestamp: Date.now(), timeStr: new Date().toLocaleTimeString() }); }
     
-    async function loadStatusList() { let myContacts = new Set(); APP_STATE.msgs.forEach(m => { if(!m.isGroup) myContacts.add(m.from === currentUserEmail ? m.to : m.from); }); myContacts.add(currentUserEmail); let now = Date.now(), validStatuses = APP_STATE.statuses.filter(s => myContacts.has(s.from) && (now - s.timestamp < 24 * 60 * 60 * 1000)); window.statusPlaylist = []; for(let s of validStatuses) { if(!s.decryptedFullText) { try { s.decryptedFullText = await runISBText(s.payload, s.from, false); } catch(e){} } if(s.decryptedFullText) { if(s.decryptedFullText.startsWith("ISB_IMG_STATUS|||")) { let parts = s.decryptedFullText.split("|||"); s.decryptedData = parts[1]; s.decryptedName = parts[2]; } else if(s.decryptedFullText.startsWith("ISB_TXT_STATUS|||")) { s.decryptedData = "txt"; s.decryptedName = s.decryptedFullText.split("|||")[1]; } window.statusPlaylist.push(s); } } window.statusPlaylist.sort((a,b) => a.timestamp - b.timestamp); let userGroups = {}; window.statusPlaylist.forEach(s => { if(!userGroups[s.from]) userGroups[s.from] = []; userGroups[s.from].push(s); }); let trayHtml = `<div class="status-card" onclick="openImageStatusModal()"><div class="status-card-avatar" style="border:none;"><div style="background:var(--bg); width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative;">${currentAvatar ? `<img src="${currentAvatar}">` : (currentUserEmail?currentUserEmail.charAt(0).toUpperCase():'U')}<div class="status-card-add-icon">+</div></div></div><div style="background:var(--surface); display:flex; justify-content:center; align-items:center; height:100%;"></div><div class="status-card-name" style="color:var(--text); text-shadow:none; text-align:center;">Add Status</div></div>`; for(let user in userGroups) { let userSts = userGroups[user]; let lastSt = userSts[userSts.length - 1]; let uInfo = getUserInfoByEmail(user); let bgStyle = `background-color: var(--primary);`; if (lastSt.decryptedData.startsWith("data:image/")) { bgStyle = `background-image: url('${lastSt.decryptedData}');`; } else if (lastSt.decryptedData.startsWith("data:video/")) { bgStyle = `background-color: #000;`; } let dName = (user === currentUserEmail) ? "My Status" : uInfo.username; let avatarHtml = uInfo.avatar ? `<img src="${uInfo.avatar}">` : user.charAt(0).toUpperCase(); trayHtml += `<div class="status-card" style="${bgStyle}" onclick="viewUserStatus('${user}')"><div class="status-card-overlay"></div><div class="status-card-avatar">${avatarHtml}</div><div class="status-card-name">${dName}</div></div>`; } document.getElementById('statusTray').innerHTML = trayHtml; let listHtml = ""; for(let user in userGroups) { if(user === currentUserEmail) continue; let st = userGroups[user][userGroups[user].length - 1]; let uInfo = getUserInfoByEmail(user); let avatarHtml = uInfo.avatar ? `<img src="${uInfo.avatar}">` : user.charAt(0).toUpperCase(); listHtml += `<div class="list-item" onclick="viewUserStatus('${user}')"><div class="avatar status-ring">${avatarHtml}</div><div class="list-info"><div class="list-title">${uInfo.username}</div><div class="list-subtitle">${st.timeStr}</div></div></div>`; } document.getElementById('statusList').innerHTML = listHtml || `<div style="text-align:center; padding:20px; color:gray;">No Updates Yet</div>`; }
+    async function loadStatusList() { let myContacts = new Set(); APP_STATE.msgs.forEach(m => { if(!m.isGroup) myContacts.add(m.from === currentUserEmail ? m.to : m.from); }); myContacts.add(currentUserEmail); let now = Date.now(), validStatuses = APP_STATE.statuses.filter(s => myContacts.has(s.from) && (now - s.timestamp < 24 * 60 * 60 * 1000)); window.statusPlaylist = []; for(let s of validStatuses) { if(!s.decryptedFullText) { try { s.decryptedFullText = await runISBText(s.payload, s.from, false); } catch(e){} } if(s.decryptedFullText) { if(s.decryptedFullText.startsWith("ISB_IMG_STATUS|||")) { let parts = s.decryptedFullText.split("|||"); s.decryptedData = parts[1]; s.decryptedName = parts[2]; } else if(s.decryptedFullText.startsWith("ISB_TXT_STATUS|||")) { s.decryptedData = "txt"; s.decryptedName = s.decryptedFullText.split("|||")[1]; } window.statusPlaylist.push(s); } } window.statusPlaylist.sort((a,b) => a.timestamp - b.timestamp); let userGroups = {}; window.statusPlaylist.forEach(s => { if(!userGroups[s.from]) userGroups[s.from] = []; userGroups[s.from].push(s); }); let trayHtml = `<div class="status-card" onclick="openImageStatusModal()"><div class="status-card-avatar" style="border:none;"><div style="background:var(--bg); width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative;">${currentAvatar ? `<img src="${currentAvatar}">` : (currentUserEmail?currentUserEmail.charAt(0).toUpperCase():'U')}<div class="status-card-add-icon" style="color: white; font-weight: bold; background: var(--primary); border-radius: 50%; width: 16px; height: 16px; font-size: 14px; display:flex; align-items:center; justify-content:center; position: absolute; bottom:-2px; right:-2px;">+</div></div></div><div style="background:var(--surface); display:flex; justify-content:center; align-items:center; height:100%;"></div><div class="status-card-name" style="color:var(--text); text-shadow:none; text-align:center;">Add Status</div></div>`; for(let user in userGroups) { let userSts = userGroups[user]; let lastSt = userSts[userSts.length - 1]; let uInfo = getUserInfoByEmail(user); let bgStyle = `background-color: var(--primary);`; if (lastSt.decryptedData.startsWith("data:image/")) { bgStyle = `background-image: url('${lastSt.decryptedData}');`; } else if (lastSt.decryptedData.startsWith("data:video/")) { bgStyle = `background-color: #000;`; } let dName = (user === currentUserEmail) ? "My Status" : uInfo.username; let avatarHtml = uInfo.avatar ? `<img src="${uInfo.avatar}">` : user.charAt(0).toUpperCase(); trayHtml += `<div class="status-card" style="${bgStyle}" onclick="viewUserStatus('${user}')"><div class="status-card-overlay"></div><div class="status-card-avatar">${avatarHtml}</div><div class="status-card-name">${dName}</div></div>`; } document.getElementById('statusTray').innerHTML = trayHtml; let listHtml = ""; for(let user in userGroups) { if(user === currentUserEmail) continue; let st = userGroups[user][userGroups[user].length - 1]; let uInfo = getUserInfoByEmail(user); let avatarHtml = uInfo.avatar ? `<img src="${uInfo.avatar}">` : user.charAt(0).toUpperCase(); listHtml += `<div class="list-item" onclick="viewUserStatus('${user}')"><div class="avatar status-ring">${avatarHtml}</div><div class="list-info"><div class="list-title">${uInfo.username}</div><div class="list-subtitle">${st.timeStr}</div></div></div>`; } document.getElementById('statusList').innerHTML = listHtml || `<div style="text-align:center; padding:20px; color:gray;">No Updates Yet</div>`; }
 
     let currentPdf = null; let currentPdfPage = 1; async function renderPdfPage(num) { if(!currentPdf) return; let canvas = document.getElementById('pdfCanvas'); let ctx = canvas.getContext('2d'); let page = await currentPdf.getPage(num); let viewport = page.getViewport({scale: window.innerWidth > 600 ? 1.5 : 1.0}); canvas.height = viewport.height; canvas.width = viewport.width; await page.render({ canvasContext: ctx, viewport: viewport }).promise; document.getElementById('pdfPageNum').innerText = num; } function changePdfPage(offset) { if(!currentPdf) return; let newPage = currentPdfPage + offset; if(newPage >= 1 && newPage <= currentPdf.numPages) { currentPdfPage = newPage; renderPdfPage(currentPdfPage); } }
     async function openMediaViewer(msgId, source) { waIsChatMedia = (source === 'msg'); document.getElementById('waStatusViewer').style.display = 'flex'; document.getElementById('waProgressBarContainer').innerHTML = ''; let m = waIsChatMedia ? APP_STATE.msgs.find(x => x.id === msgId) : window.statusPlaylist.find(x => x.id === msgId); let fData = m.decryptedData, fName = m.decryptedName; let uInfo = getUserInfoByEmail(m.from); document.getElementById('waStatusName').innerText = waIsChatMedia ? "Media" : uInfo.username; document.getElementById('waStatusTime').innerText = waIsChatMedia ? m.time : m.timeStr; document.getElementById('waStatusAvatar').innerHTML = uInfo.avatar ? `<img src="${uInfo.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : uInfo.username.charAt(0).toUpperCase(); let dBtn = document.getElementById('waStatusDownloadBtn'); let tapLeft = document.getElementById('waTapLeft'); let tapRight = document.getElementById('waTapRight'); let delBtn = document.getElementById('waStatusDeleteBtn'); if(waIsChatMedia) { dBtn.style.display = 'block'; dBtn.href = fData; dBtn.download = fName; delBtn.style.display = 'none'; tapLeft.style.display = 'none'; tapRight.style.display = 'none'; } else { dBtn.style.display = 'none'; tapLeft.style.display = 'block'; tapRight.style.display = 'block'; if(m.from === currentUserEmail) { delBtn.style.display = 'block'; } else { delBtn.style.display = 'none'; } } let contentBox = document.getElementById('waStatusContent'); contentBox.innerHTML = `<i class="material-icons animate-spin" style="font-size:50px;">sync</i>`; if (fData.startsWith("data:application/pdf")) { contentBox.innerHTML = `<div style="position:absolute; top:80px; background:var(--surface); width:90%; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.2); display:flex; justify-content:space-between; align-items:center; padding:10px 20px; z-index:4005; border:1px solid var(--border);"><i class="material-icons" onclick="changePdfPage(-1)" style="color:var(--primary); font-size:30px; cursor:pointer;">navigate_before</i><span style="color:var(--text); font-weight:bold; font-size:16px;">Page <span id="pdfPageNum">1</span> / <span id="pdfPageCount">-</span></span><i class="material-icons" onclick="changePdfPage(1)" style="color:var(--primary); font-size:30px; cursor:pointer;">navigate_next</i></div><div style="width:100%; height:100%; overflow:auto; display:flex; justify-content:center; align-items:flex-start; padding-top:150px; padding-bottom:50px; background:var(--bg);"><canvas id="pdfCanvas" style="max-width:95%; background:white; box-shadow:0 5px 15px rgba(0,0,0,0.2); border-radius:8px;"></canvas></div>`; try { let pdfBase64 = fData.split(',')[1]; let pdfBinaryString = atob(pdfBase64); let pdfBytes = new Uint8Array(pdfBinaryString.length); for (let i = 0; i < pdfBinaryString.length; i++) { pdfBytes[i] = pdfBinaryString.charCodeAt(i); } let loadingTask = pdfjsLib.getDocument({data: pdfBytes}); currentPdf = await loadingTask.promise; document.getElementById('pdfPageCount').innerText = currentPdf.numPages; currentPdfPage = 1; renderPdfPage(currentPdfPage); } catch (error) { contentBox.innerHTML = `<div style="text-align:center; color:#E91E63; margin-top:50px;"><h2>⚠️ PDF Error</h2><p>File might be corrupted.</p></div>`; } return; } let bUrl = base64ToBlobUrl(fData); if(fData.startsWith("data:video/")) { let controlsAttr = waIsChatMedia ? "controls" : ""; let vidHtml = `<video id="activeVideoPlayer" src="${bUrl}" ${controlsAttr} playsinline style="width:100%; height:100%; object-fit:contain; background:#000; outline:none;"></video>`; if(fName && !waIsChatMedia) { vidHtml += `<div class="wa-status-caption">${fName}</div>`; } contentBox.innerHTML = vidHtml; let video = document.getElementById('activeVideoPlayer'); try { let playPromise = video.play(); if (playPromise !== undefined) { playPromise.catch(error => { if(!waIsChatMedia) video.muted = true; video.play().catch(e => { if(waIsChatMedia) video.controls = true; }); }); } } catch(e) { if(waIsChatMedia) video.controls = true; } if(!waIsChatMedia) { video.onended = () => { nextWaStatus(); }; video.onloadedmetadata = () => { clearTimeout(waTimer); let fillBar = document.getElementById(`waFill_${waActiveIndex}`); if(fillBar) { fillBar.style.transition = `width ${video.duration}s linear`; fillBar.classList.add('filling'); } waTimer = setTimeout(() => { nextWaStatus(); }, video.duration * 1000 + 500); }; } } else if (fData.startsWith("data:image/")) { contentBox.innerHTML = `<img src="${bUrl}" style="width:100%; height:100%; object-fit:contain;">`; if(fName && !waIsChatMedia) contentBox.innerHTML += `<div class="wa-status-caption">${fName}</div>`; } else { if(fData === "txt") { contentBox.innerHTML = `<div style="width:100%; height:100%; display:flex; justify-content:center; align-items:center; background:var(--primary); padding:30px; font-size:28px; text-align:center; word-wrap:break-word;">${fName}</div>`; } else { contentBox.innerHTML = `<div style="text-align:center;"><h2>📁 File</h2><p>${fName}</p></div>`; } } }
@@ -765,6 +783,7 @@
     function renderWaStatus() { clearTimeout(waTimer); let st = waUserStatusGroup[waActiveIndex]; let barContainer = document.getElementById('waProgressBarContainer'); barContainer.innerHTML = ''; for(let i=0; i<waUserStatusGroup.length; i++) { let fillWidth = (i < waActiveIndex) ? '100%' : '0%'; barContainer.innerHTML += `<div class="wa-progress-segment"><div class="wa-progress-fill" id="waFill_${i}" style="width:${fillWidth}"></div></div>`; } openMediaViewer(st.id, 'status'); if(st.decryptedData !== "txt" && !st.decryptedData.startsWith("data:video/") && !st.decryptedData.startsWith("data:application/pdf")) { let fillBar = document.getElementById(`waFill_${waActiveIndex}`); if(fillBar) { void fillBar.offsetWidth; fillBar.style.transition = "width 10s linear"; fillBar.classList.add('filling'); } waTimer = setTimeout(() => { nextWaStatus(); }, 10000); } else if (st.decryptedData === "txt" || st.decryptedData.startsWith("data:application/pdf")) { let fillBar = document.getElementById(`waFill_${waActiveIndex}`); if(fillBar) { void fillBar.offsetWidth; fillBar.style.transition = "width 5s linear"; fillBar.classList.add('filling'); } waTimer = setTimeout(() => { nextWaStatus(); }, 5000); } }
     function nextWaStatus() { if(waActiveIndex < waUserStatusGroup.length - 1) { waActiveIndex++; renderWaStatus(); } else closeWaStatus(); } function prevWaStatus() { if(waActiveIndex > 0) { waActiveIndex--; renderWaStatus(); } else renderWaStatus(); } function closeWaStatus() { clearTimeout(waTimer); document.getElementById('waStatusViewer').style.display = 'none'; document.getElementById('waStatusContent').innerHTML = ""; currentPdf = null; }
 
+    // 🔥 INCOMING CALL POPUP SYSTEM 🔥
     function initCallListener() {
         if(!currentUsername) return;
         database.ref('calls/' + currentUsername).on('value', async snapshot => {
@@ -779,15 +798,26 @@
                 currentCallType = data.callType;
                 window.currentCallTarget = data.from;
 
+                // Play Ringtone
                 let ringtone = document.getElementById('incomingRing');
-                ringtone.play().catch(e => console.log("Ringtone Autoplay Blocked: ", e));
+                ringtone.play().catch(e => console.log("Autoplay block (tap screen to enable audio)"));
 
-                document.getElementById('callStatusText').innerText = "Incoming Call...";
-                document.getElementById('callTypeText').innerText = (data.callType === 'video') ? "Video Call from @" + data.from : "Audio Call from @" + data.from;
+                // 🔥 Browser Native Web Push Notification 🔥
+                if ("Notification" in window && Notification.permission === "granted") {
+                    new Notification("ISB Call", {
+                        body: `Incoming ${data.callType} call from @${data.from}`,
+                        icon: APP_STATE.users[data.from]?.avatar || "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Google_Call_Icon.svg/1024px-Google_Call_Icon.svg.png"
+                    });
+                }
+
+                // Show UI
+                document.getElementById('callStatusText').innerText = "Incoming Call";
+                document.getElementById('callTypeText').innerText = (data.callType === 'video') ? "Video Call from @" + data.from : "Voice Call from @" + data.from;
                 let uInfo = APP_STATE.users[data.from];
                 document.getElementById('callAvatarPreview').innerHTML = (uInfo && uInfo.avatar) ? `<img src="${uInfo.avatar}">` : data.from.charAt(0).toUpperCase();
                 
-                document.getElementById('btnAcceptCall').style.display = 'block';
+                // Show Accept/Decline Layout
+                document.getElementById('incomingCallActions').style.display = 'flex';
                 document.getElementById('callControls').style.display = 'none'; 
                 document.getElementById('callOverlay').style.display = 'flex';
                 document.getElementById('remoteVideo').style.display = 'none';
@@ -825,267 +855,292 @@
     async function startCall(callType) {
         if(!currentChatContact || isGroupChat) return alert("Calls only available in 1-to-1 chats.");
         let targetUname = getUserInfoByEmail(currentChatContact).username;
-        await database.ref('calls/' + targetUname).once('value', async snap => {
-            if(snap.exists() && snap.val().type !== 'end') {
-                alert("User is busy on another call.");
-                return;
-            }
-            
-            isCallActive = true;
-            currentCallDirection = 'outgoing';
-            currentCallType = callType;
-            window.currentCallTarget = targetUname;
-
-            document.getElementById('callStatusText').innerText = "Calling...";
-            document.getElementById('callTypeText').innerText = (callType === 'video') ? "Video Call to @" + targetUname : "Audio Call to @" + targetUname;
-            let uInfo = APP_STATE.users[targetUname];
-            document.getElementById('callAvatarPreview').innerHTML = (uInfo && uInfo.avatar) ? `<img src="${uInfo.avatar}">` : targetUname.charAt(0).toUpperCase();
-
-            document.getElementById('btnAcceptCall').style.display = 'none';
-            document.getElementById('callControls').style.display = 'flex';
-            document.getElementById('callOverlay').style.display = 'flex';
-            document.getElementById('callAvatarPreview').classList.remove('call-avatar-small');
-            
-            if(callType === 'video') {
-                isVideoEnabled = true;
-                document.getElementById('videoToggleIcon').innerText = "videocam";
-                document.getElementById('btnVideoToggle').style.background = "rgba(37,211,102,0.8)";
-            } else {
-                isVideoEnabled = false;
-                document.getElementById('videoToggleIcon').innerText = "videocam_off";
-                document.getElementById('btnVideoToggle').style.background = "rgba(255,255,255,0.2)";
-            }
-
-            await setupWebRTC(callType);
-
-            try {
-                let offer = await peerConnection.createOffer();
-                await peerConnection.setLocalDescription(offer);
-                
-                await database.ref('calls/' + targetUname).set({
-                    type: 'offer',
-                    from: currentUsername,
-                    callType: callType,
-                    sdp: offer.sdp
-                });
-
-                // --- बैकग्राउंड नोटिफिकेशन बजाने के लिए नया कोड ---
-                if (uInfo && uInfo.fcmToken && typeof ISBAndroid !== 'undefined') {
-                    ISBAndroid.sendCallNotification(uInfo.fcmToken, currentUsername, callType);
-                }
-
-                // Listen for answer
-                database.ref('calls/' + currentUsername).on('value', async snapshot => {
-                    const data = snapshot.val();
-                    if(data && data.type === 'answer' && isCallActive) {
-                        callStartTime = Date.now();
-                        document.getElementById('callStatusText').innerText = "00:00";
-                        startCallTimer();
-                        document.getElementById('callAvatarPreview').classList.add('call-avatar-small');
-                        if (currentCallType === 'video') {
-                            document.getElementById('localVideo').style.display = 'block';
-                            document.getElementById('remoteVideo').style.display = 'block';
-                        }
-                        await peerConnection.setRemoteDescription(new RTCSessionDescription({type: 'answer', sdp: data.sdp}));
-                    } else if (data && data.type === 'candidate' && isCallActive) {
-                        try { await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate)); } catch(e){}
-                    } else if (data && data.type === 'end') {
-                        endCall(false);
-                    }
-                });
-
-            } catch (e) {
-                console.error("Call Error:", e);
-                endCall();
-            }
-        });
-    }
-
-    async function setupWebRTC(callType) {
-        peerConnection = new RTCPeerConnection(rtcConfig);
+        await database.ref('calls/' + targetUname).remove();
         
-        peerConnection.onicecandidate = (event) => {
-            if(event.candidate && window.currentCallTarget) {
-                database.ref('calls/' + window.currentCallTarget).update({
-                    type: 'candidate',
-                    candidate: event.candidate.toJSON()
-                });
-            }
-        };
+        callStartTime = 0;
+        currentCallDirection = 'outgoing';
+        currentCallType = callType;
+        window.currentCallTarget = targetUname;
 
-        peerConnection.ontrack = (event) => {
-            document.getElementById('remoteVideo').srcObject = event.streams[0];
-        };
+        // Native FCM trigger for Sketchware (Optional, if implemented in java)
+        if(typeof ISBAndroid !== 'undefined') {
+            let tUser = APP_STATE.users[targetUname];
+            if(tUser && tUser.fcmToken) {
+                ISBAndroid.sendCallNotification(tUser.fcmToken, currentUsername, callType);
+            }
+        }
+
+        let outRing = document.getElementById('outgoingRing');
+        outRing.play().catch(e=>{});
+
+        isMuted = false;
+        document.getElementById('muteIcon').innerText = "mic";
+        document.getElementById('btnMute').style.background = "rgba(255,255,255,0.2)";
+        document.getElementById('incomingCallActions').style.display = 'none';
+        document.getElementById('callControls').style.display = 'flex';
+
+        document.getElementById('callStatusText').innerText = `Calling...`;
+        document.getElementById('callTypeText').innerText = (callType === 'video') ? "Video Call to @" + targetUname : "Voice Call to @" + targetUname;
+        let uInfo = APP_STATE.users[targetUname];
+        document.getElementById('callAvatarPreview').innerHTML = (uInfo && uInfo.avatar) ? `<img src="${uInfo.avatar}">` : targetUname.charAt(0).toUpperCase();
+        
+        document.getElementById('callOverlay').style.display = 'flex';
+        document.getElementById('remoteVideo').style.display = 'none';
+        document.getElementById('localVideo').style.display = 'none';
+        isCallActive = true;
 
         try {
-            localStream = await navigator.mediaDevices.getUserMedia({
-                audio: true,
-                video: callType === 'video' ? { facingMode: "user" } : false
-            });
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            } catch(e) {
+                localStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
+            }
+
+            isVideoEnabled = (callType === 'video');
+            if(localStream.getVideoTracks().length > 0) {
+                localStream.getVideoTracks().forEach(t => t.enabled = isVideoEnabled);
+                document.getElementById('videoToggleIcon').innerText = isVideoEnabled ? "videocam" : "videocam_off";
+                document.getElementById('btnVideoToggle').style.background = isVideoEnabled ? "rgba(37,211,102,0.8)" : "rgba(255,255,255,0.2)";
+            } else {
+                document.getElementById('btnVideoToggle').style.display = 'none'; 
+            }
+            if(isVideoEnabled) { document.getElementById('localVideo').style.display = 'block'; document.getElementById('localVideo').srcObject = localStream; }
             
-            document.getElementById('localVideo').srcObject = localStream;
+            peerConnection = new RTCPeerConnection(rtcConfig); remoteStream = new MediaStream(); 
+            
             localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-        } catch (err) {
-            console.error("Media Error:", err);
-            alert("Microphone/Camera permission denied!");
-        }
+            
+            peerConnection.ontrack = event => { 
+                event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track)); 
+                
+                let remoteVid = document.getElementById('remoteVideo');
+                remoteVid.srcObject = remoteStream;
+                let playPromise = remoteVid.play();
+                if (playPromise !== undefined) { playPromise.catch(error => console.log("Video autoplay blocked")); }
+
+                outRing.pause();
+                outRing.currentTime = 0;
+
+                if(callType === 'video') { remoteVid.style.display = 'block'; }
+                document.getElementById('callStatusText').innerText = "Connected";
+                callStartTime = Date.now(); 
+
+                if(isVideoEnabled) {
+                    document.getElementById('callAvatarPreview').classList.add('call-avatar-small');
+                    document.getElementById('callStatusText').classList.add('hide-in-video');
+                    document.getElementById('callTypeText').classList.add('hide-in-video');
+                }
+            };
+
+            peerConnection.onicecandidate = event => { if(event.candidate) database.ref('calls/' + targetUname + '/callerCandidates').push(event.candidate.toJSON()); };
+
+            const offer = await peerConnection.createOffer(); await peerConnection.setLocalDescription(offer);
+            await database.ref('calls/' + targetUname).set({ type: 'offer', from: currentUsername, callType: callType, sdp: offer.sdp });
+
+            database.ref('calls/' + targetUname + '/answer').on('value', async snapshot => {
+                const answer = snapshot.val();
+                if(answer && peerConnection && !peerConnection.currentRemoteDescription) { const answerDesc = new RTCSessionDescription({ type: 'answer', sdp: answer.sdp }); await peerConnection.setRemoteDescription(answerDesc); }
+            });
+
+            database.ref('calls/' + targetUname + '/receiverCandidates').on('child_added', snapshot => {
+                if(peerConnection) peerConnection.addIceCandidate(new RTCIceCandidate(snapshot.val()));
+            });
+        } catch(e) { alert("Camera/Mic Permission Denied!"); endCall(); }
     }
 
     async function acceptCall() {
         let ringtone = document.getElementById('incomingRing');
-        ringtone.pause(); ringtone.currentTime = 0;
+        ringtone.pause();
+        ringtone.currentTime = 0;
 
-        if(!window.currentCallData) return;
-        isCallActive = true;
-        document.getElementById('btnAcceptCall').style.display = 'none';
+        document.getElementById('incomingCallActions').style.display = 'none'; 
         document.getElementById('callControls').style.display = 'flex';
-        
-        if(window.currentCallData.callType === 'video') {
-            isVideoEnabled = true;
-            document.getElementById('videoToggleIcon').innerText = "videocam";
-            document.getElementById('btnVideoToggle').style.background = "rgba(37,211,102,0.8)";
-        } else {
-            isVideoEnabled = false;
-            document.getElementById('videoToggleIcon').innerText = "videocam_off";
-            document.getElementById('btnVideoToggle').style.background = "rgba(255,255,255,0.2)";
-        }
+        document.getElementById('callStatusText').innerText = "Connecting...";
+        const data = window.currentCallData; isCallActive = true;
 
-        await setupWebRTC(window.currentCallData.callType);
+        isMuted = false;
+        document.getElementById('muteIcon').innerText = "mic";
+        document.getElementById('btnMute').style.background = "rgba(255,255,255,0.2)";
+        document.getElementById('btnVideoToggle').style.display = 'block';
 
         try {
-            await peerConnection.setRemoteDescription(new RTCSessionDescription({type: 'offer', sdp: window.currentCallData.sdp}));
-            let answer = await peerConnection.createAnswer();
-            await peerConnection.setLocalDescription(answer);
-
-            await database.ref('calls/' + window.currentCallData.from).set({
-                type: 'answer',
-                sdp: answer.sdp
-            });
-
-            callStartTime = Date.now();
-            document.getElementById('callStatusText').innerText = "00:00";
-            startCallTimer();
-            document.getElementById('callAvatarPreview').classList.add('call-avatar-small');
-            
-            if (window.currentCallData.callType === 'video') {
-                document.getElementById('localVideo').style.display = 'block';
-                document.getElementById('remoteVideo').style.display = 'block';
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            } catch(e) {
+                localStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
             }
 
-        } catch (e) {
-            console.error("Accept Error:", e);
-            endCall();
-        }
-    }
-
-    let callTimerInterval = null;
-    function startCallTimer() {
-        clearInterval(callTimerInterval);
-        callTimerInterval = setInterval(() => {
-            if(!isCallActive || callStartTime === 0) { clearInterval(callTimerInterval); return; }
-            let elapsed = Math.floor((Date.now() - callStartTime) / 1000);
-            let m = String(Math.floor(elapsed / 60)).padStart(2, '0');
-            let s = String(elapsed % 60).padStart(2, '0');
-            let textEl = document.getElementById('callStatusText');
-            if(textEl) textEl.innerText = `${m}:${s}`;
-        }, 1000);
-    }
-
-    async function endCall(isInitiator = true) {
-        let ringtone = document.getElementById('incomingRing');
-        ringtone.pause(); ringtone.currentTime = 0;
-        clearInterval(callTimerInterval);
-        
-        if (isInitiator && window.currentCallTarget) {
-            await database.ref('calls/' + window.currentCallTarget).set({ type: 'end' });
-            await database.ref('calls/' + currentUsername).remove();
+            isVideoEnabled = (data.callType === 'video');
+            if(localStream.getVideoTracks().length > 0) {
+                localStream.getVideoTracks().forEach(t => t.enabled = isVideoEnabled);
+                document.getElementById('videoToggleIcon').innerText = isVideoEnabled ? "videocam" : "videocam_off";
+                document.getElementById('btnVideoToggle').style.background = isVideoEnabled ? "rgba(37,211,102,0.8)" : "rgba(255,255,255,0.2)";
+            } else {
+                document.getElementById('btnVideoToggle').style.display = 'none';
+            }
+            if(isVideoEnabled) { document.getElementById('localVideo').style.display = 'block'; document.getElementById('localVideo').srcObject = localStream; }
             
-            // Save Call Log
-            let duration = callStartTime > 0 ? Math.floor((Date.now() - callStartTime) / 1000) : 0;
-            let logData = {
-                target: window.currentCallTarget,
-                direction: currentCallDirection,
-                callType: currentCallType,
-                duration: duration,
-                timestamp: Date.now()
+            peerConnection = new RTCPeerConnection(rtcConfig); remoteStream = new MediaStream(); 
+            
+            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+            
+            peerConnection.ontrack = event => { 
+                event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track)); 
+                
+                let remoteVid = document.getElementById('remoteVideo');
+                remoteVid.srcObject = remoteStream;
+                let playPromise = remoteVid.play();
+                if (playPromise !== undefined) { playPromise.catch(error => console.log("Video autoplay blocked")); }
+
+                if(data.callType === 'video') remoteVid.style.display = 'block';
+                document.getElementById('callStatusText').innerText = "Connected";
+                callStartTime = Date.now(); 
+
+                if(isVideoEnabled) {
+                    document.getElementById('callAvatarPreview').classList.add('call-avatar-small');
+                    document.getElementById('callStatusText').classList.add('hide-in-video');
+                    document.getElementById('callTypeText').classList.add('hide-in-video');
+                }
             };
-            await database.ref('callHistory/' + currentUsername).push(logData);
-            await database.ref('callHistory/' + window.currentCallTarget).push({
-                target: currentUsername,
-                direction: currentCallDirection === 'outgoing' ? 'incoming' : 'outgoing',
-                callType: currentCallType,
-                duration: duration,
-                timestamp: Date.now()
+
+            peerConnection.onicecandidate = event => { if(event.candidate) database.ref('calls/' + currentUsername + '/receiverCandidates').push(event.candidate.toJSON()); };
+
+            const offerDesc = new RTCSessionDescription({ type: 'offer', sdp: data.sdp }); await peerConnection.setRemoteDescription(offerDesc);
+
+            const answer = await peerConnection.createAnswer(); await peerConnection.setLocalDescription(answer);
+
+            await database.ref('calls/' + currentUsername + '/answer').set({ type: 'answer', sdp: answer.sdp });
+
+            database.ref('calls/' + currentUsername + '/callerCandidates').on('child_added', snapshot => {
+                if(peerConnection) peerConnection.addIceCandidate(new RTCIceCandidate(snapshot.val()));
+            });
+        } catch(e) { alert("Camera/Mic Permission Denied!"); endCall(); }
+    }
+
+    function endCall(notifyRemote = true) {
+        let inRing = document.getElementById('incomingRing');
+        let outRing = document.getElementById('outgoingRing');
+        if(inRing) { inRing.pause(); inRing.currentTime = 0; }
+        if(outRing) { outRing.pause(); outRing.currentTime = 0; }
+
+        document.getElementById('callAvatarPreview').classList.remove('call-avatar-small');
+        document.getElementById('callStatusText').classList.remove('hide-in-video');
+        document.getElementById('callTypeText').classList.remove('hide-in-video');
+        document.getElementById('callAvatarPreview').removeAttribute('style');
+
+        isCallActive = false; document.getElementById('callOverlay').style.display = 'none';
+        
+        if (window.currentCallTarget && currentCallDirection) {
+            let durationStr = "Missed";
+            if (callStartTime > 0) {
+                let diffSec = Math.floor((Date.now() - callStartTime) / 1000);
+                let m = Math.floor(diffSec / 60);
+                let s = diffSec % 60;
+                durationStr = (m > 0 ? m + "m " : "") + s + "s";
+            }
+            database.ref('callHistory/' + currentUsername).push({
+                peer: window.currentCallTarget,
+                type: currentCallType,
+                direction: currentCallDirection,
+                duration: durationStr,
+                timestamp: Date.now(),
+                timeStr: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
             });
         }
+        
+        if(notifyRemote) {
+            let targetUname = window.currentCallTarget || (window.currentCallData ? window.currentCallData.from : null);
+            if(targetUname) {
+                database.ref('calls/' + targetUname).set({ type: 'end' });
+            }
+        }
+        database.ref('calls/' + currentUsername).remove();
 
-        if (peerConnection) { peerConnection.close(); peerConnection = null; }
-        if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
-
-        isCallActive = false;
-        window.currentCallTarget = null;
-        window.currentCallData = null;
-        callStartTime = 0;
-        isMuted = false;
-        isVideoEnabled = false;
-
-        document.getElementById('callOverlay').style.display = 'none';
-        document.getElementById('localVideo').style.display = 'none';
-        document.getElementById('remoteVideo').style.display = 'none';
-        document.getElementById('localVideo').srcObject = null;
+        callStartTime = 0; currentCallDirection = ''; currentCallType = ''; window.currentCallTarget = null;
+        
+        if(localStream) { localStream.getTracks().forEach(track => track.stop()); }
+        if(remoteStream) { remoteStream.getTracks().forEach(track => track.stop()); }
+        if(peerConnection) { peerConnection.close(); peerConnection = null; }
+        
+        document.getElementById('localVideo').srcObject = null; 
         document.getElementById('remoteVideo').srcObject = null;
-        document.getElementById('callAvatarPreview').classList.remove('call-avatar-small');
-        database.ref('calls/' + currentUsername).off('value'); 
-        initCallListener(); 
+        window.currentCallData = null;
     }
 
     function loadCallsList() {
-        let list = document.getElementById('callsList');
-        if (APP_STATE.callLogs.length === 0) {
-            list.innerHTML = `<div style="text-align:center; padding:50px 20px; color:var(--text-muted);"><i class="material-icons" style="font-size:60px; opacity:0.5;">call_end</i><p>No Call History</p></div>`;
-            return;
-        }
         let html = "";
         APP_STATE.callLogs.forEach(log => {
-            let uInfo = APP_STATE.users[log.target];
-            let avatarHtml = (uInfo && uInfo.avatar) ? `<img src="${uInfo.avatar}">` : log.target.charAt(0).toUpperCase();
-            let iconColor = log.duration > 0 ? (log.direction === 'outgoing' ? '#25D366' : '#2AABEE') : '#E91E63';
-            let iconType = log.direction === 'outgoing' ? 'call_made' : (log.duration > 0 ? 'call_received' : 'call_missed');
-            let callIcon = log.callType === 'video' ? 'videocam' : 'call';
+            let uInfo = APP_STATE.users[log.peer];
+            let dName = uInfo ? log.peer : log.peer;
+            let avatarHtml = (uInfo && uInfo.avatar) ? `<img src="${uInfo.avatar}">` : dName.charAt(0).toUpperCase();
             
-            let dateStr = new Date(log.timestamp).toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
-            let durationStr = log.duration > 0 ? `${Math.floor(log.duration/60)}m ${log.duration%60}s` : 'Missed';
-
-            html += `
-            <div class="list-item" onclick="openChat('${uInfo ? uInfo.email : log.target}', false, '${log.target}')">
-                <div class="avatar" style="width:45px; height:45px; font-size:18px;">${avatarHtml}</div>
-                <div class="list-info">
-                    <div class="list-title" style="font-size:15px;">${log.target}</div>
-                    <div class="list-subtitle"><i class="material-icons" style="font-size:14px; color:${iconColor}; margin-right:5px;">${iconType}</i> ${dateStr}</div>
+            let dirIcon = log.direction === 'incoming' ? 'call_received' : 'call_made';
+            let dirColor = log.duration === 'Missed' ? '#E91E63' : (log.direction === 'incoming' ? '#25D366' : '#2AABEE');
+            let typeIcon = log.type === 'video' ? 'videocam' : 'call';
+            
+            html += `<div class="list-item">
+                <div class="avatar">${avatarHtml}</div>
+                <div class="list-info" onclick="openChat('${uInfo ? uInfo.email : log.peer}', false, '${dName}')">
+                    <div class="list-title">@${dName}</div>
+                    <div class="list-subtitle" style="display:flex; align-items:center;">
+                        <i class="material-icons" style="font-size:14px; color:${dirColor}; margin-right:4px;">${dirIcon}</i>
+                        ${log.timeStr} &bull; ${log.duration}
+                    </div>
                 </div>
-                <div style="display:flex; flex-direction:column; align-items:flex-end;">
-                    <i class="material-icons" style="color:var(--primary);">${callIcon}</i>
-                    <span style="font-size:11px; color:var(--text-muted); margin-top:5px;">${durationStr}</span>
-                </div>
+                <i class="material-icons" style="color:var(--primary); font-size:22px; margin-right:15px;">${typeIcon}</i>
+                <i class="material-icons" style="color:var(--text-muted); cursor:pointer; font-size:22px;" onclick="deleteSingleCall('${log.key}')">delete_outline</i>
             </div>`;
         });
-        list.innerHTML = html;
+        document.getElementById('callsList').innerHTML = html || `<div style="text-align:center; padding:30px 20px; color:gray;"><i class="material-icons" style="font-size:50px; opacity:0.5;">phone_missed</i><p>No Recent Calls</p></div>`;
     }
 
-    async function clearAllCalls() {
-        if(confirm("Clear entire call history?")) {
-            await database.ref('callHistory/' + currentUsername).remove();
-            APP_STATE.callLogs = [];
-            loadCallsList();
+    function deleteSingleCall(key) {
+        if(confirm("Delete this call log?")) {
+            database.ref('callHistory/' + currentUsername + '/' + key).remove();
         }
     }
-    
-    // Mini Avatar Draggable in Call Overlay
-    let miniAv = document.getElementById('callAvatarPreview');
-    let isDraggingAv = false, avX = 0, avY = 0, offsetX = 0, offsetY = 0;
-    miniAv.addEventListener('touchstart', e => { if(!miniAv.classList.contains('call-avatar-small')) return; isDraggingAv = true; offsetX = e.touches[0].clientX - miniAv.getBoundingClientRect().left; offsetY = e.touches[0].clientY - miniAv.getBoundingClientRect().top; });
-    miniAv.addEventListener('touchmove', e => { if(!isDraggingAv) return; e.preventDefault(); miniAv.style.left = (e.touches[0].clientX - offsetX) + 'px'; miniAv.style.top = (e.touches[0].clientY - offsetY) + 'px'; });
-    miniAv.addEventListener('touchend', () => isDraggingAv = false);
+
+    function clearAllCalls() {
+        if(APP_STATE.callLogs.length === 0) return;
+        if(confirm("Clear entire call history? This cannot be undone.")) {
+            database.ref('callHistory/' + currentUsername).remove();
+        }
+    }
+
+    let avatarEl = document.getElementById('callAvatarPreview');
+    let isAvatarDragging = false, avStartX, avStartY, avInitialX, avInitialY;
+
+    function startAvatarDrag(e) {
+        if(!avatarEl.classList.contains('call-avatar-small')) return;
+        isAvatarDragging = true;
+        let clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+        let clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+        avStartX = clientX; avStartY = clientY;
+        let rect = avatarEl.getBoundingClientRect();
+        avInitialX = rect.left; avInitialY = rect.top;
+    }
+
+    function moveAvatarDrag(e) {
+        if(!isAvatarDragging) return;
+        e.preventDefault();
+        let clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+        let clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+        let dx = clientX - avStartX;
+        let dy = clientY - avStartY;
+        avatarEl.style.left = (avInitialX + dx) + 'px';
+        avatarEl.style.top = (avInitialY + dy) + 'px';
+        avatarEl.style.right = 'auto';
+        avatarEl.style.bottom = 'auto';
+    }
+
+    function endAvatarDrag() { isAvatarDragging = false; }
+
+    avatarEl.addEventListener('touchstart', startAvatarDrag, {passive: false});
+    avatarEl.addEventListener('mousedown', startAvatarDrag);
+    document.addEventListener('touchmove', moveAvatarDrag, {passive: false});
+    document.addEventListener('mousemove', moveAvatarDrag);
+    document.addEventListener('touchend', endAvatarDrag);
+    document.addEventListener('mouseup', endAvatarDrag);
 </script>
 </body>
 </html>
