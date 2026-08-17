@@ -762,15 +762,23 @@
     function nextWaStatus() { if(waActiveIndex < waUserStatusGroup.length - 1) { waActiveIndex++; renderWaStatus(); } else closeWaStatus(); } function prevWaStatus() { if(waActiveIndex > 0) { waActiveIndex--; renderWaStatus(); } else renderWaStatus(); } function closeWaStatus() { clearTimeout(waTimer); document.getElementById('waStatusViewer').style.display = 'none'; document.getElementById('waStatusContent').innerHTML = ""; currentPdf = null; }
 
     // 🔥 INCOMING CALL POPUP SYSTEM 🔥
+    let lastCallSdp = ""; // यह वेरिएबल बार-बार बजने से रोकेगा
+
     function initCallListener() {
         if(!currentUsername) return;
         database.ref('calls/' + currentUsername).on('value', async snapshot => {
             const data = snapshot.val();
             
             if(data && data.type === 'end') {
+                lastCallSdp = ""; // कॉल कटने पर लॉक खोल दें
                 endCall(false); 
             } 
             else if(data && !isCallActive && data.type === 'offer') {
+                
+                // 🔥 असली जादू: अगर यह वही कॉल है जो पहले बज चुकी है, तो इग्नोर करो!
+                if(lastCallSdp === data.sdp) return;
+                lastCallSdp = data.sdp; // नई कॉल को लॉक कर दो
+
                 callStartTime = 0;
                 currentCallDirection = 'incoming';
                 currentCallType = data.callType;
@@ -798,6 +806,7 @@
                 document.getElementById('localVideo').style.display = 'none';
                 window.currentCallData = data;
             } else if (!data && isCallActive) {
+                lastCallSdp = "";
                 endCall(false); 
             }
         });
