@@ -177,7 +177,6 @@
             <h2 style="font-weight:900; font-size: 28px; margin: 0;">ISB Premium</h2>
             <p style="color:var(--text-muted); font-size:14px; margin-bottom:30px; font-weight: 600;">End-to-End Encrypted Web3 Network.</p>
             
-            <!-- Superfast Google Login Container -->
             <div id="googleButtonContainer" class="g_id_signin"></div>
             <div id="loginStatus" style="font-size: 12px; color: var(--primary); margin-top: 15px; font-weight: 600; display: none;">Securely connecting...</div>
         </div>
@@ -196,14 +195,12 @@
         <div class="search-bar-container" id="homeSearchBar"><input type="text" id="homeSearchInput" placeholder="Search chats..." onkeyup="filterChats()"></div>
 
         <div class="container">
-            <!-- CHATS TAB -->
             <div id="chatsTab" class="tab-content active">
                 <div id="chatsList"></div>
                 <div class="fab fab-secondary" onclick="openNewGroupModal()"><i class="material-icons">group_add</i></div>
                 <div class="fab" onclick="openNewChatModal()"><i class="material-icons">add_comment</i></div>
             </div>
 
-            <!-- STATUS TAB -->
             <div id="statusTab" class="tab-content">
                 <div class="status-tray" id="statusTray"></div>
                 <div id="statusList"></div>
@@ -211,7 +208,6 @@
                 <div class="fab" onclick="openImageStatusModal()"><i class="material-icons">camera_alt</i></div>
             </div>
 
-            <!-- CALLS TAB -->
             <div id="callsTab" class="tab-content">
                 <div style="display:flex; justify-content:space-between; align-items:center; padding:15px 20px; border-bottom:1px solid var(--border);">
                     <h3 style="margin:0; font-size:18px; color:var(--text); font-weight: 800;">Recent Calls</h3>
@@ -220,7 +216,6 @@
                 <div id="callsList"></div>
             </div>
 
-            <!-- SETTINGS TAB -->
             <div id="settingsTab" class="tab-content">
                 <div style="text-align:center; padding: 30px 20px 20px;">
                     <div class="avatar" style="margin: 0 auto 15px auto; width:110px; height:110px; font-size:45px; border: 4px solid var(--primary); cursor:pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.1);" id="profileAvatar" onclick="document.getElementById('editProfileAvatarFile').click()">U</div>
@@ -303,16 +298,13 @@
         <video id="remoteVideo" autoplay playsinline style="width:100%; height:100%; position:absolute; top:0; left:0; object-fit:cover; z-index:-1; display:none; background:#111;"></video>
         <video id="localVideo" autoplay playsinline muted style="width:110px; height:150px; position:absolute; bottom:140px; right:20px; border-radius:12px; border:2px solid white; object-fit:cover; box-shadow:0 10px 20px rgba(0,0,0,0.5); display:none; background:#333; z-index: 10;"></video>
         
-        <!-- Action Buttons Layout (Native Style) -->
         <div style="position:absolute; bottom:50px; width: 100%; display:flex; justify-content:center; align-items:center; z-index: 20;">
             
-            <!-- Incoming Call Buttons -->
             <div id="incomingCallActions" style="display:none; width: 80%; justify-content: space-between; padding: 0 30px;">
                 <button class="call-action-btn btn-decline" onclick="endCall()"><i class="material-icons" style="font-size:36px;">call_end</i></button>
                 <button class="call-action-btn btn-accept" onclick="acceptCall()"><i class="material-icons" style="font-size:36px;">call</i></button>
             </div>
 
-            <!-- Active Call Controls -->
             <div id="callControls" style="display:none; gap:25px; align-items: center;">
                 <button id="btnMute" onclick="toggleMute()" style="background:rgba(255,255,255,0.2); border:none; border-radius:50%; width:60px; height:60px; color:white; cursor:pointer; backdrop-filter:blur(5px);"><i class="material-icons" id="muteIcon" style="font-size:28px;">mic</i></button>
                 <button class="call-action-btn btn-decline" onclick="endCall()" style="width: 75px; height: 75px;"><i class="material-icons" style="font-size:36px;">call_end</i></button>
@@ -322,7 +314,7 @@
         </div>
     </div>
 
-    <!-- MEDIA VIEWER & MODALS (Kept exact same functionality, optimized UI) -->
+    <!-- MEDIA VIEWER & MODALS -->
     <div id="waStatusViewer" class="wa-status-viewer"><div class="wa-progress-container" id="waProgressBarContainer"></div><div class="wa-header"><div style="display:flex; align-items:center; gap:12px; cursor:pointer; z-index:4005;" onclick="closeWaStatus()"><i class="material-icons">arrow_back</i><div class="avatar" id="waStatusAvatar" style="width:40px; height:40px;">U</div><div style="display:flex; flex-direction:column;"><span id="waStatusName" style="font-weight:700;">Name</span><span id="waStatusTime" style="font-size:12px; opacity:0.8;">Time</span></div></div><div style="display:flex; align-items:center; gap:15px; z-index:4005;"><a id="waStatusDownloadBtn" style="color:white; display:none;"><i class="material-icons">download</i></a><i class="material-icons" id="waStatusDeleteBtn" style="color:#E91E63; display:none; cursor:pointer;" onclick="deleteActiveStatus()">delete</i></div></div><div class="wa-content" id="waStatusContent"></div><div class="wa-tap-left" id="waTapLeft" onclick="prevWaStatus()" style="display:none;"></div><div class="wa-tap-right" id="waTapRight" onclick="nextWaStatus()" style="display:none;"></div></div>
     
     <div id="setupProfileModal" class="modal-overlay"><div class="modal-content" style="text-align:center;"><h3 style="margin-top:0; color:var(--text);">Create Your Profile</h3><p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">Choose a unique username and photo</p><div class="profile-pic-upload" onclick="document.getElementById('setupAvatarFile').click()"><img id="setupAvatarPreview" style="display:none;"><i class="material-icons" id="setupAvatarIcon" style="font-size:40px; color:var(--primary);">camera_alt</i></div><input type="file" id="setupAvatarFile" accept="image/*" style="display:none;" onchange="handleImageSelection(event, 'setup')"><div class="input-wrapper"><input type="text" id="setupUsernameInput" placeholder="@username" oninput="validateUsernameInput()"><i class="material-icons input-icon-right" id="usernameStatusIcon" style="color:var(--text-muted);">info</i></div><button id="saveProfileBtn" disabled style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:16px; font-weight:800; font-size:16px; box-shadow:0 4px 10px rgba(0,0,0,0.15); cursor:pointer; opacity:0.5; transition:0.3s;" onclick="saveProfileSetup()">SAVE PROFILE</button><button id="cancelSetupBtn" style="width:100%; padding:15px; background:transparent; color:#E91E63; border:none; margin-top:10px; cursor:pointer; display:none; font-weight:800;" onclick="logoutUser()">LOGOUT & GO BACK</button></div></div>
@@ -354,12 +346,10 @@
     let waActiveUser = null, waUserStatusGroup = [], waActiveIndex = 0, waTimer = null, waIsChatMedia = false; 
     let activeActionMsg = null;
 
-    // 🔥 Web Notification Request for Desktop/Browser Native Popups
     if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
         Notification.requestPermission();
     }
 
-    // 🔥 Native Token Interface
     window.updateMyFCMToken = function(token) {
         if(currentUsername && token) {
             database.ref('users/' + currentUsername).update({ fcmToken: token });
@@ -382,7 +372,6 @@
     let isMuted = false;
     let isVideoEnabled = false;
 
-    // 🔥 FAST OCTA-CORE ENGINE SETUP 🔥
     const SYSTEM_CORES = navigator.hardwareConcurrency || 2;
     console.log(`[ISB Engine] Detected ${SYSTEM_CORES}-Core Processor.`);
     
@@ -391,7 +380,6 @@
     const precompiledKeyWorkerURL = URL.createObjectURL(new Blob([keyWorkerCode], {type:'application/javascript'}));
     const precompiledMathWorkerURL = URL.createObjectURL(new Blob([mathWorkerCode], {type:'application/javascript'}));
 
-    // 🔥 GOOGLE LOGIN START 🔥
     window.onload = function() {
         applyTheme(localStorage.getItem('isb_theme') || 'default');
         document.getElementById('coreBadgeDisplay').innerText = `⚡ ${SYSTEM_CORES}-Core Processing Active`;
@@ -400,7 +388,6 @@
         if(currentUserEmail) {
             initAppFlow();
         } else { 
-            // Better Google Identity Initialization (Fast & Reliable)
             let checkGoogle = setInterval(function() {
                 if(typeof google !== 'undefined' && google.accounts && google.accounts.id) {
                     clearInterval(checkGoogle);
@@ -408,14 +395,12 @@
                         google.accounts.id.initialize({ 
                             client_id: ISB_CLIENT_ID, 
                             callback: handleCredentialResponse,
-                            auto_select: true // Tries to auto-login if previously logged in
+                            auto_select: true
                         }); 
-                        // Visual Button (Always works)
                         google.accounts.id.renderButton(
                             document.getElementById("googleButtonContainer"), 
                             { theme: "filled_blue", size: "large", type: "standard", shape: "pill", text: "continue_with", width: 280 } 
                         ); 
-                        // One-Tap Prompt (Fast popup)
                         google.accounts.id.prompt(); 
                     } catch(e) {
                         document.getElementById("googleButtonContainer").innerHTML = "<p style='color:#E91E63; font-weight:bold;'>Please turn off Adblocker to Sign in.</p>";
@@ -446,7 +431,6 @@
                 currentUsername = foundUname; currentAvatar = APP_STATE.users[foundUname].avatar;
                 myHideStatus = APP_STATE.users[foundUname].hideStatus || false; updatePrivacyUI();
                 
-                // Signal Sketchware Android to save FCM token
                 if(typeof ISBAndroid !== 'undefined') { ISBAndroid.saveFCMToken(currentUsername); }
 
                 document.getElementById('profileUsernameDisplay').innerText = "@" + currentUsername;
@@ -464,7 +448,6 @@
         });
     }
 
-    // Modal closers
     window.onclick = function(event) {
         if (event.target.classList.contains('modal-overlay')) {
             if(event.target.id === 'setupProfileModal' && !currentUsername) return; 
@@ -486,7 +469,6 @@
     function togglePrivacy() { myHideStatus = !myHideStatus; database.ref('users/' + currentUsername).update({ hideStatus: myHideStatus }); updatePrivacyUI(); }
     function updatePrivacyUI() { let icon = document.getElementById('privacyToggleIcon'); let text = document.getElementById('privacyStatusText'); let mainIcon = document.getElementById('privacyMainIcon'); if(myHideStatus) { icon.innerText = "toggle_off"; icon.style.color = "var(--border)"; text.innerText = "Nobody (Hidden)"; mainIcon.innerText = "visibility_off"; mainIcon.style.color = "var(--text-muted)";} else { icon.innerText = "toggle_on"; icon.style.color = "var(--primary)"; text.innerText = "Everyone (Visible)"; mainIcon.innerText = "visibility"; mainIcon.style.color = "var(--primary)";} }
 
-    // Image Cropper Logic
     let cropImgObj = null, cropX = 0, cropY = 0, cropZoom = 1, baseScale = 1, isDragging = false, startX, startY, cropDest = '';
     function handleImageSelection(e, dest) { let file = e.target.files[0]; if(!file) return; cropDest = dest; let reader = new FileReader(); reader.onload = function(evt) { cropImgObj = new Image(); cropImgObj.onload = function() { baseScale = Math.max(250 / cropImgObj.width, 250 / cropImgObj.height); cropZoom = 1; document.getElementById('cropZoomSlider').value = 1; cropX = (250 - (cropImgObj.width * baseScale)) / 2; cropY = (250 - (cropImgObj.height * baseScale)) / 2; document.getElementById('cropperModal').style.display = 'flex'; drawCrop(); }; cropImgObj.src = evt.target.result; }; reader.readAsDataURL(file); }
     function drawCrop() { if(!cropImgObj) return; cropZoom = parseFloat(document.getElementById('cropZoomSlider').value); let canvas = document.getElementById('cropCanvas'); let ctx = canvas.getContext('2d'); ctx.clearRect(0,0,250,250); let w = cropImgObj.width * baseScale * cropZoom; let h = cropImgObj.height * baseScale * cropZoom; ctx.drawImage(cropImgObj, cropX, cropY, w, h); }
@@ -497,7 +479,6 @@
     function editUsernameModal() { tempSetupAvatarData = null; document.getElementById('setupUsernameInput').value = currentUsername; validateUsernameInput(); if(currentAvatar) { document.getElementById('setupAvatarIcon').style.display = 'none'; document.getElementById('setupAvatarPreview').style.display = 'block'; document.getElementById('setupAvatarPreview').src = currentAvatar; } document.getElementById('cancelSetupBtn').style.display = 'block'; document.getElementById('setupProfileModal').style.display = 'flex'; }
     function getUserInfoByEmail(email) { let found = Object.entries(APP_STATE.users).find(([k, v]) => v.email === email); if(found) return { username: found[0], avatar: found[1].avatar }; return { username: email.split('@')[0], avatar: null }; }
 
-    // Search and Chats
     function toggleHomeSearch() { let sb = document.getElementById('homeSearchBar'); sb.style.display = (sb.style.display === 'block') ? 'none' : 'block'; if(sb.style.display === 'block') document.getElementById('homeSearchInput').focus(); else { document.getElementById('homeSearchInput').value = ""; filterChats(); } }
     function filterChats() { let q = document.getElementById('homeSearchInput').value.toLowerCase(); let items = document.getElementById('chatsList').getElementsByClassName('list-item'); for(let i=0; i<items.length; i++) { let title = items[i].querySelector('.list-title').innerText.toLowerCase(); items[i].style.display = title.includes(q) ? 'flex' : 'none'; } }
     function toggleChatSearch() { let sb = document.getElementById('chatSearchBar'); sb.style.display = (sb.style.display === 'block') ? 'none' : 'block'; if(sb.style.display === 'block') document.getElementById('chatSearchInput').focus(); else { document.getElementById('chatSearchInput').value = ""; filterChatMessages(); } }
@@ -537,7 +518,6 @@
     function startFirebaseSync() {
         if(isListeningToFirebase) return; isListeningToFirebase = true;
         
-        // Fast Initial Load
         database.ref('messages').orderByChild('timestamp').limitToLast(100).once('value', function() { isChatsLoaded = true; loadChatsList(); });
         
         database.ref('messages').on('child_added', function(snapshot) { let m = snapshot.val(); if(!m) return; m.fbKey = snapshot.key; if (!APP_STATE.msgs.some(msg => msg.id === m.id)) { let isMyGroupMsg = m.isGroup && APP_STATE.groups.some(g => g.id === m.to); let isPersonalMsg = !m.isGroup && (m.from === currentUserEmail || m.to === currentUserEmail); if (isMyGroupMsg || isPersonalMsg) { APP_STATE.msgs.push(m); loadChatsList(); if(currentChatContact && ((!m.isGroup && ((m.from===currentUserEmail && m.to===currentChatContact) || (m.from===currentChatContact && m.to===currentUserEmail))) || (m.isGroup && m.to===currentChatContact))) appendSingleMessage(m); } } });
@@ -569,7 +549,6 @@
     function base64ToUint8(base64) { let binary = atob(base64.replace(/\s+/g, '')); let len = binary.length; let bytes = new Uint8Array(len); for (let i = 0; i < len; i++) { bytes[i] = binary.charCodeAt(i); } return bytes; }
     function uint8ToBase64(bytes) { let binary = ''; let len = bytes.byteLength; let chunkSize = 0x8000; for (let i = 0; i < len; i += chunkSize) { binary += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + chunkSize, len))); } return btoa(binary); }
 
-    // 🔥 FAST OCTA-CORE ENCRYPTION 🔥
     async function runISBText(text, password, isEncrypt) {
         return new Promise((resolve, reject) => {
             let buffer, salt;
@@ -798,11 +777,9 @@
                 currentCallType = data.callType;
                 window.currentCallTarget = data.from;
 
-                // Play Ringtone
                 let ringtone = document.getElementById('incomingRing');
-                ringtone.play().catch(e => console.log("Autoplay block (tap screen to enable audio)"));
+                ringtone.play().catch(e => console.log("Autoplay block"));
 
-                // 🔥 Browser Native Web Push Notification 🔥
                 if ("Notification" in window && Notification.permission === "granted") {
                     new Notification("ISB Call", {
                         body: `Incoming ${data.callType} call from @${data.from}`,
@@ -810,13 +787,11 @@
                     });
                 }
 
-                // Show UI
                 document.getElementById('callStatusText').innerText = "Incoming Call";
                 document.getElementById('callTypeText').innerText = (data.callType === 'video') ? "Video Call from @" + data.from : "Voice Call from @" + data.from;
                 let uInfo = APP_STATE.users[data.from];
                 document.getElementById('callAvatarPreview').innerHTML = (uInfo && uInfo.avatar) ? `<img src="${uInfo.avatar}">` : data.from.charAt(0).toUpperCase();
                 
-                // Show Accept/Decline Layout
                 document.getElementById('incomingCallActions').style.display = 'flex';
                 document.getElementById('callControls').style.display = 'none'; 
                 document.getElementById('callOverlay').style.display = 'flex';
@@ -862,12 +837,18 @@
         currentCallType = callType;
         window.currentCallTarget = targetUname;
 
-        // Native FCM trigger for Sketchware (Optional, if implemented in java)
-        if(typeof ISBAndroid !== 'undefined') {
-            let tUser = APP_STATE.users[targetUname];
-            if(tUser && tUser.fcmToken) {
-                ISBAndroid.sendCallNotification(tUser.fcmToken, currentUsername, callType);
-            }
+        // 🔥 BACKEND API TRIGGER FOR FCM 🔥
+        let tUser = APP_STATE.users[targetUname];
+        if(tUser && tUser.fcmToken) {
+            fetch('http://isbchatapi.great-site.net/send_call.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    token: tUser.fcmToken,
+                    caller: currentUsername,
+                    callType: callType
+                })
+            }).catch(e => console.log('Push error', e));
         }
 
         let outRing = document.getElementById('outgoingRing');
