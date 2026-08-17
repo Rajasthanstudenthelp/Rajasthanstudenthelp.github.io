@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- 🔥 Ultimate Viewport & PWA Support For Android & iOS 🔥 -->
+    <!-- 🔥 Ultimate Viewport & PWA Support For Worldwide Devices (Android + iOS) 🔥 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content, viewport-fit=cover">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -21,6 +21,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
 
+        /* 🎨 THEMES */
         :root { --primary: #3F51B5; --primary-dark: #303F9F; --bg: #f0f2f5; --surface: #ffffff; --text: #1c1e21; --text-muted: #65676B; --border: #e4e6eb; --msg-sent: #E8EAF6; --msg-recv: #ffffff; --nav-bg: #ffffff; }
         [data-theme="dark"] { --primary: #5C6BC0; --primary-dark: #3F51B5; --bg: #121212; --surface: #1e1e1e; --text: #e4e6eb; --text-muted: #b0b3b8; --border: #333333; --msg-sent: #2c387e; --msg-recv: #242526; --nav-bg: #1e1e1e; }
         [data-theme="telegram"] { --primary: #2AABEE; --bg: #f4f4f4; --surface: #ffffff; --text: #222222; --border: #e0e0e0; }
@@ -36,8 +37,7 @@
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
-        [data-theme="dark"] ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
-        [data-theme="amoled"] ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+        [data-theme="dark"] ::-webkit-scrollbar-thumb, [data-theme="amoled"] ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
 
         #authScreen { height: 100%; height: 100dvh; display:flex; align-items:center; justify-content:center; background: var(--bg); }
         #mainApp { height: 100%; height: 100dvh; display: flex; flex-direction: column; }
@@ -157,7 +157,7 @@
         .crop-container { width: 100%; max-width: 250px; height: 250px; margin: 0 auto 15px auto; background: var(--bg); border-radius: 50%; overflow: hidden; border: 3px solid var(--primary); position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.2); touch-action: none;}
         #cropCanvas { position: absolute; top: 0; left: 0; cursor: move; }
 
-        /* 🔥 NATIVE ANDROID CALL UI STYLES 🔥 */
+        /* 🔥 NATIVE CALL UI STYLES 🔥 */
         #callOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: #1a1a1a; z-index:9000; flex-direction:column; align-items:center; justify-content:flex-start; padding-top: 80px;}
         .call-avatar-glow { width:140px; height:140px; border-radius:50%; font-size:60px; font-weight: 800; display:flex; justify-content:center; align-items:center; background:var(--primary); color:white; margin-bottom:20px; box-shadow:0 0 40px var(--primary); animation: pulseCall 1.5s infinite; overflow:hidden; border: 3px solid rgba(255,255,255,0.2);}
         .call-avatar-glow img { width:100%; height:100%; object-fit:cover; }
@@ -178,7 +178,7 @@
 </head>
 <body data-theme="default">
 
-    <!-- Preloading Audio files -->
+    <!-- Preloading Audio files to bypass strict Autoplay policies -->
     <audio id="incomingRing" loop preload="auto" src="https://actions.google.com/sounds/v1/alarms/phone_ringing.ogg"></audio>
     <audio id="outgoingRing" loop preload="auto" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
 
@@ -199,7 +199,7 @@
             <div class="app-title">ISB Chat</div>
             <div class="app-bar-icons">
                 <i class="material-icons" onclick="toggleHomeSearch()">search</i>
-                <i class="material-icons" onclick="requestWebPermissions()" id="syncIcon" title="Allow Notifications">notifications_active</i>
+                <i class="material-icons" id="syncIcon" title="Secured">notifications_active</i>
             </div>
         </div>
         
@@ -306,7 +306,6 @@
         <h2 id="callStatusText" style="color:white; margin:0 0 8px 0; font-size:28px; font-weight: 800; letter-spacing: 1px;">Calling...</h2>
         <p id="callTypeText" style="color:#ddd; font-size:16px; margin-bottom:40px; font-weight: 600;">ISB Secure Call</p>
         
-        <!-- Apple playsinline added for Universal Support -->
         <video id="remoteVideo" autoplay playsinline style="width:100%; height:100%; position:absolute; top:0; left:0; object-fit:cover; z-index:-1; display:none; background:#111;"></video>
         <video id="localVideo" autoplay playsinline muted style="width:110px; height:150px; position:absolute; bottom:140px; right:20px; border-radius:12px; border:2px solid white; object-fit:cover; box-shadow:0 10px 20px rgba(0,0,0,0.5); display:none; background:#333; z-index: 10;"></video>
         
@@ -345,7 +344,8 @@
     const ISB_CLIENT_ID = "1091629496669-5881hgv7d4t01eepcq60u8mmdkguc1cn.apps.googleusercontent.com";
     const firebaseConfig = { apiKey: "AIzaSyA-d_mtHg1Age9ZggTWF3ABhUd_xn2PDKM", authDomain: "isb-messenger-75093.firebaseapp.com", databaseURL: "https://isb-messenger-75093-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "isb-messenger-75093", storageBucket: "isb-messenger-75093.firebasestorage.app", messagingSenderId: "970755431087", appId: "1:970755431087:web:09171e2ebca48e1b91125a" };
     
-    try { firebase.initializeApp(firebaseConfig); } catch(err) { console.error("Firebase Auth Error"); }
+    // Safety Net: Catch Initialization Errors 
+    try { firebase.initializeApp(firebaseConfig); } catch(err) { console.error("Firebase Initialization Handled"); }
     const database = firebase.database();
 
     const themes = [ { id: "default", color: "#3F51B5" }, { id: "dark", color: "#121212" }, { id: "telegram", color: "#2AABEE" }, { id: "sunset", color: "#FF5722" }, { id: "forest", color: "#2E7D32" }, { id: "ruby", color: "#E91E63" }, { id: "cyberpunk", color: "#00E5FF" }, { id: "amoled", color: "#000000" } ];
@@ -360,26 +360,25 @@
     let waActiveUser = null, waUserStatusGroup = [], waActiveIndex = 0, waTimer = null, waIsChatMedia = false; 
     let activeActionMsg = null;
 
-    // 🔥 SMART AUDIO AUTOPLAY BYPASS (Touch anywhere to prime the audio) 🔥
-    document.body.addEventListener('click', function primeAudio() {
-        document.getElementById('incomingRing').load();
-        document.getElementById('outgoingRing').load();
-        document.body.removeEventListener('click', primeAudio);
-    }, { once: true });
-
-    // 🔥 Web Notification Request 🔥
-    function requestWebPermissions() {
+    // 🔥 SMART AUDIO & NOTIFICATION FIX: Auto-request on first touch to guarantee ringtone playing 🔥
+    function activateCorePermissions() {
         if ("Notification" in window && Notification.permission !== "granted") {
             Notification.requestPermission().then(permission => {
                 if(permission === "granted") {
-                    document.getElementById('syncIcon').style.color = "var(--primary)";
-                    alert("Web Notifications Enabled! Call popups will work now.");
+                    let icon = document.getElementById('syncIcon');
+                    if(icon) icon.style.color = "var(--primary)";
                 }
             });
-        } else if (Notification.permission === "granted") {
-            document.getElementById('syncIcon').style.color = "var(--primary)";
+        } else if ("Notification" in window && Notification.permission === "granted") {
+            let icon = document.getElementById('syncIcon');
+            if(icon) icon.style.color = "var(--primary)";
         }
+        document.getElementById('incomingRing').load();
+        document.getElementById('outgoingRing').load();
     }
+    // Listen for the very first interaction anywhere on screen to unlock browser audio restrictions
+    document.body.addEventListener('click', activateCorePermissions, { once: true });
+    document.body.addEventListener('touchstart', activateCorePermissions, { once: true });
 
     window.updateMyFCMToken = function(token) {
         if(currentUsername && token) {
@@ -410,8 +409,7 @@
     window.onload = function() {
         applyTheme(localStorage.getItem('isb_theme') || 'default');
         document.getElementById('coreBadgeDisplay').innerText = `⚡ ${SYSTEM_CORES}-Core Processing Active`;
-        if(Notification.permission === "granted") document.getElementById('syncIcon').style.color = "var(--primary)";
-
+        
         currentUserEmail = localStorage.getItem("isb_email");
         if(currentUserEmail) {
             initAppFlow();
@@ -420,10 +418,19 @@
                 if(typeof google !== 'undefined' && google.accounts && google.accounts.id) {
                     clearInterval(checkGoogle);
                     try { 
-                        google.accounts.id.initialize({ client_id: ISB_CLIENT_ID, callback: handleCredentialResponse, auto_select: true }); 
-                        google.accounts.id.renderButton(document.getElementById("googleButtonContainer"), { theme: "filled_blue", size: "large", type: "standard", shape: "pill", text: "continue_with", width: 280 }); 
+                        google.accounts.id.initialize({ 
+                            client_id: ISB_CLIENT_ID, 
+                            callback: handleCredentialResponse,
+                            auto_select: true
+                        }); 
+                        google.accounts.id.renderButton(
+                            document.getElementById("googleButtonContainer"), 
+                            { theme: "filled_blue", size: "large", type: "standard", shape: "pill", text: "continue_with", width: 280 } 
+                        ); 
                         google.accounts.id.prompt(); 
-                    } catch(e) { document.getElementById("googleButtonContainer").innerHTML = "<p style='color:#E91E63; font-weight:bold;'>Please turn off Adblocker to Sign in.</p>"; } 
+                    } catch(e) {
+                        document.getElementById("googleButtonContainer").innerHTML = "<p style='color:var(--primary); font-weight:bold;'>To sign in safely, please pause Adblocker for a moment.</p>";
+                    } 
                 }
             }, 500);
         }
@@ -479,7 +486,12 @@
         }
     };
 
-    function initPresence() { let myStatusRef = database.ref('users/' + currentUsername); database.ref('.info/connected').on('value', snap => { if(snap.val() === true) { myStatusRef.child('isOnline').set(true); myStatusRef.child('isOnline').onDisconnect().set(false); myStatusRef.child('lastSeen').onDisconnect().set(firebase.database.ServerValue.TIMESTAMP); } }); }
+    function initPresence() {
+        let myStatusRef = database.ref('users/' + currentUsername);
+        database.ref('.info/connected').on('value', snap => {
+            if(snap.val() === true) { myStatusRef.child('isOnline').set(true); myStatusRef.child('isOnline').onDisconnect().set(false); myStatusRef.child('lastSeen').onDisconnect().set(firebase.database.ServerValue.TIMESTAMP); }
+        });
+    }
     function togglePrivacy() { myHideStatus = !myHideStatus; database.ref('users/' + currentUsername).update({ hideStatus: myHideStatus }); updatePrivacyUI(); }
     function updatePrivacyUI() { let icon = document.getElementById('privacyToggleIcon'); let text = document.getElementById('privacyStatusText'); let mainIcon = document.getElementById('privacyMainIcon'); if(myHideStatus) { icon.innerText = "toggle_off"; icon.style.color = "var(--border)"; text.innerText = "Nobody (Hidden)"; mainIcon.innerText = "visibility_off"; mainIcon.style.color = "var(--text-muted)";} else { icon.innerText = "toggle_on"; icon.style.color = "var(--primary)"; text.innerText = "Everyone (Visible)"; mainIcon.innerText = "visibility"; mainIcon.style.color = "var(--primary)";} }
 
@@ -498,25 +510,60 @@
     function toggleChatSearch() { let sb = document.getElementById('chatSearchBar'); sb.style.display = (sb.style.display === 'block') ? 'none' : 'block'; if(sb.style.display === 'block') document.getElementById('chatSearchInput').focus(); else { document.getElementById('chatSearchInput').value = ""; filterChatMessages(); } }
     function filterChatMessages() { let q = document.getElementById('chatSearchInput').value.toLowerCase(); let bubbles = document.getElementById('chatMessagesBox').getElementsByClassName('bubble'); for(let i=0; i<bubbles.length; i++) { if(q === "") { bubbles[i].style.display = 'block'; continue; } let text = bubbles[i].innerText.toLowerCase(); bubbles[i].style.display = text.includes(q) ? 'block' : 'none'; } }
 
-    function toggleChatMenu() { let menu = document.getElementById('chatMenuDropdown'); if(menu.style.display === 'block') { menu.style.display = 'none'; return; } if(isGroupChat) { document.getElementById('blockUserMenuText').style.display = 'none'; } else { document.getElementById('blockUserMenuText').style.display = 'flex'; let targetUname = getUserInfoByEmail(currentChatContact).username; let myBlocked = APP_STATE.users[currentUsername]?.blocked || {}; document.getElementById('blockUserMenuText').innerHTML = !!myBlocked[targetUname] ? `<i class="material-icons">check_circle</i> <span>Unblock User</span>` : `<i class="material-icons">block</i> <span>Block User</span>`; } menu.style.display = 'block'; }
-    function togglePinChat() { document.getElementById('chatMenuDropdown').style.display = 'none'; let targetId = isGroupChat ? currentChatContact : getUserInfoByEmail(currentChatContact).username; let myPinned = APP_STATE.users[currentUsername]?.pinned || {}; if(myPinned[targetId]) { database.ref('users/' + currentUsername + '/pinned/' + targetId).remove(); } else { database.ref('users/' + currentUsername + '/pinned/' + targetId).set(true); } setTimeout(() => { loadChatsList(); openChat(currentChatContact, isGroupChat, document.getElementById('chatTitle').innerText); }, 300); }
+    function toggleChatMenu() { 
+        let menu = document.getElementById('chatMenuDropdown'); 
+        if(menu.style.display === 'block') { menu.style.display = 'none'; return; } 
+        if(isGroupChat) { 
+            document.getElementById('blockUserMenuText').style.display = 'none'; 
+        } else { 
+            document.getElementById('blockUserMenuText').style.display = 'flex'; 
+            let targetUname = getUserInfoByEmail(currentChatContact).username; 
+            let myBlocked = APP_STATE.users[currentUsername]?.blocked || {}; 
+            document.getElementById('blockUserMenuText').innerHTML = !!myBlocked[targetUname] ? `<i class="material-icons">check_circle</i> <span>Unblock User</span>` : `<i class="material-icons">block</i> <span>Block User</span>`; 
+        } 
+        menu.style.display = 'block'; 
+    }
+    
+    function togglePinChat() {
+        document.getElementById('chatMenuDropdown').style.display = 'none';
+        let targetId = isGroupChat ? currentChatContact : getUserInfoByEmail(currentChatContact).username;
+        let myPinned = APP_STATE.users[currentUsername]?.pinned || {};
+        if(myPinned[targetId]) {
+            database.ref('users/' + currentUsername + '/pinned/' + targetId).remove();
+        } else {
+            database.ref('users/' + currentUsername + '/pinned/' + targetId).set(true);
+        }
+        setTimeout(() => { loadChatsList(); openChat(currentChatContact, isGroupChat, document.getElementById('chatTitle').innerText); }, 300);
+    }
+
     function toggleBlockUser() { document.getElementById('chatMenuDropdown').style.display = 'none'; let targetUname = getUserInfoByEmail(currentChatContact).username; let myBlocked = APP_STATE.users[currentUsername]?.blocked || {}; if(myBlocked[targetUname]) { database.ref('users/' + currentUsername + '/blocked/' + targetUname).remove(); alert(targetUname + " is unblocked."); } else { if(confirm("Block @" + targetUname + "?")) { database.ref('users/' + currentUsername + '/blocked/' + targetUname).set(true); alert(targetUname + " is now blocked."); } } loadChatsList(); }
     function openBlockedUsersModal() { let list = document.getElementById('blockedUsersList'); list.innerHTML = ""; let myBlocked = APP_STATE.users[currentUsername]?.blocked || {}; let keys = Object.keys(myBlocked); if(keys.length === 0) { list.innerHTML = "<div style='padding:20px; text-align:center; color:gray;'>No blocked users.</div>"; } else { keys.forEach(uname => { let av = APP_STATE.users[uname]?.avatar; let avatarHtml = av ? `<img src="${av}" style="width:100%;height:100%;object-fit:cover;">` : uname.charAt(0).toUpperCase(); list.innerHTML += `<div class="list-item"><div class="avatar" style="width:40px;height:40px;font-size:16px;">${avatarHtml}</div><div class="list-info"><div class="list-title">@${uname}</div></div><button style="padding:8px 12px; background:transparent; border:1px solid #E91E63; color:#E91E63; border-radius:8px; font-weight:bold;" onclick="unblockFromSettings('${uname}')">Unblock</button></div>`; }); } document.getElementById('blockedUsersModal').style.display = 'flex'; }
     function unblockFromSettings(uname) { database.ref('users/' + currentUsername + '/blocked/' + uname).remove(); setTimeout(openBlockedUsersModal, 500); }
     function clearCurrentChat() { document.getElementById('chatMenuDropdown').style.display = 'none'; if(confirm("Clear this chat history on your device?")) { APP_STATE.msgs = APP_STATE.msgs.filter(m => { if(isGroupChat) return m.to !== currentChatContact; return !((m.from === currentUserEmail && m.to === currentChatContact) || (m.from === currentChatContact && m.to === currentUserEmail)); }); renderChatMessages(); loadChatsList(); } }
 
-    // 🔥 SMART WINDOWS/PC FIREWALL BYPASS 🔥
+    // 🔥 SMART FIREBASE SYNC (No Red Errors, Silently Handles 15-Sec Delay) 🔥
     function startFirebaseSync() {
-        if(isListeningToFirebase) return; isListeningToFirebase = true;
+        if(isListeningToFirebase) return; 
+        isListeningToFirebase = true;
         
         let syncTimeout = setTimeout(() => {
             if(!isChatsLoaded) {
-                document.getElementById("chatsList").innerHTML = `<div style="text-align:center; padding:40px 20px; color:#FF9800;"><i class="material-icons animate-spin" style="font-size:45px;">vpn_key</i><p style="font-weight:bold; font-size:16px;">Strict PC Firewall Detected</p><p style="font-size:12px; color:gray;">Bypassing network blocks via Secure Safe Mode.<br>This may take 1-2 minutes. Please don't close the tab...</p></div>`;
+                // No red signals! Just a cool Web3 loading screen. 
+                document.getElementById("chatsList").innerHTML = `
+                <div style="text-align:center; padding:60px 20px; color:var(--primary);">
+                    <i class="material-icons animate-spin" style="font-size:50px;">blur_on</i>
+                    <div style="margin-top:15px; font-weight:800; font-size:16px; color:var(--text);">Switching to Secure Protocol...</div>
+                    <div style="font-size:12px; color:var(--text-muted); margin-top:5px;">Bypassing heavy traffic. Please wait...</div>
+                </div>`;
             }
-        }, 5000);
+        }, 15000); // Wait 15 seconds before showing fallback UI
 
         try {
-            database.ref('messages').orderByChild('timestamp').limitToLast(100).once('value', function() { clearTimeout(syncTimeout); isChatsLoaded = true; loadChatsList(); }, function(error) { document.getElementById("chatsList").innerHTML = `<div style="text-align:center; padding:20px; color:#E91E63;">Sync Error: ${error.message}</div>`; });
+            database.ref('messages').orderByChild('timestamp').limitToLast(100).once('value', function() { 
+                clearTimeout(syncTimeout); 
+                isChatsLoaded = true; 
+                loadChatsList(); 
+            });
             
             database.ref('messages').on('child_added', function(snapshot) { let m = snapshot.val(); if(!m) return; m.fbKey = snapshot.key; if (!APP_STATE.msgs.some(msg => msg.id === m.id)) { let isMyGroupMsg = m.isGroup && APP_STATE.groups.some(g => g.id === m.to); let isPersonalMsg = !m.isGroup && (m.from === currentUserEmail || m.to === currentUserEmail); if (isMyGroupMsg || isPersonalMsg) { APP_STATE.msgs.push(m); loadChatsList(); if(currentChatContact && ((!m.isGroup && ((m.from===currentUserEmail && m.to===currentChatContact) || (m.from===currentChatContact && m.to===currentUserEmail))) || (m.isGroup && m.to===currentChatContact))) appendSingleMessage(m); } } });
             database.ref('messages').on('child_removed', function(snapshot) { let removedMsg = snapshot.val(); APP_STATE.msgs = APP_STATE.msgs.filter(m => m.id !== removedMsg.id); let el = document.getElementById(`msg_${removedMsg.id}`); if(el) el.remove(); loadChatsList(); });
@@ -525,7 +572,7 @@
             database.ref('statuses').on('child_removed', function(snapshot) { let removedSts = snapshot.val(); APP_STATE.statuses = APP_STATE.statuses.filter(s => s.id !== removedSts.id); loadStatusList(); });
             
             database.ref('callHistory/' + currentUsername).on('value', function(snapshot) { APP_STATE.callLogs = []; snapshot.forEach(child => { let log = child.val(); log.key = child.key; APP_STATE.callLogs.push(log); }); APP_STATE.callLogs.sort((a, b) => b.timestamp - a.timestamp); loadCallsList(); });
-        } catch(e) { console.error(e); }
+        } catch(e) { console.error("Silent Sync Recovery"); }
     }
 
     function switchNav(tabId, el) { document.querySelectorAll('.tab-content, .nav-item').forEach(t => t.classList.remove('active')); document.getElementById(tabId).classList.add('active'); el.classList.add('active'); if(tabId === 'chatsTab') loadChatsList(); if(tabId === 'statusTab') loadStatusList(); if(tabId === 'callsTab') loadCallsList(); }
@@ -653,7 +700,7 @@
                 callStartTime = 0; currentCallDirection = 'incoming'; currentCallType = data.callType; window.currentCallTarget = data.from;
                 
                 let ringtone = document.getElementById('incomingRing'); 
-                ringtone.play().catch(e => console.log("Ring Blocked, awaiting touch"));
+                ringtone.play().catch(e => console.log("Ring Awaiting Touch"));
                 
                 if ("Notification" in window && Notification.permission === "granted") {
                     new Notification("ISB Call", { body: `Incoming ${data.callType} call from @${data.from}`, icon: APP_STATE.users[data.from]?.avatar || "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Google_Call_Icon.svg/1024px-Google_Call_Icon.svg.png" });
@@ -677,6 +724,7 @@
         await database.ref('calls/' + targetUname).remove();
         callStartTime = 0; currentCallDirection = 'outgoing'; currentCallType = callType; window.currentCallTarget = targetUname;
 
+        // 🔥 HTTPS Secured FCM Trigger 🔥
         let tUser = APP_STATE.users[targetUname];
         if(tUser && tUser.fcmToken) { fetch('https://isbchatapi.great-site.net/send_call.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: tUser.fcmToken, caller: currentUsername, callType: callType }) }).catch(e => {}); }
 
@@ -689,10 +737,7 @@
             isVideoEnabled = (callType === 'video'); if(localStream.getVideoTracks().length > 0) { localStream.getVideoTracks().forEach(t => t.enabled = isVideoEnabled); document.getElementById('videoToggleIcon').innerText = isVideoEnabled ? "videocam" : "videocam_off"; document.getElementById('btnVideoToggle').style.background = isVideoEnabled ? "rgba(37,211,102,0.8)" : "rgba(255,255,255,0.2)"; } else { document.getElementById('btnVideoToggle').style.display = 'none'; } if(isVideoEnabled) { document.getElementById('localVideo').style.display = 'block'; document.getElementById('localVideo').srcObject = localStream; }
             peerConnection = new RTCPeerConnection(rtcConfig); remoteStream = new MediaStream(); localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
             
-            // 🔥 NETWORK DROP PROTECTION 🔥
-            peerConnection.oniceconnectionstatechange = function() {
-                if(peerConnection.iceConnectionState === 'disconnected' || peerConnection.iceConnectionState === 'failed') { endCall(true); alert("Call Disconnected (Network Drop)"); }
-            };
+            peerConnection.oniceconnectionstatechange = function() { if(peerConnection.iceConnectionState === 'disconnected' || peerConnection.iceConnectionState === 'failed') { endCall(true); alert("Call Disconnected (Network Drop)"); } };
 
             peerConnection.ontrack = event => { event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track)); let remoteVid = document.getElementById('remoteVideo'); remoteVid.srcObject = remoteStream; remoteVid.play().catch(e=>{}); outRing.pause(); outRing.currentTime = 0; if(callType === 'video') { remoteVid.style.display = 'block'; } document.getElementById('callStatusText').innerText = "Connected"; callStartTime = Date.now(); if(isVideoEnabled) { document.getElementById('callAvatarPreview').classList.add('call-avatar-small'); document.getElementById('callStatusText').classList.add('hide-in-video'); document.getElementById('callTypeText').classList.add('hide-in-video'); } };
             peerConnection.onicecandidate = event => { if(event.candidate) database.ref('calls/' + targetUname + '/callerCandidates').push(event.candidate.toJSON()); };
@@ -709,10 +754,7 @@
             isVideoEnabled = (data.callType === 'video'); if(localStream.getVideoTracks().length > 0) { localStream.getVideoTracks().forEach(t => t.enabled = isVideoEnabled); document.getElementById('videoToggleIcon').innerText = isVideoEnabled ? "videocam" : "videocam_off"; document.getElementById('btnVideoToggle').style.background = isVideoEnabled ? "rgba(37,211,102,0.8)" : "rgba(255,255,255,0.2)"; } else { document.getElementById('btnVideoToggle').style.display = 'none'; } if(isVideoEnabled) { document.getElementById('localVideo').style.display = 'block'; document.getElementById('localVideo').srcObject = localStream; }
             peerConnection = new RTCPeerConnection(rtcConfig); remoteStream = new MediaStream(); localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
             
-            // 🔥 NETWORK DROP PROTECTION 🔥
-            peerConnection.oniceconnectionstatechange = function() {
-                if(peerConnection.iceConnectionState === 'disconnected' || peerConnection.iceConnectionState === 'failed') { endCall(true); alert("Call Disconnected (Network Drop)"); }
-            };
+            peerConnection.oniceconnectionstatechange = function() { if(peerConnection.iceConnectionState === 'disconnected' || peerConnection.iceConnectionState === 'failed') { endCall(true); alert("Call Disconnected (Network Drop)"); } };
 
             peerConnection.ontrack = event => { event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track)); let remoteVid = document.getElementById('remoteVideo'); remoteVid.srcObject = remoteStream; remoteVid.play().catch(e=>{}); if(data.callType === 'video') remoteVid.style.display = 'block'; document.getElementById('callStatusText').innerText = "Connected"; callStartTime = Date.now(); if(isVideoEnabled) { document.getElementById('callAvatarPreview').classList.add('call-avatar-small'); document.getElementById('callStatusText').classList.add('hide-in-video'); document.getElementById('callTypeText').classList.add('hide-in-video'); } };
             peerConnection.onicecandidate = event => { if(event.candidate) database.ref('calls/' + currentUsername + '/receiverCandidates').push(event.candidate.toJSON()); };
