@@ -6,10 +6,11 @@
     <title>ISB-24 Premium Web3</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Firebase Compat Libraries (Auth Added) -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
@@ -157,7 +158,13 @@
             <i class="material-icons shield-icon" style="font-size:70px; color:var(--primary);">fingerprint</i>
             <h2 style="font-weight:800;">ISB Premium</h2>
             <p style="color:var(--text-muted); font-size:14px; margin-bottom:30px;">End-to-End Encrypted Web3 Network.</p>
-            <div id="googleButtonContainer" style="display: flex; justify-content: center; min-height:50px;"></div>
+            
+            <!-- Firebase Custom Login Button (No 400 Error, No White Screen) -->
+            <div id="googleButtonContainer" style="display: flex; justify-content: center; min-height:50px;">
+                <button onclick="signInWithGoogle()" style="background: #4285F4; color: white; border: none; padding: 12px 24px; border-radius: 5px; font-size: 16px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: bold; width: 100%; justify-content: center; box-shadow: 0 4px 10px rgba(66, 133, 244, 0.3);">
+                    <span style="background: white; color: #4285F4; padding: 2px 6px; border-radius: 3px;">G</span> Continue with Google
+                </button>
+            </div>
         </div>
     </div>
 
@@ -320,9 +327,11 @@
 <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-    const ISB_CLIENT_ID = "1091629496669-5881hgv7d4t01eepcq60u8mmdkguc1cn.apps.googleusercontent.com";
+    // Firebase Initialization
     const firebaseConfig = { apiKey: "AIzaSyA-d_mtHg1Age9ZggTWF3ABhUd_xn2PDKM", authDomain: "isb-messenger-75093.firebaseapp.com", databaseURL: "https://isb-messenger-75093-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "isb-messenger-75093", storageBucket: "isb-messenger-75093.firebasestorage.app", messagingSenderId: "970755431087", appId: "1:970755431087:web:09171e2ebca48e1b91125a" };
-    firebase.initializeApp(firebaseConfig); const database = firebase.database();
+    firebase.initializeApp(firebaseConfig); 
+    const database = firebase.database();
+    const auth = firebase.auth();
 
     const themes = [ { id: "default", color: "#3F51B5" }, { id: "dark", color: "#121212" }, { id: "telegram", color: "#2AABEE" }, { id: "sunset", color: "#FF5722" }, { id: "forest", color: "#2E7D32" }, { id: "ruby", color: "#E91E63" }, { id: "cyberpunk", color: "#00E5FF" }, { id: "amoled", color: "#000000" } ];
 
@@ -371,40 +380,53 @@
     window.onload = function() {
         applyTheme(localStorage.getItem('isb_theme') || 'default');
         document.getElementById('coreBadgeDisplay').innerText = `⚡ ${SYSTEM_CORES}-Core Processing Active`;
-        currentUserEmail = localStorage.getItem("isb_email");
-        if(currentUserEmail) {
-            initAppFlow();
-        } else { 
-            let checkGoogle = setInterval(function() {
-                if(typeof google !== 'undefined' && google.accounts && google.accounts.id) {
-                    clearInterval(checkGoogle);
-                    try { 
-                        google.accounts.id.initialize({ 
-                            client_id: ISB_CLIENT_ID, 
-                            callback: handleCredentialResponse,
-                            cancel_on_tap_outside: false
-                        }); 
-                        google.accounts.id.renderButton(document.getElementById("googleButtonContainer"), { theme: "filled_blue", size: "large", text: "continue_with" }); 
-                        google.accounts.id.prompt(); 
-                    } catch(e) {
-                        document.getElementById("googleButtonContainer").innerHTML = "<p style='color:red;'>Please turn off Adblocker to Sign in.</p>";
-                    } 
-                }
-            }, 500);
-        }
+        
+        // 1. Check Auth State directly with Firebase
+        auth.onAuthStateChanged(function(user) {
+            if (user) {
+                currentUserEmail = user.email;
+                localStorage.setItem("isb_email", currentUserEmail);
+                initAppFlow();
+            } else {
+                document.getElementById('mainApp').style.display = 'none';
+                document.getElementById('authScreen').style.display = 'flex';
+            }
+        });
+
+        // 2. Catch the Redirect Result from Firebase Login
+        auth.getRedirectResult().then(function(result) {
+            if (result && result.user) {
+                currentUserEmail = result.user.email;
+                localStorage.setItem("isb_email", currentUserEmail);
+                initAppFlow();
+            }
+        }).catch(function(error) {
+            console.error("Auth Error:", error);
+            document.getElementById("googleButtonContainer").innerHTML = `
+                <button onclick="signInWithGoogle()" style="background: #4285F4; color: white; border: none; padding: 12px 24px; border-radius: 5px; font-size: 16px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: bold; width: 100%; justify-content: center; box-shadow: 0 4px 10px rgba(66, 133, 244, 0.3);">
+                    <span style="background: white; color: #4285F4; padding: 2px 6px; border-radius: 3px;">G</span> Retry Login
+                </button>
+            `;
+        });
     };
+
+    // Firebase Auth Login Function (Fixes White Screen & 400 Error)
+    function signInWithGoogle() {
+        document.getElementById("googleButtonContainer").innerHTML = "<p style='color:var(--primary); font-weight:bold; font-size:16px;'>Connecting to Google...</p>";
+        var provider = new firebase.auth.GoogleAuthProvider();
+        auth.signInWithRedirect(provider);
+    }
+
+    // Secure Logout
+    function logoutUser() { 
+        auth.signOut().then(() => {
+            localStorage.removeItem("isb_email"); 
+            location.reload(); 
+        });
+    }
 
     function applyTheme(themeId) { document.body.setAttribute('data-theme', themeId); localStorage.setItem('isb_theme', themeId); document.getElementById('themeGrid').innerHTML = themes.map(t => `<div class="theme-circle ${t.id === themeId ? 'active' : ''}" style="background-color: ${t.color};" onclick="applyTheme('${t.id}')"></div>`).join(''); }
 
-    function handleCredentialResponse(response) {
-        try {
-            let base64 = response.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-            let jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
-            currentUserEmail = JSON.parse(jsonPayload).email; localStorage.setItem("isb_email", currentUserEmail); initAppFlow();
-        } catch(e) { alert("Login Failed"); }
-    }
-    function logoutUser() { localStorage.removeItem("isb_email"); location.reload(); }
-    
     function initAppFlow() {
         document.getElementById('authScreen').style.display = 'none';
         database.ref('users').on('value', snapshot => {
