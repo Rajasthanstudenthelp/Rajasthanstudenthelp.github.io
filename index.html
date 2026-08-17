@@ -2,7 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, interactive-widget=resizes-content">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#3F51B5">
+    
     <title>ISB-24 Premium Web3</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -15,6 +20,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
 
+        /* 🎨 THEME VARIABLES */
         :root { --primary: #3F51B5; --primary-dark: #303F9F; --bg: #f0f2f5; --surface: #ffffff; --text: #1c1e21; --text-muted: #65676B; --border: #e4e6eb; --msg-sent: #E8EAF6; --msg-recv: #ffffff; --nav-bg: #ffffff; }
         [data-theme="dark"] { --primary: #5C6BC0; --primary-dark: #3F51B5; --bg: #121212; --surface: #1e1e1e; --text: #e4e6eb; --text-muted: #b0b3b8; --border: #333333; --msg-sent: #2c387e; --msg-recv: #242526; --nav-bg: #1e1e1e; }
         [data-theme="telegram"] { --primary: #2AABEE; --bg: #f4f4f4; --surface: #ffffff; --text: #222222; --border: #e0e0e0; }
@@ -24,9 +30,16 @@
         [data-theme="cyberpunk"] { --primary: #00E5FF; --bg: #09090b; --surface: #17171c; --text: #00E5FF; --border: #006064; }
         [data-theme="amoled"] { --primary: #ffffff; --bg: #000000; --surface: #0a0a0a; --text: #ffffff; --border: #222222; }
         
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body, html { height: 100%; height: 100dvh; overflow: hidden; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0;}
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        body, html { height: 100vh; height: 100dvh; overflow: hidden; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0;}
         
+        /* 🛠️ CUSTOM SCROLLBAR FOR BETTER UI */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
+        [data-theme="dark"] ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+        [data-theme="amoled"] ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+
         #authScreen { height: 100%; height: 100dvh; display:flex; align-items:center; justify-content:center; background: var(--bg); }
         #mainApp { height: 100%; height: 100dvh; display: flex; flex-direction: column; }
         
@@ -160,13 +173,14 @@
         .btn-decline { background: #E91E63; }
         
         @keyframes bounceGlow { 0%, 100% { transform: translateY(0); box-shadow: 0 10px 25px rgba(37,211,102,0.4); } 50% { transform: translateY(-10px); box-shadow: 0 15px 35px rgba(37,211,102,0.6); } }
+
         .g_id_signin { display: flex; justify-content: center; width: 100%; margin-top: 15px;}
     </style>
 </head>
 <body data-theme="default">
 
-    <audio id="incomingRing" loop src="https://actions.google.com/sounds/v1/alarms/phone_ringing.ogg"></audio>
-    <audio id="outgoingRing" loop src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
+    <audio id="incomingRing" loop preload="auto" src="https://actions.google.com/sounds/v1/alarms/phone_ringing.ogg"></audio>
+    <audio id="outgoingRing" loop preload="auto" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
 
     <div id="authScreen" class="auth-container">
         <div class="auth-box">
@@ -248,7 +262,6 @@
         </div>
     </div>
 
-    <!-- CHAT WINDOW -->
     <div id="chatWindow" class="chat-window">
         <div class="chat-header">
             <i class="material-icons" onclick="closeChat()">arrow_back_ios_new</i>
@@ -286,7 +299,6 @@
         </div>
     </div>
 
-    <!-- 🔥 NATIVE CALL OVERLAY 🔥 -->
     <div id="callOverlay">
         <div class="call-avatar-glow" id="callAvatarPreview">U</div>
         <h2 id="callStatusText" style="color:white; margin:0 0 8px 0; font-size:28px; font-weight: 800; letter-spacing: 1px;">Calling...</h2>
@@ -311,7 +323,6 @@
         </div>
     </div>
 
-    <!-- MEDIA VIEWER & MODALS -->
     <div id="waStatusViewer" class="wa-status-viewer"><div class="wa-progress-container" id="waProgressBarContainer"></div><div class="wa-header"><div style="display:flex; align-items:center; gap:12px; cursor:pointer; z-index:4005;" onclick="closeWaStatus()"><i class="material-icons">arrow_back</i><div class="avatar" id="waStatusAvatar" style="width:40px; height:40px;">U</div><div style="display:flex; flex-direction:column;"><span id="waStatusName" style="font-weight:700;">Name</span><span id="waStatusTime" style="font-size:12px; opacity:0.8;">Time</span></div></div><div style="display:flex; align-items:center; gap:15px; z-index:4005;"><a id="waStatusDownloadBtn" style="color:white; display:none;"><i class="material-icons">download</i></a><i class="material-icons" id="waStatusDeleteBtn" style="color:#E91E63; display:none; cursor:pointer;" onclick="deleteActiveStatus()">delete</i></div></div><div class="wa-content" id="waStatusContent"></div><div class="wa-tap-left" id="waTapLeft" onclick="prevWaStatus()" style="display:none;"></div><div class="wa-tap-right" id="waTapRight" onclick="nextWaStatus()" style="display:none;"></div></div>
     
     <div id="setupProfileModal" class="modal-overlay"><div class="modal-content" style="text-align:center;"><h3 style="margin-top:0; color:var(--text);">Create Your Profile</h3><p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">Choose a unique username and photo</p><div class="profile-pic-upload" onclick="document.getElementById('setupAvatarFile').click()"><img id="setupAvatarPreview" style="display:none;"><i class="material-icons" id="setupAvatarIcon" style="font-size:40px; color:var(--primary);">camera_alt</i></div><input type="file" id="setupAvatarFile" accept="image/*" style="display:none;" onchange="handleImageSelection(event, 'setup')"><div class="input-wrapper"><input type="text" id="setupUsernameInput" placeholder="@username" oninput="validateUsernameInput()"><i class="material-icons input-icon-right" id="usernameStatusIcon" style="color:var(--text-muted);">info</i></div><button id="saveProfileBtn" disabled style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:16px; font-weight:800; font-size:16px; box-shadow:0 4px 10px rgba(0,0,0,0.15); cursor:pointer; opacity:0.5; transition:0.3s;" onclick="saveProfileSetup()">SAVE PROFILE</button><button id="cancelSetupBtn" style="width:100%; padding:15px; background:transparent; color:#E91E63; border:none; margin-top:10px; cursor:pointer; display:none; font-weight:800;" onclick="logoutUser()">LOGOUT & GO BACK</button></div></div>
@@ -329,7 +340,10 @@
     // FIREBASE INITIALIZATION
     const ISB_CLIENT_ID = "1091629496669-5881hgv7d4t01eepcq60u8mmdkguc1cn.apps.googleusercontent.com";
     const firebaseConfig = { apiKey: "AIzaSyA-d_mtHg1Age9ZggTWF3ABhUd_xn2PDKM", authDomain: "isb-messenger-75093.firebaseapp.com", databaseURL: "https://isb-messenger-75093-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "isb-messenger-75093", storageBucket: "isb-messenger-75093.firebasestorage.app", messagingSenderId: "970755431087", appId: "1:970755431087:web:09171e2ebca48e1b91125a" };
-    firebase.initializeApp(firebaseConfig); const database = firebase.database();
+    
+    // Safety Net: Catch Initialization Errors 
+    try { firebase.initializeApp(firebaseConfig); } catch(err) { console.error("Firebase Auth Error"); }
+    const database = firebase.database();
 
     const themes = [ { id: "default", color: "#3F51B5" }, { id: "dark", color: "#121212" }, { id: "telegram", color: "#2AABEE" }, { id: "sunset", color: "#FF5722" }, { id: "forest", color: "#2E7D32" }, { id: "ruby", color: "#E91E63" }, { id: "cyberpunk", color: "#00E5FF" }, { id: "amoled", color: "#000000" } ];
 
@@ -343,15 +357,24 @@
     let waActiveUser = null, waUserStatusGroup = [], waActiveIndex = 0, waTimer = null, waIsChatMedia = false; 
     let activeActionMsg = null;
 
+    // 🔥 SMART AUDIO AUTOPLAY BYPASS (Touch anywhere to prime the audio) 🔥
+    document.body.addEventListener('click', function primeAudio() {
+        document.getElementById('incomingRing').load();
+        document.getElementById('outgoingRing').load();
+        document.body.removeEventListener('click', primeAudio);
+    }, { once: true });
+
     // 🔥 Web Notification Request 🔥
     function requestWebPermissions() {
         if ("Notification" in window && Notification.permission !== "granted") {
             Notification.requestPermission().then(permission => {
                 if(permission === "granted") {
                     document.getElementById('syncIcon').style.color = "var(--primary)";
-                    alert("Web Notifications Enabled!");
+                    alert("Web Notifications Enabled! Call popups will work now.");
                 }
             });
+        } else if (Notification.permission === "granted") {
+            document.getElementById('syncIcon').style.color = "var(--primary)";
         }
     }
 
@@ -384,7 +407,8 @@
     window.onload = function() {
         applyTheme(localStorage.getItem('isb_theme') || 'default');
         document.getElementById('coreBadgeDisplay').innerText = `⚡ ${SYSTEM_CORES}-Core Processing Active`;
-        requestWebPermissions();
+        if(Notification.permission === "granted") document.getElementById('syncIcon').style.color = "var(--primary)";
+
         currentUserEmail = localStorage.getItem("isb_email");
         if(currentUserEmail) {
             initAppFlow();
@@ -478,25 +502,29 @@
     function unblockFromSettings(uname) { database.ref('users/' + currentUsername + '/blocked/' + uname).remove(); setTimeout(openBlockedUsersModal, 500); }
     function clearCurrentChat() { document.getElementById('chatMenuDropdown').style.display = 'none'; if(confirm("Clear this chat history on your device?")) { APP_STATE.msgs = APP_STATE.msgs.filter(m => { if(isGroupChat) return m.to !== currentChatContact; return !((m.from === currentUserEmail && m.to === currentChatContact) || (m.from === currentChatContact && m.to === currentUserEmail)); }); renderChatMessages(); loadChatsList(); } }
 
-    // 🔥 Safety Net for Windows Firebase Block 🔥
+    // 🔥 Ultra-Safe Windows / Mac Sync Fix 🔥
     function startFirebaseSync() {
         if(isListeningToFirebase) return; isListeningToFirebase = true;
         
         let syncTimeout = setTimeout(() => {
             if(!isChatsLoaded) {
-                document.getElementById("chatsList").innerHTML = `<div style="text-align:center; padding:20px; color:#E91E63;"><i class="material-icons" style="font-size:40px;">error</i><p style="font-weight:bold;">Connection Blocked!</p><p style="font-size:12px; color:gray;">Your Antivirus or Adblocker is blocking Firebase WebSockets. Turn them off and refresh.</p></div>`;
+                document.getElementById("chatsList").innerHTML = `<div style="text-align:center; padding:20px; color:#E91E63;"><i class="material-icons" style="font-size:40px;">error</i><p style="font-weight:bold;">Connection Blocked!</p><p style="font-size:12px; color:gray;">Your Adblocker/Antivirus is blocking Firebase. Disable it and refresh.</p></div>`;
             }
         }, 15000);
 
-        database.ref('messages').orderByChild('timestamp').limitToLast(100).once('value', function() { clearTimeout(syncTimeout); isChatsLoaded = true; loadChatsList(); }, function(error) { document.getElementById("chatsList").innerHTML = `<div style="text-align:center; padding:20px; color:#E91E63;">Sync Error: ${error.message}</div>`; });
-        
-        database.ref('messages').on('child_added', function(snapshot) { let m = snapshot.val(); if(!m) return; m.fbKey = snapshot.key; if (!APP_STATE.msgs.some(msg => msg.id === m.id)) { let isMyGroupMsg = m.isGroup && APP_STATE.groups.some(g => g.id === m.to); let isPersonalMsg = !m.isGroup && (m.from === currentUserEmail || m.to === currentUserEmail); if (isMyGroupMsg || isPersonalMsg) { APP_STATE.msgs.push(m); loadChatsList(); if(currentChatContact && ((!m.isGroup && ((m.from===currentUserEmail && m.to===currentChatContact) || (m.from===currentChatContact && m.to===currentUserEmail))) || (m.isGroup && m.to===currentChatContact))) appendSingleMessage(m); } } });
-        database.ref('messages').on('child_removed', function(snapshot) { let removedMsg = snapshot.val(); APP_STATE.msgs = APP_STATE.msgs.filter(m => m.id !== removedMsg.id); let el = document.getElementById(`msg_${removedMsg.id}`); if(el) el.remove(); loadChatsList(); });
-        database.ref('groups').on('child_added', function(snapshot) { let g = snapshot.val(); if(g && g.members.includes(currentUserEmail)) { if(!APP_STATE.groups.some(grp => grp.id === g.id)) { APP_STATE.groups.push(g); loadChatsList(); } } });
-        database.ref('statuses').on('child_added', function(snapshot) { let s = snapshot.val(); s.fbKey = snapshot.key; if(s) { if(!APP_STATE.statuses.some(st => st.id === s.id)) { APP_STATE.statuses.push(s); loadStatusList(); } } });
-        database.ref('statuses').on('child_removed', function(snapshot) { let removedSts = snapshot.val(); APP_STATE.statuses = APP_STATE.statuses.filter(s => s.id !== removedSts.id); loadStatusList(); });
-        
-        database.ref('callHistory/' + currentUsername).on('value', function(snapshot) { APP_STATE.callLogs = []; snapshot.forEach(child => { let log = child.val(); log.key = child.key; APP_STATE.callLogs.push(log); }); APP_STATE.callLogs.sort((a, b) => b.timestamp - a.timestamp); loadCallsList(); });
+        try {
+            database.ref('messages').orderByChild('timestamp').limitToLast(100).once('value', function() { clearTimeout(syncTimeout); isChatsLoaded = true; loadChatsList(); }, function(error) { document.getElementById("chatsList").innerHTML = `<div style="text-align:center; padding:20px; color:#E91E63;">Sync Error: ${error.message}</div>`; });
+            
+            database.ref('messages').on('child_added', function(snapshot) { let m = snapshot.val(); if(!m) return; m.fbKey = snapshot.key; if (!APP_STATE.msgs.some(msg => msg.id === m.id)) { let isMyGroupMsg = m.isGroup && APP_STATE.groups.some(g => g.id === m.to); let isPersonalMsg = !m.isGroup && (m.from === currentUserEmail || m.to === currentUserEmail); if (isMyGroupMsg || isPersonalMsg) { APP_STATE.msgs.push(m); loadChatsList(); if(currentChatContact && ((!m.isGroup && ((m.from===currentUserEmail && m.to===currentChatContact) || (m.from===currentChatContact && m.to===currentUserEmail))) || (m.isGroup && m.to===currentChatContact))) appendSingleMessage(m); } } });
+            database.ref('messages').on('child_removed', function(snapshot) { let removedMsg = snapshot.val(); APP_STATE.msgs = APP_STATE.msgs.filter(m => m.id !== removedMsg.id); let el = document.getElementById(`msg_${removedMsg.id}`); if(el) el.remove(); loadChatsList(); });
+            database.ref('groups').on('child_added', function(snapshot) { let g = snapshot.val(); if(g && g.members.includes(currentUserEmail)) { if(!APP_STATE.groups.some(grp => grp.id === g.id)) { APP_STATE.groups.push(g); loadChatsList(); } } });
+            database.ref('statuses').on('child_added', function(snapshot) { let s = snapshot.val(); s.fbKey = snapshot.key; if(s) { if(!APP_STATE.statuses.some(st => st.id === s.id)) { APP_STATE.statuses.push(s); loadStatusList(); } } });
+            database.ref('statuses').on('child_removed', function(snapshot) { let removedSts = snapshot.val(); APP_STATE.statuses = APP_STATE.statuses.filter(s => s.id !== removedSts.id); loadStatusList(); });
+            
+            database.ref('callHistory/' + currentUsername).on('value', function(snapshot) { APP_STATE.callLogs = []; snapshot.forEach(child => { let log = child.val(); log.key = child.key; APP_STATE.callLogs.push(log); }); APP_STATE.callLogs.sort((a, b) => b.timestamp - a.timestamp); loadCallsList(); });
+        } catch(e) {
+            console.error(e);
+        }
     }
 
     function switchNav(tabId, el) { document.querySelectorAll('.tab-content, .nav-item').forEach(t => t.classList.remove('active')); document.getElementById(tabId).classList.add('active'); el.classList.add('active'); if(tabId === 'chatsTab') loadChatsList(); if(tabId === 'statusTab') loadStatusList(); if(tabId === 'callsTab') loadCallsList(); }
@@ -509,14 +537,16 @@
             if (isEncrypt) { buffer = new TextEncoder().encode(text); salt = crypto.getRandomValues(new Uint8Array(32)); } 
             else { try { buffer = base64ToUint8(text); } catch(e) { reject("Invalid Code"); return; } salt = buffer.slice(0, 32); buffer = buffer.slice(32); }
             
-            let kw = new Worker(precompiledKeyWorkerURL);
-            kw.onmessage = function(e) { 
-                let bigKey = e.data.bigKey; kw.terminate(); 
-                let mw = new Worker(precompiledMathWorkerURL); 
-                mw.onmessage = function(e2) { mw.terminate(); let outBuf = new Uint8Array(e2.data.buffer); if (isEncrypt) { let finalArr = new Uint8Array(32 + outBuf.length); finalArr.set(salt, 0); finalArr.set(outBuf, 32); resolve(uint8ToBase64(finalArr)); } else { resolve(new TextDecoder().decode(outBuf)); } }; 
-                mw.postMessage({buffer: buffer.buffer, action: isEncrypt ? 'encrypt' : 'bigKey', bigKey: bigKey, chunkIdx: 0}, [buffer.buffer, bigKey]); 
-            };
-            kw.postMessage({password: password, salt: salt.buffer});
+            try {
+                let kw = new Worker(precompiledKeyWorkerURL);
+                kw.onmessage = function(e) { 
+                    let bigKey = e.data.bigKey; kw.terminate(); 
+                    let mw = new Worker(precompiledMathWorkerURL); 
+                    mw.onmessage = function(e2) { mw.terminate(); let outBuf = new Uint8Array(e2.data.buffer); if (isEncrypt) { let finalArr = new Uint8Array(32 + outBuf.length); finalArr.set(salt, 0); finalArr.set(outBuf, 32); resolve(uint8ToBase64(finalArr)); } else { resolve(new TextDecoder().decode(outBuf)); } }; 
+                    mw.postMessage({buffer: buffer.buffer, action: isEncrypt ? 'encrypt' : 'bigKey', bigKey: bigKey, chunkIdx: 0}, [buffer.buffer, bigKey]); 
+                };
+                kw.postMessage({password: password, salt: salt.buffer});
+            } catch(e) { reject("Worker Error"); }
         });
     }
 
@@ -620,7 +650,10 @@
                 if(lastCallSdp === data.sdp) return;
                 lastCallSdp = data.sdp; 
                 callStartTime = 0; currentCallDirection = 'incoming'; currentCallType = data.callType; window.currentCallTarget = data.from;
-                let ringtone = document.getElementById('incomingRing'); ringtone.play().catch(e => {});
+                
+                let ringtone = document.getElementById('incomingRing'); 
+                ringtone.play().catch(e => console.log("Ring Blocked, awaiting touch"));
+                
                 if ("Notification" in window && Notification.permission === "granted") {
                     new Notification("ISB Call", { body: `Incoming ${data.callType} call from @${data.from}`, icon: APP_STATE.users[data.from]?.avatar || "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Google_Call_Icon.svg/1024px-Google_Call_Icon.svg.png" });
                 }
@@ -654,6 +687,12 @@
             try { localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true }); } catch(e) { localStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true }); }
             isVideoEnabled = (callType === 'video'); if(localStream.getVideoTracks().length > 0) { localStream.getVideoTracks().forEach(t => t.enabled = isVideoEnabled); document.getElementById('videoToggleIcon').innerText = isVideoEnabled ? "videocam" : "videocam_off"; document.getElementById('btnVideoToggle').style.background = isVideoEnabled ? "rgba(37,211,102,0.8)" : "rgba(255,255,255,0.2)"; } else { document.getElementById('btnVideoToggle').style.display = 'none'; } if(isVideoEnabled) { document.getElementById('localVideo').style.display = 'block'; document.getElementById('localVideo').srcObject = localStream; }
             peerConnection = new RTCPeerConnection(rtcConfig); remoteStream = new MediaStream(); localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+            
+            // 🔥 NETWORK DROP PROTECTION 🔥
+            peerConnection.oniceconnectionstatechange = function() {
+                if(peerConnection.iceConnectionState === 'disconnected' || peerConnection.iceConnectionState === 'failed') { endCall(true); alert("Call Disconnected (Network Drop)"); }
+            };
+
             peerConnection.ontrack = event => { event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track)); let remoteVid = document.getElementById('remoteVideo'); remoteVid.srcObject = remoteStream; remoteVid.play().catch(e=>{}); outRing.pause(); outRing.currentTime = 0; if(callType === 'video') { remoteVid.style.display = 'block'; } document.getElementById('callStatusText').innerText = "Connected"; callStartTime = Date.now(); if(isVideoEnabled) { document.getElementById('callAvatarPreview').classList.add('call-avatar-small'); document.getElementById('callStatusText').classList.add('hide-in-video'); document.getElementById('callTypeText').classList.add('hide-in-video'); } };
             peerConnection.onicecandidate = event => { if(event.candidate) database.ref('calls/' + targetUname + '/callerCandidates').push(event.candidate.toJSON()); };
             const offer = await peerConnection.createOffer(); await peerConnection.setLocalDescription(offer); await database.ref('calls/' + targetUname).set({ type: 'offer', from: currentUsername, callType: callType, sdp: offer.sdp });
@@ -668,6 +707,12 @@
             try { localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true }); } catch(e) { localStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true }); }
             isVideoEnabled = (data.callType === 'video'); if(localStream.getVideoTracks().length > 0) { localStream.getVideoTracks().forEach(t => t.enabled = isVideoEnabled); document.getElementById('videoToggleIcon').innerText = isVideoEnabled ? "videocam" : "videocam_off"; document.getElementById('btnVideoToggle').style.background = isVideoEnabled ? "rgba(37,211,102,0.8)" : "rgba(255,255,255,0.2)"; } else { document.getElementById('btnVideoToggle').style.display = 'none'; } if(isVideoEnabled) { document.getElementById('localVideo').style.display = 'block'; document.getElementById('localVideo').srcObject = localStream; }
             peerConnection = new RTCPeerConnection(rtcConfig); remoteStream = new MediaStream(); localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+            
+            // 🔥 NETWORK DROP PROTECTION 🔥
+            peerConnection.oniceconnectionstatechange = function() {
+                if(peerConnection.iceConnectionState === 'disconnected' || peerConnection.iceConnectionState === 'failed') { endCall(true); alert("Call Disconnected (Network Drop)"); }
+            };
+
             peerConnection.ontrack = event => { event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track)); let remoteVid = document.getElementById('remoteVideo'); remoteVid.srcObject = remoteStream; remoteVid.play().catch(e=>{}); if(data.callType === 'video') remoteVid.style.display = 'block'; document.getElementById('callStatusText').innerText = "Connected"; callStartTime = Date.now(); if(isVideoEnabled) { document.getElementById('callAvatarPreview').classList.add('call-avatar-small'); document.getElementById('callStatusText').classList.add('hide-in-video'); document.getElementById('callTypeText').classList.add('hide-in-video'); } };
             peerConnection.onicecandidate = event => { if(event.candidate) database.ref('calls/' + currentUsername + '/receiverCandidates').push(event.candidate.toJSON()); };
             const offerDesc = new RTCSessionDescription({ type: 'offer', sdp: data.sdp }); await peerConnection.setRemoteDescription(offerDesc); const answer = await peerConnection.createAnswer(); await peerConnection.setLocalDescription(answer); await database.ref('calls/' + currentUsername + '/answer').set({ type: 'answer', sdp: answer.sdp }); database.ref('calls/' + currentUsername + '/callerCandidates').on('child_added', snapshot => { if(peerConnection) peerConnection.addIceCandidate(new RTCIceCandidate(snapshot.val())); });
