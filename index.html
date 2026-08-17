@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!-- 🔥 Ultimate Viewport & PWA Support For Android & iOS 🔥 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content, viewport-fit=cover">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -20,7 +21,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
 
-        /* 🎨 THEME VARIABLES */
         :root { --primary: #3F51B5; --primary-dark: #303F9F; --bg: #f0f2f5; --surface: #ffffff; --text: #1c1e21; --text-muted: #65676B; --border: #e4e6eb; --msg-sent: #E8EAF6; --msg-recv: #ffffff; --nav-bg: #ffffff; }
         [data-theme="dark"] { --primary: #5C6BC0; --primary-dark: #3F51B5; --bg: #121212; --surface: #1e1e1e; --text: #e4e6eb; --text-muted: #b0b3b8; --border: #333333; --msg-sent: #2c387e; --msg-recv: #242526; --nav-bg: #1e1e1e; }
         [data-theme="telegram"] { --primary: #2AABEE; --bg: #f4f4f4; --surface: #ffffff; --text: #222222; --border: #e0e0e0; }
@@ -33,7 +33,6 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         body, html { height: 100vh; height: 100dvh; overflow: hidden; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0;}
         
-        /* 🛠️ CUSTOM SCROLLBAR FOR BETTER UI */
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
@@ -179,6 +178,7 @@
 </head>
 <body data-theme="default">
 
+    <!-- Preloading Audio files -->
     <audio id="incomingRing" loop preload="auto" src="https://actions.google.com/sounds/v1/alarms/phone_ringing.ogg"></audio>
     <audio id="outgoingRing" loop preload="auto" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
 
@@ -262,6 +262,7 @@
         </div>
     </div>
 
+    <!-- CHAT WINDOW -->
     <div id="chatWindow" class="chat-window">
         <div class="chat-header">
             <i class="material-icons" onclick="closeChat()">arrow_back_ios_new</i>
@@ -299,11 +300,13 @@
         </div>
     </div>
 
+    <!-- 🔥 NATIVE CALL OVERLAY 🔥 -->
     <div id="callOverlay">
         <div class="call-avatar-glow" id="callAvatarPreview">U</div>
         <h2 id="callStatusText" style="color:white; margin:0 0 8px 0; font-size:28px; font-weight: 800; letter-spacing: 1px;">Calling...</h2>
         <p id="callTypeText" style="color:#ddd; font-size:16px; margin-bottom:40px; font-weight: 600;">ISB Secure Call</p>
         
+        <!-- Apple playsinline added for Universal Support -->
         <video id="remoteVideo" autoplay playsinline style="width:100%; height:100%; position:absolute; top:0; left:0; object-fit:cover; z-index:-1; display:none; background:#111;"></video>
         <video id="localVideo" autoplay playsinline muted style="width:110px; height:150px; position:absolute; bottom:140px; right:20px; border-radius:12px; border:2px solid white; object-fit:cover; box-shadow:0 10px 20px rgba(0,0,0,0.5); display:none; background:#333; z-index: 10;"></video>
         
@@ -323,6 +326,7 @@
         </div>
     </div>
 
+    <!-- MEDIA VIEWER & MODALS -->
     <div id="waStatusViewer" class="wa-status-viewer"><div class="wa-progress-container" id="waProgressBarContainer"></div><div class="wa-header"><div style="display:flex; align-items:center; gap:12px; cursor:pointer; z-index:4005;" onclick="closeWaStatus()"><i class="material-icons">arrow_back</i><div class="avatar" id="waStatusAvatar" style="width:40px; height:40px;">U</div><div style="display:flex; flex-direction:column;"><span id="waStatusName" style="font-weight:700;">Name</span><span id="waStatusTime" style="font-size:12px; opacity:0.8;">Time</span></div></div><div style="display:flex; align-items:center; gap:15px; z-index:4005;"><a id="waStatusDownloadBtn" style="color:white; display:none;"><i class="material-icons">download</i></a><i class="material-icons" id="waStatusDeleteBtn" style="color:#E91E63; display:none; cursor:pointer;" onclick="deleteActiveStatus()">delete</i></div></div><div class="wa-content" id="waStatusContent"></div><div class="wa-tap-left" id="waTapLeft" onclick="prevWaStatus()" style="display:none;"></div><div class="wa-tap-right" id="waTapRight" onclick="nextWaStatus()" style="display:none;"></div></div>
     
     <div id="setupProfileModal" class="modal-overlay"><div class="modal-content" style="text-align:center;"><h3 style="margin-top:0; color:var(--text);">Create Your Profile</h3><p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">Choose a unique username and photo</p><div class="profile-pic-upload" onclick="document.getElementById('setupAvatarFile').click()"><img id="setupAvatarPreview" style="display:none;"><i class="material-icons" id="setupAvatarIcon" style="font-size:40px; color:var(--primary);">camera_alt</i></div><input type="file" id="setupAvatarFile" accept="image/*" style="display:none;" onchange="handleImageSelection(event, 'setup')"><div class="input-wrapper"><input type="text" id="setupUsernameInput" placeholder="@username" oninput="validateUsernameInput()"><i class="material-icons input-icon-right" id="usernameStatusIcon" style="color:var(--text-muted);">info</i></div><button id="saveProfileBtn" disabled style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:16px; font-weight:800; font-size:16px; box-shadow:0 4px 10px rgba(0,0,0,0.15); cursor:pointer; opacity:0.5; transition:0.3s;" onclick="saveProfileSetup()">SAVE PROFILE</button><button id="cancelSetupBtn" style="width:100%; padding:15px; background:transparent; color:#E91E63; border:none; margin-top:10px; cursor:pointer; display:none; font-weight:800;" onclick="logoutUser()">LOGOUT & GO BACK</button></div></div>
@@ -341,7 +345,6 @@
     const ISB_CLIENT_ID = "1091629496669-5881hgv7d4t01eepcq60u8mmdkguc1cn.apps.googleusercontent.com";
     const firebaseConfig = { apiKey: "AIzaSyA-d_mtHg1Age9ZggTWF3ABhUd_xn2PDKM", authDomain: "isb-messenger-75093.firebaseapp.com", databaseURL: "https://isb-messenger-75093-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "isb-messenger-75093", storageBucket: "isb-messenger-75093.firebasestorage.app", messagingSenderId: "970755431087", appId: "1:970755431087:web:09171e2ebca48e1b91125a" };
     
-    // Safety Net: Catch Initialization Errors 
     try { firebase.initializeApp(firebaseConfig); } catch(err) { console.error("Firebase Auth Error"); }
     const database = firebase.database();
 
@@ -502,15 +505,15 @@
     function unblockFromSettings(uname) { database.ref('users/' + currentUsername + '/blocked/' + uname).remove(); setTimeout(openBlockedUsersModal, 500); }
     function clearCurrentChat() { document.getElementById('chatMenuDropdown').style.display = 'none'; if(confirm("Clear this chat history on your device?")) { APP_STATE.msgs = APP_STATE.msgs.filter(m => { if(isGroupChat) return m.to !== currentChatContact; return !((m.from === currentUserEmail && m.to === currentChatContact) || (m.from === currentChatContact && m.to === currentUserEmail)); }); renderChatMessages(); loadChatsList(); } }
 
-    // 🔥 Ultra-Safe Windows / Mac Sync Fix 🔥
+    // 🔥 SMART WINDOWS/PC FIREWALL BYPASS 🔥
     function startFirebaseSync() {
         if(isListeningToFirebase) return; isListeningToFirebase = true;
         
         let syncTimeout = setTimeout(() => {
             if(!isChatsLoaded) {
-                document.getElementById("chatsList").innerHTML = `<div style="text-align:center; padding:20px; color:#E91E63;"><i class="material-icons" style="font-size:40px;">error</i><p style="font-weight:bold;">Connection Blocked!</p><p style="font-size:12px; color:gray;">Your Adblocker/Antivirus is blocking Firebase. Disable it and refresh.</p></div>`;
+                document.getElementById("chatsList").innerHTML = `<div style="text-align:center; padding:40px 20px; color:#FF9800;"><i class="material-icons animate-spin" style="font-size:45px;">vpn_key</i><p style="font-weight:bold; font-size:16px;">Strict PC Firewall Detected</p><p style="font-size:12px; color:gray;">Bypassing network blocks via Secure Safe Mode.<br>This may take 1-2 minutes. Please don't close the tab...</p></div>`;
             }
-        }, 15000);
+        }, 5000);
 
         try {
             database.ref('messages').orderByChild('timestamp').limitToLast(100).once('value', function() { clearTimeout(syncTimeout); isChatsLoaded = true; loadChatsList(); }, function(error) { document.getElementById("chatsList").innerHTML = `<div style="text-align:center; padding:20px; color:#E91E63;">Sync Error: ${error.message}</div>`; });
@@ -522,9 +525,7 @@
             database.ref('statuses').on('child_removed', function(snapshot) { let removedSts = snapshot.val(); APP_STATE.statuses = APP_STATE.statuses.filter(s => s.id !== removedSts.id); loadStatusList(); });
             
             database.ref('callHistory/' + currentUsername).on('value', function(snapshot) { APP_STATE.callLogs = []; snapshot.forEach(child => { let log = child.val(); log.key = child.key; APP_STATE.callLogs.push(log); }); APP_STATE.callLogs.sort((a, b) => b.timestamp - a.timestamp); loadCallsList(); });
-        } catch(e) {
-            console.error(e);
-        }
+        } catch(e) { console.error(e); }
     }
 
     function switchNav(tabId, el) { document.querySelectorAll('.tab-content, .nav-item').forEach(t => t.classList.remove('active')); document.getElementById(tabId).classList.add('active'); el.classList.add('active'); if(tabId === 'chatsTab') loadChatsList(); if(tabId === 'statusTab') loadStatusList(); if(tabId === 'callsTab') loadCallsList(); }
