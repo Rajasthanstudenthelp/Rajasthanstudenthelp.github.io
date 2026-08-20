@@ -279,7 +279,17 @@
     <div id="newGroupModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h3>New Group</h3><button class="close-btn" onclick="document.getElementById('newGroupModal').style.display='none'"><i class="material-icons">cancel</i></button></div><input type="text" id="newGroupName" placeholder="Group Name" style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:15px;"><textarea id="newGroupEmails" placeholder="Usernames OR Gmails (comma separated)" style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:15px;"></textarea><button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px;" onclick="createGroup()">CREATE GROUP</button></div></div>
     <div id="textStatusModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h3>Type Status</h3><button class="close-btn" onclick="closeStatusModal()"><i class="material-icons">cancel</i></button></div><textarea id="statusTextOnly" rows="4" placeholder="What's on your mind?" style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:15px; font-weight:bold; font-size:18px; outline:none; resize:none;"></textarea><button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:bold; font-size:16px; box-shadow:0 4px 10px rgba(0,0,0,0.15); cursor:pointer;" onclick="postStatus('text')">POST STATUS</button></div></div>
     <div id="imageStatusModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h3>Upload Media</h3><button class="close-btn" onclick="closeStatusModal()"><i class="material-icons">cancel</i></button></div><div class="upload-area" id="statusUploadArea" onclick="document.getElementById('statusFile').click()"><i class="material-icons upload-icon">cloud_upload</i><div class="upload-text">Tap to select Image or Video</div><div style="font-size:12px; color:var(--text-muted); margin-top:5px;">Max size 5MB (MP4, JPG, PNG)</div></div><img id="statusImgPreview" class="status-preview-box" /><video id="statusVidPreview" class="status-preview-box" muted autoplay playsinline loop></video><input type="file" id="statusFile" accept="image/*,video/mp4" style="display:none;" onchange="handleStatusFile(event)"><input type="text" id="statusCaption" placeholder="Add a caption..." style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin-bottom:15px; font-weight:bold; font-size:15px; outline:none;"><button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:bold; font-size:16px; box-shadow:0 4px 10px rgba(0,0,0,0.15); cursor:pointer;" onclick="postStatus('image')">POST STATUS</button></div></div>
-    <div id="msgOptionsModal" class="modal-overlay"><div class="modal-content" style="text-align:center;"><h3 style="margin-top:0;">Message Options</h3><button onclick="shareSelectedMsg()" style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px; margin-bottom:10px; font-weight:bold;">SHARE FILE / MESSAGE</button><button onclick="deleteSelectedMsg()" style="width:100%; padding:15px; background:#E91E63; color:white; border:none; border-radius:12px; margin-bottom:10px; font-weight:bold;">DELETE FOR ALL</button><button onclick="document.getElementById('msgOptionsModal').style.display='none'" style="width:100%; padding:15px; background:transparent; border:2px solid var(--border); color:var(--text); border-radius:12px; font-weight:bold;">CANCEL</button></div></div>
+    
+    <!-- 🔥 Message Options Update 🔥 -->
+    <div id="msgOptionsModal" class="modal-overlay">
+        <div class="modal-content" style="text-align:center;">
+            <h3 style="margin-top:0;">Message Options</h3>
+            <button onclick="copySelectedMsg()" style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px; margin-bottom:10px; font-weight:bold;">COPY MESSAGE</button>
+            <button onclick="shareSelectedMsg()" style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:12px; margin-bottom:10px; font-weight:bold;">SHARE FILE / MESSAGE</button>
+            <button onclick="deleteSelectedMsg()" style="width:100%; padding:15px; background:#E91E63; color:white; border:none; border-radius:12px; margin-bottom:10px; font-weight:bold;">DELETE FOR ALL</button>
+            <button onclick="document.getElementById('msgOptionsModal').style.display='none'" style="width:100%; padding:15px; background:transparent; border:2px solid var(--border); color:var(--text); border-radius:12px; font-weight:bold;">CANCEL</button>
+        </div>
+    </div>
 
 <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
@@ -303,11 +313,29 @@
     let peerConnection = null, localStream = null, remoteStream = null, isCallActive = false, callData = null;
     const rtcConfig = { iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }] };
 
+    // 🔥 UPDATED GOOGLE AUTH LOGIC FOR MOBILE APP / PWA 🔥
     window.onload = function() {
         applyTheme(localStorage.getItem('isb_theme') || 'default');
         currentUserEmail = localStorage.getItem("isb_email");
         if(currentUserEmail) initAppFlow();
-        else { if(typeof google !== 'undefined') { try { google.accounts.id.initialize({ client_id: ISB_CLIENT_ID, callback: handleCredentialResponse }); google.accounts.id.renderButton(document.getElementById("googleButtonContainer"), { theme: "filled_blue", size: "large", text: "continue_with" }); } catch(e) {} } }
+        else { 
+            if(typeof google !== 'undefined') { 
+                try { 
+                    google.accounts.id.initialize({ 
+                        client_id: ISB_CLIENT_ID, 
+                        callback: handleCredentialResponse,
+                        ux_mode: "popup", // Forces in-app popup instead of browser redirect
+                        cancel_on_tap_outside: false
+                    }); 
+                    google.accounts.id.renderButton(
+                        document.getElementById("googleButtonContainer"), 
+                        { theme: "filled_blue", size: "large", text: "continue_with", shape: "pill" } 
+                    ); 
+                    // This triggers the Mobile Native 'One Tap' bottom sheet UI
+                    google.accounts.id.prompt(); 
+                } catch(e) { console.error("Google Auth Setup Error:", e); } 
+            } 
+        }
     };
 
     function applyTheme(themeId) { document.body.setAttribute('data-theme', themeId); localStorage.setItem('isb_theme', themeId); document.getElementById('themeGrid').innerHTML = themes.map(t => `<div class="theme-circle ${t.id === themeId ? 'active' : ''}" style="background-color: ${t.color};" onclick="applyTheme('${t.id}')"></div>`).join(''); }
@@ -345,33 +373,19 @@
         });
     }
 
-    // 🔥 POPUP OUTSIDE CLICK TO CLOSE & MENU CLOSE 🔥
     window.onclick = function(event) {
-        // Close Modals
         if (event.target.classList.contains('modal-overlay')) {
-            // Protect setup profile if user is new
             if(event.target.id === 'setupProfileModal' && !currentUsername) return; 
-            
             event.target.style.display = "none";
-            // Extra resets
             if(event.target.id === 'imageStatusModal' || event.target.id === 'textStatusModal') closeStatusModal();
         }
-        
-        // Close Chat Dropdown Menu
         if (!event.target.matches('.material-icons') || event.target.innerText !== 'more_vert') {
             let dropdown = document.getElementById("chatMenuDropdown");
-            if (dropdown && dropdown.style.display === "block") {
-                dropdown.style.display = "none";
-            }
+            if (dropdown && dropdown.style.display === "block") { dropdown.style.display = "none"; }
         }
     };
 
-    function initPresence() {
-        let myStatusRef = database.ref('users/' + currentUsername);
-        database.ref('.info/connected').on('value', snap => {
-            if(snap.val() === true) { myStatusRef.child('isOnline').set(true); myStatusRef.child('isOnline').onDisconnect().set(false); myStatusRef.child('lastSeen').onDisconnect().set(firebase.database.ServerValue.TIMESTAMP); }
-        });
-    }
+    function initPresence() { let myStatusRef = database.ref('users/' + currentUsername); database.ref('.info/connected').on('value', snap => { if(snap.val() === true) { myStatusRef.child('isOnline').set(true); myStatusRef.child('isOnline').onDisconnect().set(false); myStatusRef.child('lastSeen').onDisconnect().set(firebase.database.ServerValue.TIMESTAMP); } }); }
     function togglePrivacy() { myHideStatus = !myHideStatus; database.ref('users/' + currentUsername).update({ hideStatus: myHideStatus }); updatePrivacyUI(); }
     function updatePrivacyUI() { let icon = document.getElementById('privacyToggleIcon'); let text = document.getElementById('privacyStatusText'); let mainIcon = document.getElementById('privacyMainIcon'); if(myHideStatus) { icon.innerText = "toggle_off"; icon.style.color = "var(--border)"; text.innerText = "Nobody (Hidden)"; mainIcon.innerText = "visibility_off"; mainIcon.style.color = "var(--text-muted)";} else { icon.innerText = "toggle_on"; icon.style.color = "var(--primary)"; text.innerText = "Everyone (Visible)"; mainIcon.innerText = "visibility"; mainIcon.style.color = "var(--primary)";} }
 
@@ -501,6 +515,19 @@
         let input = document.getElementById('chatInputMsg'), msg = input.value.trim(), payloadToEncrypt = ""; if(selectedFileData) { payloadToEncrypt = `ISB_FILE|||${selectedFileName}|||${selectedFileData}`; } else { if(!msg) return; payloadToEncrypt = msg; }
         let sendBtn = document.querySelector('.btn-send'); sendBtn.disabled = true; input.disabled = true;
         try { let encryptionPwd = isGroupChat ? currentChatContact : currentUserEmail; let encryptedPayload = await runISBText(payloadToEncrypt, encryptionPwd, true); await database.ref('messages').push({ id: Date.now() + Math.random().toString().substring(2,8), from: currentUserEmail, to: currentChatContact, payload: encryptedPayload, time: new Date().toLocaleString(), isGroup: isGroupChat }); input.value = ""; cancelSelectedFile(); sendBtn.disabled = false; input.disabled = false; input.focus(); setTimeout(() => { document.getElementById('chatMessagesBox').scrollTop = document.getElementById('chatMessagesBox').scrollHeight; }, 100); } catch(e) { alert("Encryption Error"); sendBtn.disabled = false; input.disabled = false; }
+    }
+
+    // 🔥 NEW: Copy Message Feature 🔥
+    function copySelectedMsg() {
+        document.getElementById('msgOptionsModal').style.display = 'none';
+        if (!activeActionMsg || !activeActionMsg.decryptedFullText) return;
+        if (activeActionMsg.decryptedFullText.startsWith("ISB_FILE|||")) {
+            alert("Media files cannot be copied as text."); return;
+        }
+        navigator.clipboard.writeText(activeActionMsg.decryptedFullText).then(() => {
+            // Optional: you can show a small toast here, using alert for now
+            // alert("Message Copied!");
+        }).catch(err => console.error("Copy failed", err));
     }
 
     async function shareSelectedMsg() { document.getElementById('msgOptionsModal').style.display='none'; if(!activeActionMsg) return; try { if(activeActionMsg.decryptedData && activeActionMsg.decryptedData.startsWith("data:")) { let blob = dataURItoBlob(activeActionMsg.decryptedData); let file = new File([blob], activeActionMsg.decryptedName || "ISB_Media", {type: blob.type}); if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: activeActionMsg.decryptedName }); } else { await navigator.share({ title: 'ISB File', text: 'File Attached: ' + activeActionMsg.decryptedName }); } } else { await navigator.share({ title: 'ISB Message', text: activeActionMsg.decryptedFullText }); } } catch(e) { console.log("Share failed", e); } }
@@ -635,4 +662,4 @@
     }
 </script>
 </body>
-</html>
+            </html>
